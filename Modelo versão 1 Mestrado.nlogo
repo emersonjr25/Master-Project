@@ -56,7 +56,7 @@ to setup ; configuração inicial do sistema
   ]
   ; crescimento das gramineas ;; pensar nas especies a serem criadas
     ask patches [
-      set pcolor one-of [ green ]
+      set pcolor one-of [ green ] ;;; set pcolor one-of [ green red blue pink ] outra forma
       ifelse pcolor = green
         [ set countdown grass-regrowth-time ]
       [ set countdown random grass-regrowth-time ] ; initialize grass regrowth clocks randomly for brown patches
@@ -131,15 +131,6 @@ to setup ; configuração inicial do sistema
     setxy random-xcor random-ycor
   ]
   reset-ticks
-end
-
-to limbo
-  ask patches
-  [
-     set pcolor brown
-    ]
-    ask n-of 3000 patches [ set pcolor green ]
-  ask n-of 100 patches [ set pcolor blue ]
 end
 
 to go ; faz individuos se moveram e fazer as açoes criadas
@@ -307,6 +298,53 @@ end
 
 to-report grass
   report patches with [pcolor = green]
+end
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; NAO FAZ PARTE DO CÓDIGO
+to limbo
+  ask patches
+  [
+     set pcolor brown
+    ]
+    ask n-of 3000 patches [ set pcolor green ]
+  ask n-of 100 patches [ set pcolor blue ]
+end
+
+to limbo2
+
+
+ ;;set pcolor [pcolor] of one-of neighbors
+
+;;ask patches [ set pcolor black ]
+  ;;ifelse use-greenhouse?
+ ;; [
+  ;;  ask patches with [pxcor >= 6 and pycor >= 6] [ set pcolor greenhouse ]
+  ;;  ask patch 11 6 [ set plabel "greenhouse plants" ]
+  ;;]
+ ;; [ ask patch 11 6 [ set plabel "" ] ]
+;;3
+;; ask patches with [ pxcor < round (max-pxcor / 2) ] [
+   ;; sprout-liver-cells 1 [
+    ;;  set shape "square 2"
+    ;;  set color brown + 2
+    ;;  set glucose-store random-poisson 150 ; Enough to survive for about a week.
+   ;; ]
+;;  ]
+;;end
+
+; Sets up pancreatic cells
+;;to make-pancreas
+  ;;ask patches with [ pxcor >= round (max-pxcor / 2) ] [
+   ;; sprout-pancreatic-cells 1 [
+     ;; set shape "square 2"
+      ;;set color yellow - 1
+    ;;]
+ ;; ]
+;;4
+;;ask patches [
+  ;;  ifelse (pycor <= 0)
+    ;;[ set pcolor blue ]
+   ;; [ set pcolor brown ]
+  ;;]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
