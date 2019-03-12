@@ -12,7 +12,7 @@ patches-own [ countdown ] ; contagem regressiva para nascimento das gramíneas
 
 to setup ; configuração inicial do sistema
   clear-all
-  resize-world -45 45 -25 25
+  resize-world -45 45 -25 23 ; size of world
   ifelse netlogo-web?
   [
     set max-sheep 10000
@@ -22,7 +22,7 @@ to setup ; configuração inicial do sistema
   ]
   ; crescimento das gramineas ;; pensar nas especies a serem criadas
     ask patches [
-      set pcolor one-of [ green ] ;;; set pcolor one-of [ green red blue pink ] outra forma
+      set pcolor one-of [ green gray violet sky ]
       ifelse pcolor = green
         [ set countdown grass-regrowth-time ]
       [ set countdown random grass-regrowth-time ] ; initialize grass regrowth clocks randomly for brown patches
@@ -109,7 +109,7 @@ to go ; faz individuos se moveram e fazer as açoes criadas
       move
      ; sheep eat grass, grass grows and it costs sheep energy to move
       set energy energy - 1
-      eat-grass
+      eat-grassone
       death ; sheep die from starvation
       reproduce-sheep  ; sheep reproduce at random rate governed by slider
   ]
@@ -118,7 +118,7 @@ to go ; faz individuos se moveram e fazer as açoes criadas
     move
      ; sheep eat grass, grass grows and it costs sheep energy to move
       set energy energy - 1
-      eat-grass
+      eat-grasstwo
       death ; sheep die from starvation
       reproduce-sheep  ; sheep reproduce at random rate governed by slider
   ]
@@ -127,7 +127,7 @@ to go ; faz individuos se moveram e fazer as açoes criadas
       move
      ; sheep eat grass, grass grows and it costs sheep energy to move
       set energy energy - 1
-      eat-grass
+      eat-grassthree
       death ; sheep die from starvation
       reproduce-sheep  ; sheep reproduce at random rate governed by slider
   ]
@@ -136,7 +136,7 @@ to go ; faz individuos se moveram e fazer as açoes criadas
       move
      ; sheep eat grass, grass grows and it costs sheep energy to move
       set energy energy - 1
-      eat-grass
+      eat-grassfour
       death ; sheep die from starvation
       reproduce-sheep  ; sheep reproduce at random rate governed by slider
   ]
@@ -152,6 +152,7 @@ to go ; faz individuos se moveram e fazer as açoes criadas
   [
     move
     set energy energy - 0.3  ; wolves lose energy as they move
+    eat-sheepone
     eat-sheeptwo ; wolves eat a sheep on their patch
     death ; wolves die if our of energy
     reproduce-wolves ; wolves reproduce at random rate governed by slider
@@ -160,6 +161,8 @@ to go ; faz individuos se moveram e fazer as açoes criadas
   [
     move
     set energy energy - 0.3  ; wolves lose energy as they move
+    eat-sheepone
+    eat-sheeptwo
     eat-sheepthree ; wolves eat a sheep on their patch
     death ; wolves die if our of energy
     reproduce-wolves ; wolves reproduce at random rate governed by slider
@@ -168,6 +171,9 @@ to go ; faz individuos se moveram e fazer as açoes criadas
   [
     move
     set energy energy - 0.3  ; wolves lose energy as they move
+    eat-sheepone
+    eat-sheeptwo
+    eat-sheepthree
     eat-sheepfour ; wolves eat a sheep on their patch
     death ; wolves die if our of energy
     reproduce-wolves ; wolves reproduce at random rate governed by slider
@@ -186,9 +192,33 @@ to move  ; turtle procedure
   fd 1
 end
 
-to eat-grass  ; sheep procedure
+to eat-grassone  ; sheep procedure
   ; sheep eat grass, turn the patch brown
   if pcolor = green
+   [
+    set pcolor brown
+    set energy energy + sheep-gain-from-food  ; sheep gain energy by eating
+   ]
+end
+to eat-grasstwo  ; sheep procedure
+  ; sheep eat grass, turn the patch brown
+  if pcolor = gray
+   [
+    set pcolor brown
+    set energy energy + sheep-gain-from-food  ; sheep gain energy by eating
+   ]
+end
+to eat-grassthree  ; sheep procedure
+  ; sheep eat grass, turn the patch brown
+  if pcolor = violet
+   [
+    set pcolor brown
+    set energy energy + sheep-gain-from-food  ; sheep gain energy by eating
+   ]
+end
+to eat-grassfour  ; sheep procedure
+  ; sheep eat grass, turn the patch brown
+  if pcolor = sky
    [
     set pcolor brown
     set energy energy + sheep-gain-from-food  ; sheep gain energy by eating
@@ -260,24 +290,16 @@ to grow-grass  ; patch procedure
         set countdown grass-regrowth-time ]
       [ set countdown countdown - 1 ]
   ]
+
+
 end
 
 to-report grass
-  report patches with [pcolor = green]
+  report patches with [pcolor != brown]
 end
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; NAO FAZ PARTE DO CÓDIGO
+
 to limbo
-  ask patches
-  [
-     set pcolor brown
-    ]
-    ask n-of 3000 patches [ set pcolor green ]
-  ask n-of 100 patches [ set pcolor blue ]
-end
-
-to limbo2
-
-
  ;;set pcolor [pcolor] of one-of neighbors
 
 ;;ask patches [ set pcolor black ]
@@ -316,9 +338,9 @@ end
 GRAPHICS-WINDOW
 355
 10
-1273
-529
--1
+1275
+531
+45
 -1
 10.0
 1
@@ -333,7 +355,7 @@ GRAPHICS-WINDOW
 -45
 45
 -25
-25
+23
 1
 1
 1
@@ -349,7 +371,7 @@ initial-number-sheep
 initial-number-sheep
 0
 250
-100.0
+100
 1
 1
 NIL
@@ -364,7 +386,7 @@ sheep-gain-from-food
 sheep-gain-from-food
 0.0
 50.0
-7.0
+30
 1.0
 1
 NIL
@@ -379,7 +401,7 @@ sheep-reproduce
 sheep-reproduce
 1.0
 20.0
-3.0
+10
 1.0
 1
 %
@@ -394,7 +416,7 @@ initial-number-wolves
 initial-number-wolves
 0
 250
-100.0
+40
 1
 1
 NIL
@@ -409,7 +431,7 @@ wolf-gain-from-food
 wolf-gain-from-food
 0.0
 100.0
-15.0
+15
 1.0
 1
 NIL
@@ -424,7 +446,7 @@ wolf-reproduce
 wolf-reproduce
 0.0
 20.0
-5.0
+5
 1.0
 1
 %
@@ -439,7 +461,7 @@ grass-regrowth-time
 grass-regrowth-time
 0
 100
-20.0
+20
 1
 1
 NIL
@@ -480,10 +502,10 @@ NIL
 0
 
 PLOT
-10
-360
-350
-530
+5
+320
+340
+505
 populations
 time
 pop.
@@ -495,21 +517,21 @@ true
 true
 "" ""
 PENS
-"sheep" 1.0 0 -612749 true "" "plot count sheepone"
-"wolves" 1.0 0 -16449023 true "" "plot count wolvesone"
 "grass / 4" 1.0 0 -10899396 true "" "plot count grass / 4"
-"pen-3" 1.0 0 -7500403 true "" "plot count sheeptwo"
-"pen-4" 1.0 0 -2674135 true "" "plot count wolvestwo"
-"pen-5" 1.0 0 -955883 true "" "plot count sheepthree"
-"pen-6" 1.0 0 -6459832 true "" "plot count sheepfour"
-"pen-7" 1.0 0 -1184463 true "" "plot count wolvesthree"
-"pen-8" 1.0 0 -13840069 true "" "plot count wolvesfour"
+"sheepone" 1.0 0 -1513240 true "" "plot count sheepone"
+"sheeptwo" 1.0 0 -2674135 true "" "plot count sheeptwo"
+"sheepthree" 1.0 0 -13345367 true "" "plot count sheepthree"
+"sheepfour" 1.0 0 -955883 true "" "plot count sheepfour"
+"wolvesone" 1.0 0 -16777216 true "" "plot count wolvesone"
+"wolvestwo" 1.0 0 -2064490 true "" "plot count wolvestwo"
+"wolvesthree" 1.0 0 -5825686 true "" "plot count wolvesthree"
+"wolvesfour" 1.0 0 -1184463 true "" "plot count wolvesfour"
 
 MONITOR
-41
-308
-111
-353
+20
+270
+90
+315
 sheep
 count turtles with [ shape = \"sheep\"]
 3
@@ -517,10 +539,10 @@ count turtles with [ shape = \"sheep\"]
 11
 
 MONITOR
-115
-308
-182
-353
+105
+270
+172
+315
 wolves
 count turtles with [ shape = \"wolf\"]
 3
@@ -528,10 +550,10 @@ count turtles with [ shape = \"wolf\"]
 11
 
 MONITOR
-191
-308
-256
-353
+195
+270
+260
+315
 grass
 count grass / 4
 0
@@ -985,8 +1007,9 @@ false
 0
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
+
 @#$#@#$#@
-NetLogo 6.0.4
+NetLogo 5.3
 @#$#@#$#@
 set model-version "sheep-wolves-grass"
 set show-energy? false
@@ -1006,6 +1029,7 @@ true
 0
 Line -7500403 true 150 150 90 180
 Line -7500403 true 150 150 210 180
+
 @#$#@#$#@
 1
 @#$#@#$#@
