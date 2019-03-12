@@ -1,48 +1,14 @@
-globals
-[
-  max-sheep ; don't let sheep population grow too large
-]
-; Sheep and wolves are both breeds of turtle.
-breed
-[
-  sheepone a-sheepone ; sheep is its own plural, so we use "a-sheep" as the singular.
-]
-breed
-[
-  sheeptwo a-sheeptwo ; especie 2 de ovelha
-]
-breed
-[
-  sheepthree a-sheepthree ; especie 3 de ovelha
-]
-breed
-[
-  sheepfour a-sheepfour ; especie 4 de ovelha
-]
-breed
-[
-  wolvesone wolfone ; especie 1 de lobo
-]
-breed
-[
-  wolvestwo wolftwo ; especie 2 de lobo
-]
-breed
-[
-  wolvesthree wolfthree ; especie 3 de lobo
-]
-breed
-[
-  wolvesfour wolffour ; especie 4 de lobo
-]
-turtles-own
-[
-  energy ; both wolves and sheep have energy
-]
-patches-own
-[
-  countdown ; contagem regressiva para nascimento das gramíneas
-]
+globals [ max-sheep ] ; don't let sheep population grow too large ;; Sheep and wolves are both breeds of turtle.
+breed [ sheepone a-sheepone ] ; sheep is its own plural, so we use "a-sheep" as the singular.
+breed [ sheeptwo a-sheeptwo ] ; especie 2 de ovelha
+breed [ sheepthree a-sheepthree ] ; especie 3 de ovelha
+breed [ sheepfour a-sheepfour ] ; especie 4 de ovelha
+breed [ wolvesone wolfone ] ; especie 1 de lobo
+breed [ wolvestwo wolftwo ] ; especie 2 de lobo
+breed [ wolvesthree wolfthree ]; especie 3 de lobo
+breed [ wolvesfour wolffour ] ; especie 4 de lobo
+turtles-own [ energy ] ; both wolves and sheep have energy
+patches-own [ countdown ] ; contagem regressiva para nascimento das gramíneas
 
 to setup ; configuração inicial do sistema
   clear-all
