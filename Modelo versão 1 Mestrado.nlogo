@@ -20,19 +20,18 @@ to setup ; configuração inicial do sistema
   [
     set max-sheep 30000
   ]
-  ; crescimento das gramineas ;; pensar nas especies a serem criadas
+  ; crescimento das gramineas
     ask patches [
       set pcolor one-of [ green gray violet sky ]
-      if pcolor = green
-        [ set countdown grass-regrowth-time ]
-       ;; [ set countdown random grass-regrowth-time ] ; initialize grass regrowth clocks randomly for brown patches
+      if pcolor = green ;; 1 - VITOOOOR, VAI DEIXAR SÓ a cor VERDE COM ISSO?
+        [ set countdown grass-regrowth-time ]  ;; 2 - E ISSO AQUI VITOR? [ set countdown random grass-regrowth-time ] ; initialize grass regrowth clocks randomly for brown patches
     ]
   create-sheepone initial-number-sheep  ; create the first sheep, then initialize their variables
   [
     set shape "sheep"
     set color white
     set size 1.5  ; easier to see
-    set label-color blue - 2 ; isso serve vitor?
+    set label-color blue - 2 ;; 3 - ISSO SERVE PARA QUE VITOR?
     set energy random (2 * sheep-gain-from-food)
     setxy random-xcor random-ycor ; aparecem aleatoriamente
   ]
@@ -42,27 +41,27 @@ to setup ; configuração inicial do sistema
     set shape "sheep"
     set color red
     set size 1.5  ; easier to see
-    set label-color blue - 2 ; isso serve vitor?
+    set label-color blue - 2
     set energy random (2 * sheep-gain-from-food)
-    setxy random-xcor random-ycor ;
+    setxy random-xcor random-ycor
   ]
    create-sheepthree initial-number-sheep
   [
     set shape "sheep"
     set color blue
     set size 1.5  ; easier to see
-    set label-color blue - 2 ; isso serve vitor?
+    set label-color blue - 2
     set energy random (2 * sheep-gain-from-food)
-    setxy random-xcor random-ycor ;
+    setxy random-xcor random-ycor
   ]
    create-sheepfour initial-number-sheep
   [
     set shape "sheep"
     set color orange
     set size 1.5  ; easier to see
-    set label-color blue - 2 ; isso serve vitor?
+    set label-color blue - 2
     set energy random (2 * sheep-gain-from-food)
-    setxy random-xcor random-ycor ;
+    setxy random-xcor random-ycor
   ]
   create-wolvesone initial-number-wolves  ; create the first wolves, then initialize their variables
   [
@@ -72,7 +71,7 @@ to setup ; configuração inicial do sistema
     set energy random (2 * wolf-gain-from-food)
     setxy random-xcor random-ycor
   ]
-   create-wolvestwo initial-number-wolves ; create the first wolves, then initialize their variables
+   create-wolvestwo initial-number-wolves
   [
     set shape "wolf"
     set color pink
@@ -80,7 +79,7 @@ to setup ; configuração inicial do sistema
     set energy random (2 * wolf-gain-from-food)
     setxy random-xcor random-ycor
   ]
-  create-wolvesthree initial-number-wolves ; create the first wolves, then initialize their variables
+  create-wolvesthree initial-number-wolves
   [
     set shape "wolf"
     set color magenta
@@ -88,7 +87,7 @@ to setup ; configuração inicial do sistema
     set energy random (2 * wolf-gain-from-food)
     setxy random-xcor random-ycor
   ]
-  create-wolvesfour initial-number-wolves ; create the first wolves, then initialize their variables
+  create-wolvesfour initial-number-wolves
   [
     set shape "wolf"
     set color yellow
@@ -103,7 +102,7 @@ to go ; faz individuos se moveram e fazer as açoes criadas
   ; stop the simulation of no wolves or sheep
   if not any? turtles [ stop ]
   ; stop the model if there are no wolves and the number of sheep gets very large
-  if not any? wolvesone and count sheepone > max-sheep [ user-message "The sheep have inherited the earth" stop ]
+  if not any? turtles with [ shape = "wolf"] and count turtles with [shape = "sheep"] > max-sheep [ user-message "The sheeps have inherited the earth" stop ]
   ask sheepone
   [
       move
@@ -115,7 +114,7 @@ to go ; faz individuos se moveram e fazer as açoes criadas
   ]
   ask sheeptwo
   [
-    move
+      move
      ; sheep eat grass, grass grows and it costs sheep energy to move
       set energy energy - 1
       eat-grassone
@@ -128,9 +127,9 @@ to go ; faz individuos se moveram e fazer as açoes criadas
       move
      ; sheep eat grass, grass grows and it costs sheep energy to move
       set energy energy - 1
-      eat-grassone
       eat-grasstwo
       eat-grassthree
+      eat-grassfour
       death ; sheep die from starvation
       reproduce-sheep  ; sheep reproduce at random rate governed by slider
   ]
@@ -149,34 +148,34 @@ to go ; faz individuos se moveram e fazer as açoes criadas
   ask wolvesone
   [
     move
-    set energy energy - (0.3) ; wolves lose energy as they move ; * plasticidade
-    eat-sheepone ; wolves eat a sheep on their patch
+    set energy energy - 1 ; wolves lose energy as they move ;;; 4 - CUSTO PLASTICIDADE MULTIPLICA PELO GASTO DE ENERGIA!!
+    eat-sheepfour ; wolves eat a sheep on their patch
     death ; wolves die if our of energy
     reproduce-wolves ; wolves reproduce at random rate governed by slider
   ]
    ask wolvestwo
   [
     move
-    set energy energy - 0.3  ; wolves lose energy as they move
-    eat-sheepone
-    eat-sheeptwo ; wolves eat a sheep on their patch
+    set energy energy - 1  ; wolves lose energy as they move
+    eat-sheepthree
+    eat-sheepfour ; wolves eat a sheep on their patch
     death ; wolves die if our of energy
     reproduce-wolves ; wolves reproduce at random rate governed by slider
   ]
    ask wolvesthree
   [
     move
-    set energy energy - 0.3  ; wolves lose energy as they move
-    eat-sheepone
+    set energy energy - 1  ; wolves lose energy as they move
     eat-sheeptwo
-    eat-sheepthree ; wolves eat a sheep on their patch
+    eat-sheepthree
+    eat-sheepfour ; wolves eat a sheep on their patch
     death ; wolves die if our of energy
     reproduce-wolves ; wolves reproduce at random rate governed by slider
   ]
    ask wolvesfour
   [
     move
-    set energy energy - 0.3  ; wolves lose energy as they move
+    set energy energy - 1  ; wolves lose energy as they move
     eat-sheepone
     eat-sheeptwo
     eat-sheepthree
@@ -184,11 +183,7 @@ to go ; faz individuos se moveram e fazer as açoes criadas
     death ; wolves die if our of energy
     reproduce-wolves ; wolves reproduce at random rate governed by slider
   ]
-ask patches
-  [
-    grow-grass
-  ]
-  ; set grass count patches with [pcolor = green]
+ask patches [ grow-grass ]
   tick
 end
 
@@ -421,7 +416,7 @@ initial-number-sheep
 initial-number-sheep
 0
 250
-86.0
+85.0
 1
 1
 NIL
@@ -436,7 +431,7 @@ sheep-gain-from-food
 sheep-gain-from-food
 0.0
 50.0
-15.0
+6.0
 1.0
 1
 NIL
@@ -451,7 +446,7 @@ sheep-reproduce
 sheep-reproduce
 1.0
 20.0
-2.0
+5.0
 1.0
 1
 %
@@ -466,7 +461,7 @@ initial-number-wolves
 initial-number-wolves
 0
 250
-165.0
+85.0
 1
 1
 NIL
@@ -481,7 +476,7 @@ wolf-gain-from-food
 wolf-gain-from-food
 0.0
 100.0
-82.0
+29.0
 1.0
 1
 NIL
@@ -496,7 +491,7 @@ wolf-reproduce
 wolf-reproduce
 0.0
 20.0
-15.0
+2.0
 1.0
 1
 %
@@ -511,7 +506,7 @@ grass-regrowth-time
 grass-regrowth-time
 0
 100
-28.0
+11.0
 1
 1
 NIL
@@ -635,8 +630,8 @@ TEXTBOX
 10
 340
 66
-Falta: implementar plasticidade e custo, perturbação, equilibrar as alimentações (slide), revisar código, reequilibrar número de indivíduos por espécie, tempo de vida das espécies, gravar variáveis no final
-12
+Falta: implementar plasticidade e custo, perturbação, revisar código, reequilibrar número de indivíduos por espécie, tempo de vida das espécies, gravar variáveis no final, só patche azul está se recuperando totalmente
+10
 0.0
 1
 
