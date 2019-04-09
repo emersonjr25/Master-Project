@@ -23,8 +23,9 @@ to setup ; configuração inicial do sistema
   ; crescimento das gramineas
     ask patches [
       set pcolor one-of [ green gray violet sky ]
-      if pcolor = green ;; 1 - VITOOOOR, VAI DEIXAR SÓ a cor VERDE COM ISSO?
-        [ set countdown grass-regrowth-time ]  ;; 2 - E ISSO AQUI VITOR? [ set countdown random grass-regrowth-time ] ; initialize grass regrowth clocks randomly for brown patches
+      if pcolor = green ;; 1 - VITOOOOR, VAI DEIXAR SÓ a cor VERDE COM ISSO? ;; ifelse no outro código
+        [ set countdown grass-regrowth-time ]
+    ;;  [ set countdown random grass-regrowth-time ] ; initialize grass regrowth clocks randomly for brown patches ;; 2 - E ISSO AQUI VITOR?
     ]
   create-sheepone initial-number-sheep  ; create the first sheep, then initialize their variables
   [
@@ -188,9 +189,9 @@ ask patches [ grow-grass ]
 end
 
 to move  ; turtle procedure
-  rt random 50 ; tenho um outro jeito no outro arquivo
+  rt random 50 ; 7 - tenho um outro jeito (set heading random 360), MAIS UM EMBAIXO
   lt random 50
-  fd 1 ;; alterar tamanho do passo de acordo com plasticidade
+  fd 1 ;; 5 - COMO SERIA ISSO? alterar tamanho do passo de acordo com plasticidade
 end
 
 to eat-grassone  ; sheep procedure
@@ -274,7 +275,7 @@ to reproduce-sheep  ; sheep procedure
   if random-float 100 < sheep-reproduce ; throw "dice" to see if you will reproduce
   [
     set energy (energy / 2)                ; divide energy between parent and offspring
-    hatch 1 [ rt random-float 360 fd 1 ]   ; hatch an offspring and move it forward 1 step
+    hatch 1 [ rt random-float 360 fd 1 ]   ; hatch an offspring and move it forward 1 step ;; 6 - ISSO AQUI VAI PRECISAR SER ALTERADO, ANDAMENTO PÓS-REPRODUÇÃO?. MAIS UMA FORMA DE ANDAR!!
   ]
 end
 
@@ -285,8 +286,6 @@ to reproduce-wolves  ; wolf procedure
     hatch 1 [ rt random-float 360 fd 1 ]  ; hatch an offspring and move it forward 1 step
   ]
 end
-
-
 
 to grow-grass  ; patch procedure
   ; countdown on brown patches: if reach 0, grow some grass
@@ -323,7 +322,7 @@ end
 
 to death  ; turtle procedure (i.e. both wolf nd sheep procedure)
   ; when energy dips below zero, die
-  if energy < 0 [ die ]
+  if energy < 0 [ die ] ; 8 - MENOR e IGUAL OU SÓ MENOR??
 end
 
 to impact
@@ -338,46 +337,7 @@ to impact
 end
 
 to-report grass
-  report patches with [pcolor != brown]
-end
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; NAO FAZ PARTE DO CÓDIGO
-
-to limbo
- ;;set pcolor [pcolor] of one-of neighbors
-
-;;ask patches [ set pcolor black ]
-  ;;ifelse use-greenhouse?
- ;; [
-  ;;  ask patches with [pxcor >= 6 and pycor >= 6] [ set pcolor greenhouse ]
-  ;;  ask patch 11 6 [ set plabel "greenhouse plants" ]
-  ;;]
- ;; [ ask patch 11 6 [ set plabel "" ] ]
-;;3
-;; ask patches with [ pxcor < round (max-pxcor / 2) ] [
-   ;; sprout-liver-cells 1 [
-    ;;  set shape "square 2"
-    ;;  set color brown + 2
-    ;;  set glucose-store random-poisson 150 ; Enough to survive for about a week.
-   ;; ]
-;;  ]
-;;end
-
-; Sets up pancreatic cells
-;;to make-pancreas
-  ;;ask patches with [ pxcor >= round (max-pxcor / 2) ] [
-   ;; sprout-pancreatic-cells 1 [
-     ;; set shape "square 2"
-      ;;set color yellow - 1
-    ;;]
- ;; ]
-;;4
-;;ask patches [
-  ;;  ifelse (pycor <= 0)
-    ;;[ set pcolor blue ]
-   ;; [ set pcolor brown ]
-  ;;]
+  report patches with [pcolor != brown] ;; SE O IMPACTO FOR DE COR DIFERENTE DE MARRON PRECISA MUDAR ISSO AQUI !!!
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -431,7 +391,7 @@ sheep-gain-from-food
 sheep-gain-from-food
 0.0
 50.0
-6.0
+20.0
 1.0
 1
 NIL
@@ -476,7 +436,7 @@ wolf-gain-from-food
 wolf-gain-from-food
 0.0
 100.0
-29.0
+25.0
 1.0
 1
 NIL
@@ -491,7 +451,7 @@ wolf-reproduce
 wolf-reproduce
 0.0
 20.0
-2.0
+5.0
 1.0
 1
 %
@@ -506,7 +466,7 @@ grass-regrowth-time
 grass-regrowth-time
 0
 100
-11.0
+25.0
 1
 1
 NIL
@@ -630,7 +590,7 @@ TEXTBOX
 10
 340
 66
-Falta: implementar plasticidade e custo, perturbação, revisar código, reequilibrar número de indivíduos por espécie, tempo de vida das espécies, gravar variáveis no final, só patche azul está se recuperando totalmente
+Falta: 1 implementar plasticidade e custo, 2 perturbação, 3 tempo de vida das espécies, 4 reequilibrar número de indivíduos por espécie (explicar), 5 gravar variáveis no final e 6 só patche azul está se recuperando totalmente
 10
 0.0
 1
