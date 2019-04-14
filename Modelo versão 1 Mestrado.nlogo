@@ -7,7 +7,7 @@ breed [ wolvesone wolfone ] ; especie 1 de lobo
 breed [ wolvestwo wolftwo ] ; especie 2 de lobo
 breed [ wolvesthree wolfthree ]; especie 3 de lobo
 breed [ wolvesfour wolffour ] ; especie 4 de lobo
-turtles-own [ energy ] ; both wolves and sheep have energy
+turtles-own [ energy trophic-level age ] ; both wolves and sheep have energy
 patches-own [ countdown ] ; contagem regressiva para nascimento das gramíneas
 
 to setup ; configuração inicial do sistema
@@ -23,10 +23,11 @@ to setup ; configuração inicial do sistema
   ; crescimento das gramineas
     ask patches [
       set pcolor one-of [ green gray violet sky ]
-      if pcolor = green ;; 1 - VITOOOOR, VAI DEIXAR SÓ a cor VERDE COM ISSO? ;; ifelse no outro código
+      if pcolor != brown
         [ set countdown grass-regrowth-time ]
-    ;;  [ set countdown random grass-regrowth-time ] ; initialize grass regrowth clocks randomly for brown patches ;; 2 - E ISSO AQUI VITOR?
+        ;; [ set countdown random grass-regrowth-time ] ; initialize grass regrowth clocks randomly for brown patches
     ]
+  ask turtles [set age 0]
   create-sheepone initial-number-sheep  ; create the first sheep, then initialize their variables
   [
     set shape "sheep"
@@ -35,6 +36,7 @@ to setup ; configuração inicial do sistema
     set label-color blue - 2 ;; 3 - ISSO SERVE PARA QUE VITOR?
     set energy random (2 * sheep-gain-from-food)
     setxy random-xcor random-ycor ; aparecem aleatoriamente
+    set trophic-level "consumer"
   ]
 
   create-sheeptwo initial-number-sheep
@@ -45,6 +47,7 @@ to setup ; configuração inicial do sistema
     set label-color blue - 2
     set energy random (2 * sheep-gain-from-food)
     setxy random-xcor random-ycor
+    set trophic-level "consumer"
   ]
    create-sheepthree initial-number-sheep
   [
@@ -54,6 +57,7 @@ to setup ; configuração inicial do sistema
     set label-color blue - 2
     set energy random (2 * sheep-gain-from-food)
     setxy random-xcor random-ycor
+    set trophic-level "consumer"
   ]
    create-sheepfour initial-number-sheep
   [
@@ -63,6 +67,7 @@ to setup ; configuração inicial do sistema
     set label-color blue - 2
     set energy random (2 * sheep-gain-from-food)
     setxy random-xcor random-ycor
+    set trophic-level "consumer"
   ]
   create-wolvesone initial-number-wolves  ; create the first wolves, then initialize their variables
   [
@@ -71,6 +76,7 @@ to setup ; configuração inicial do sistema
     set size 1.5  ; easier to see
     set energy random (2 * wolf-gain-from-food)
     setxy random-xcor random-ycor
+    set trophic-level "predator"
   ]
    create-wolvestwo initial-number-wolves
   [
@@ -79,6 +85,7 @@ to setup ; configuração inicial do sistema
     set size 1.5  ; easier to see
     set energy random (2 * wolf-gain-from-food)
     setxy random-xcor random-ycor
+    set trophic-level "predator"
   ]
   create-wolvesthree initial-number-wolves
   [
@@ -87,6 +94,7 @@ to setup ; configuração inicial do sistema
     set size 1.5  ; easier to see
     set energy random (2 * wolf-gain-from-food)
     setxy random-xcor random-ycor
+    set trophic-level "predator"
   ]
   create-wolvesfour initial-number-wolves
   [
@@ -95,6 +103,7 @@ to setup ; configuração inicial do sistema
     set size 1.5  ; easier to see
     set energy random (2 * wolf-gain-from-food)
     setxy random-xcor random-ycor
+    set trophic-level "predator"
   ]
   reset-ticks
 end
@@ -110,6 +119,7 @@ to go ; faz individuos se moveram e fazer as açoes criadas
      ; sheep eat grass, grass grows and it costs sheep energy to move
       set energy energy - 1
       eat-grassone
+   ;;    ;;;;show (word "who" who)
       death ; sheep die from starvation
       reproduce-sheep  ; sheep reproduce at random rate governed by slider
   ]
@@ -119,7 +129,9 @@ to go ; faz individuos se moveram e fazer as açoes criadas
      ; sheep eat grass, grass grows and it costs sheep energy to move
       set energy energy - 1
       eat-grassone
+   ;;    ;;;;show (word "who" who)
       eat-grasstwo
+   ;;    ;;;;show (word "who" who)
       death ; sheep die from starvation
       reproduce-sheep  ; sheep reproduce at random rate governed by slider
   ]
@@ -129,8 +141,11 @@ to go ; faz individuos se moveram e fazer as açoes criadas
      ; sheep eat grass, grass grows and it costs sheep energy to move
       set energy energy - 1
       eat-grasstwo
+   ;;    ;;;;show (word "who" who)
       eat-grassthree
+   ;;    ;;;;show (word "who" who)
       eat-grassfour
+   ;;    ;;;;show (word "who" who)
       death ; sheep die from starvation
       reproduce-sheep  ; sheep reproduce at random rate governed by slider
   ]
@@ -140,16 +155,20 @@ to go ; faz individuos se moveram e fazer as açoes criadas
      ; sheep eat grass, grass grows and it costs sheep energy to move
       set energy energy - 1
       eat-grassone
+   ;;    ;;;;show (word "who" who)
       eat-grasstwo
+   ;;    ;;;;show (word "who" who)
       eat-grassthree
+   ;;    ;;;;show (word "who" who)
       eat-grassfour
+   ;;    ;;;;show (word "who" who)
       death ; sheep die from starvation
       reproduce-sheep  ; sheep reproduce at random rate governed by slider
   ]
   ask wolvesone
   [
     move
-    set energy energy - 1 ; wolves lose energy as they move ;;; 4 - CUSTO PLASTICIDADE MULTIPLICA PELO GASTO DE ENERGIA!!
+    set energy energy - 1 ; wolves lose energy as they move ;;; 4 - CUSTO PLASTICIDADE MULTIPLICA O GASTO DE ENERGIA!!
     eat-sheepfour ; wolves eat a sheep on their patch
     death ; wolves die if our of energy
     reproduce-wolves ; wolves reproduce at random rate governed by slider
@@ -184,6 +203,7 @@ to go ; faz individuos se moveram e fazer as açoes criadas
     death ; wolves die if our of energy
     reproduce-wolves ; wolves reproduce at random rate governed by slider
   ]
+  ask turtles [set age age + 1]
 ask patches [ grow-grass ]
   tick
 end
@@ -191,7 +211,8 @@ end
 to move  ; turtle procedure
   rt random 50 ; 7 - tenho um outro jeito (set heading random 360), MAIS UM EMBAIXO
   lt random 50
-  fd 1 ;; 5 - COMO SERIA ISSO? alterar tamanho do passo de acordo com plasticidade
+
+  fd 1 + salto;; 5 - COMO SERIA ISSO? alterar tamanho do passo de acordo com plasticidade
 end
 
 to eat-grassone  ; sheep procedure
@@ -201,6 +222,7 @@ to eat-grassone  ; sheep procedure
     set pcolor brown
     set energy energy + sheep-gain-from-food  ; sheep gain energy by eating
       set countdown grass-regrowth-time
+         ;;    ;;    ;; ;;show "comi verde"
    ]
 end
 
@@ -211,6 +233,7 @@ to eat-grasstwo  ; sheep procedure
     set pcolor brown
     set energy energy + sheep-gain-from-food  ; sheep gain energy by eating
       set countdown grass-regrowth-time
+         ;;    ;;    ;; ;;show "comi cinza"
    ]
 end
 
@@ -221,6 +244,7 @@ to eat-grassthree  ; sheep procedure
     set pcolor brown
     set energy energy + sheep-gain-from-food  ; sheep gain energy by eating
       set countdown grass-regrowth-time
+         ;;    ;;    ;; ;;show "comi violeta"
    ]
 end
 
@@ -231,6 +255,7 @@ to eat-grassfour  ; sheep procedure
     set pcolor brown
     set energy energy + sheep-gain-from-food  ; sheep gain energy by eating
       set countdown grass-regrowth-time
+         ;;    ;;    ;; ;;show "comi azul"
    ]
 end
 
@@ -275,7 +300,11 @@ to reproduce-sheep  ; sheep procedure
   if random-float 100 < sheep-reproduce ; throw "dice" to see if you will reproduce
   [
     set energy (energy / 2)                ; divide energy between parent and offspring
-    hatch 1 [ rt random-float 360 fd 1 ]   ; hatch an offspring and move it forward 1 step ;; 6 - ISSO AQUI VAI PRECISAR SER ALTERADO, ANDAMENTO PÓS-REPRODUÇÃO?. MAIS UMA FORMA DE ANDAR!!
+    hatch 1 [
+      rt random-float 360
+      fd 1
+      set age 0
+    ]   ; hatch an offspring and move it forward 1 step ;; 6 - ISSO AQUI VAI PRECISAR SER ALTERADO, ANDAMENTO PÓS-REPRODUÇÃO?. MAIS UMA FORMA DE ANDAR!!
   ]
 end
 
@@ -283,7 +312,11 @@ to reproduce-wolves  ; wolf procedure
   if random-float 100 < wolf-reproduce ; throw "dice" to see if you will reproduce
   [
     set energy (energy / 2)               ; divide energy between parent and offspring
-    hatch 1 [ rt random-float 360 fd 1 ]  ; hatch an offspring and move it forward 1 step
+    hatch 1 [
+      rt random-float 360
+      fd 1
+      set age 0
+    ]  ; hatch an offspring and move it forward 1 step
   ]
 end
 
@@ -291,23 +324,36 @@ to grow-grass  ; patch procedure
   ; countdown on brown patches: if reach 0, grow some grass
   if pcolor = brown
   [
-    ifelse countdown <= 0
-      [ let greens count neighbors with [pcolor = green]
+    let neighbors-not-brown count neighbors with [pcolor != brown]
+    ifelse (countdown <= 0) and neighbors-not-brown != 0
+      [
+        let greens count neighbors with [pcolor = green]
         let grays count neighbors with [pcolor = gray]
         let violets count neighbors with [pcolor  = violet]
         let skys count neighbors with [pcolor = sky]
-        let percent-greens greens / count neighbors
-        let percent-grays grays / count neighbors
-        let percent-violets violets / count neighbors
-        let percent-skys skys / count neighbors
+           ;;;;show (word "vizinhos =" count neighbors)
+        let percent-greens greens / neighbors-not-brown
+           ;;;;show (word "percent-greens  =" percent-greens )
+        let percent-grays grays /  neighbors-not-brown
+           ;;;;show (word "percent-grays greens ="percent-grays)
+        let percent-violets violets /  neighbors-not-brown
+           ;;;;show (word "percent-violets  =" percent-violets)
+        let percent-skys skys /  neighbors-not-brown
+           ;;;;show (word "percent-skys =" percent-skys)
+
 
         let g1  0 + percent-greens
+        ;;show g1
         let g2  g1 + percent-grays
+        ;;show g2
         let g3  g2 + percent-violets
+        ;;show g3
         let g4  g3 + percent-skys ;; tem que somar um
+        ;;show g4
+        ;;show percent-greens + percent-grays + percent-violets + percent-skys
 
         let x random-float 1
-        if x <= g1[set pcolor green
+        if x <= g1 [set pcolor green
           set countdown grass-regrowth-time]
         if ( x > g1) AND (x <= g2)[set pcolor gray
           set countdown grass-regrowth-time]
@@ -323,6 +369,7 @@ end
 to death  ; turtle procedure (i.e. both wolf nd sheep procedure)
   ; when energy dips below zero, die
   if energy < 0 [ die ] ; 8 - MENOR e IGUAL OU SÓ MENOR??
+  if age > max-age [die]
 end
 
 to impact
@@ -338,6 +385,15 @@ end
 
 to-report grass
   report patches with [pcolor != brown] ;; SE O IMPACTO FOR DE COR DIFERENTE DE MARRON PRECISA MUDAR ISSO AQUI !!!
+end
+
+to-report salto
+  let tamanho 0
+  if ([pcolor] of patch-here = black) AND energy < 10 [
+    ifelse (trophic-level = "consumer") [set tamanho 3 + plasticity ][set tamanho 5 + plasticity ]
+  ]
+  report tamanho
+  ;; sortear de uma distribuição de cauda longa
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -406,7 +462,7 @@ sheep-reproduce
 sheep-reproduce
 1.0
 20.0
-5.0
+8.0
 1.0
 1
 %
@@ -466,7 +522,7 @@ grass-regrowth-time
 grass-regrowth-time
 0
 100
-25.0
+3.0
 1
 1
 NIL
@@ -590,10 +646,40 @@ TEXTBOX
 10
 340
 66
-Falta: 1 implementar plasticidade e custo, 2 perturbação, 3 tempo de vida das espécies, 4 reequilibrar número de indivíduos por espécie (explicar), 5 gravar variáveis no final e 6 só patche azul está se recuperando totalmente
+Falta: 1 implementar plasticidade e custo, 2 perturbação, 3 tempo de vida das espécies e 4 gravar variáveis no final 
 10
 0.0
 1
+
+SLIDER
+200
+145
+372
+178
+plasticity
+plasticity
+0
+2
+0.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+255
+110
+427
+143
+max-age
+max-age
+0
+100
+38.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
