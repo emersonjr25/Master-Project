@@ -7,33 +7,28 @@ breed [ wolvesone wolfone ] ; especie 1 de lobo
 breed [ wolvestwo wolftwo ] ; especie 2 de lobo
 breed [ wolvesthree wolfthree ]; especie 3 de lobo
 breed [ wolvesfour wolffour ] ; especie 4 de lobo
-turtles-own [ energy trophic-level age ] ; both wolves and sheep have energy
+turtles-own [ energy trophic-level age ] ; both wolves and sheep have energy ---
 patches-own [ countdown ] ; contagem regressiva para nascimento das gramíneas
 
 to setup ; configuração inicial do sistema
   clear-all
   resize-world -45 45 -25 23 ; size of world
   ifelse netlogo-web?
-  [
-    set max-sheep 10000
-  ]
-  [
-    set max-sheep 30000
-  ]
-  ; crescimento das gramineas
+   [  set max-sheep 10000  ]
+   [  set max-sheep 30000  ]
+  ; nascimento das gramíneas
     ask patches [
       set pcolor one-of [ green gray violet sky ]
       if pcolor != brown
         [ set countdown grass-regrowth-time ]
-        ;; [ set countdown random grass-regrowth-time ] ; initialize grass regrowth clocks randomly for brown patches
+     ;; [ set countdown random grass-regrowth-time ] ; initialize grass regrowth clocks randomly for brown patches --- (pode servir)
     ]
-  ask turtles [set age 0]
+  ask turtles [set age 0] ; initial age wolves and sheeps
   create-sheepone initial-number-sheep  ; create the first sheep, then initialize their variables
   [
     set shape "sheep"
     set color white
     set size 1.5  ; easier to see
-    set label-color blue - 2 ;; 3 - ISSO SERVE PARA QUE VITOR?
     set energy random (2 * sheep-gain-from-food)
     setxy random-xcor random-ycor ; aparecem aleatoriamente
     set trophic-level "consumer"
@@ -44,7 +39,6 @@ to setup ; configuração inicial do sistema
     set shape "sheep"
     set color red
     set size 1.5  ; easier to see
-    set label-color blue - 2
     set energy random (2 * sheep-gain-from-food)
     setxy random-xcor random-ycor
     set trophic-level "consumer"
@@ -54,7 +48,6 @@ to setup ; configuração inicial do sistema
     set shape "sheep"
     set color blue
     set size 1.5  ; easier to see
-    set label-color blue - 2
     set energy random (2 * sheep-gain-from-food)
     setxy random-xcor random-ycor
     set trophic-level "consumer"
@@ -64,7 +57,6 @@ to setup ; configuração inicial do sistema
     set shape "sheep"
     set color orange
     set size 1.5  ; easier to see
-    set label-color blue - 2
     set energy random (2 * sheep-gain-from-food)
     setxy random-xcor random-ycor
     set trophic-level "consumer"
@@ -119,7 +111,6 @@ to go ; faz individuos se moveram e fazer as açoes criadas
      ; sheep eat grass, grass grows and it costs sheep energy to move
       set energy energy - 1
       eat-grassone
-   ;;    ;;;;show (word "who" who)
       death ; sheep die from starvation
       reproduce-sheep  ; sheep reproduce at random rate governed by slider
   ]
@@ -129,9 +120,7 @@ to go ; faz individuos se moveram e fazer as açoes criadas
      ; sheep eat grass, grass grows and it costs sheep energy to move
       set energy energy - 1
       eat-grassone
-   ;;    ;;;;show (word "who" who)
       eat-grasstwo
-   ;;    ;;;;show (word "who" who)
       death ; sheep die from starvation
       reproduce-sheep  ; sheep reproduce at random rate governed by slider
   ]
@@ -141,11 +130,8 @@ to go ; faz individuos se moveram e fazer as açoes criadas
      ; sheep eat grass, grass grows and it costs sheep energy to move
       set energy energy - 1
       eat-grasstwo
-   ;;    ;;;;show (word "who" who)
       eat-grassthree
-   ;;    ;;;;show (word "who" who)
       eat-grassfour
-   ;;    ;;;;show (word "who" who)
       death ; sheep die from starvation
       reproduce-sheep  ; sheep reproduce at random rate governed by slider
   ]
@@ -155,20 +141,16 @@ to go ; faz individuos se moveram e fazer as açoes criadas
      ; sheep eat grass, grass grows and it costs sheep energy to move
       set energy energy - 1
       eat-grassone
-   ;;    ;;;;show (word "who" who)
       eat-grasstwo
-   ;;    ;;;;show (word "who" who)
       eat-grassthree
-   ;;    ;;;;show (word "who" who)
       eat-grassfour
-   ;;    ;;;;show (word "who" who)
       death ; sheep die from starvation
       reproduce-sheep  ; sheep reproduce at random rate governed by slider
   ]
   ask wolvesone
   [
     move
-    set energy energy - 1 ; wolves lose energy as they move ;;; 4 - CUSTO PLASTICIDADE MULTIPLICA O GASTO DE ENERGIA!!
+    set energy energy - 1 ; wolves lose energy as they move ;;; CUSTO PLASTICIDADE MULTIPLICA O GASTO DE ENERGIA!!
     eat-sheepfour ; wolves eat a sheep on their patch
     death ; wolves die if our of energy
     reproduce-wolves ; wolves reproduce at random rate governed by slider
@@ -203,16 +185,16 @@ to go ; faz individuos se moveram e fazer as açoes criadas
     death ; wolves die if our of energy
     reproduce-wolves ; wolves reproduce at random rate governed by slider
   ]
-  ask turtles [set age age + 1]
-ask patches [ grow-grass ]
+  ask turtles [set age age + 1] ; --- Consumidores primários com menos idade que os secundários? idade por tick?
+  ask patches [ grow-grass ]
   tick
 end
 
 to move  ; turtle procedure
-  rt random 50 ; 7 - tenho um outro jeito (set heading random 360), MAIS UM EMBAIXO
+  rt random 50 ; opção 2: set heading random 360
   lt random 50
 
-  fd 1 + salto;; 5 - COMO SERIA ISSO? alterar tamanho do passo de acordo com plasticidade
+  fd 1 + salto;; alterar tamanho do passo de acordo com plasticidade ---
 end
 
 to eat-grassone  ; sheep procedure
@@ -221,8 +203,7 @@ to eat-grassone  ; sheep procedure
    [
     set pcolor brown
     set energy energy + sheep-gain-from-food  ; sheep gain energy by eating
-      set countdown grass-regrowth-time
-         ;;    ;;    ;; ;;show "comi verde"
+    set countdown grass-regrowth-time
    ]
 end
 
@@ -232,8 +213,7 @@ to eat-grasstwo  ; sheep procedure
    [
     set pcolor brown
     set energy energy + sheep-gain-from-food  ; sheep gain energy by eating
-      set countdown grass-regrowth-time
-         ;;    ;;    ;; ;;show "comi cinza"
+    set countdown grass-regrowth-time
    ]
 end
 
@@ -243,8 +223,7 @@ to eat-grassthree  ; sheep procedure
    [
     set pcolor brown
     set energy energy + sheep-gain-from-food  ; sheep gain energy by eating
-      set countdown grass-regrowth-time
-         ;;    ;;    ;; ;;show "comi violeta"
+    set countdown grass-regrowth-time
    ]
 end
 
@@ -254,8 +233,7 @@ to eat-grassfour  ; sheep procedure
    [
     set pcolor brown
     set energy energy + sheep-gain-from-food  ; sheep gain energy by eating
-      set countdown grass-regrowth-time
-         ;;    ;;    ;; ;;show "comi azul"
+    set countdown grass-regrowth-time
    ]
 end
 
@@ -304,7 +282,7 @@ to reproduce-sheep  ; sheep procedure
       rt random-float 360
       fd 1
       set age 0
-    ]   ; hatch an offspring and move it forward 1 step ;; 6 - ISSO AQUI VAI PRECISAR SER ALTERADO, ANDAMENTO PÓS-REPRODUÇÃO?. MAIS UMA FORMA DE ANDAR!!
+    ]   ; hatch an offspring and move it forward 1 step ;;
   ]
 end
 
@@ -368,7 +346,7 @@ end
 
 to death  ; turtle procedure (i.e. both wolf nd sheep procedure)
   ; when energy dips below zero, die
-  if energy < 0 [ die ] ; 8 - MENOR e IGUAL OU SÓ MENOR??
+  if energy < 0 [ die ]
   if age > max-age [die]
 end
 
@@ -397,13 +375,13 @@ to-report salto
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-345
+360
 10
-1263
-509
+1308
+525
 -1
 -1
-10.0
+10.33
 1
 14
 1
@@ -425,14 +403,14 @@ ticks
 
 SLIDER
 -5
-60
+40
 169
-93
+73
 initial-number-sheep
 initial-number-sheep
 0
 250
-85.0
+140.0
 1
 1
 NIL
@@ -440,9 +418,9 @@ HORIZONTAL
 
 SLIDER
 -5
-196
+170
 169
-229
+203
 sheep-gain-from-food
 sheep-gain-from-food
 0.0
@@ -455,14 +433,14 @@ HORIZONTAL
 
 SLIDER
 -5
-231
+205
 169
-264
+238
 sheep-reproduce
 sheep-reproduce
 1.0
 20.0
-8.0
+3.0
 1.0
 1
 %
@@ -470,14 +448,14 @@ HORIZONTAL
 
 SLIDER
 175
-60
+40
 340
-93
+73
 initial-number-wolves
 initial-number-wolves
 0
 250
-85.0
+140.0
 1
 1
 NIL
@@ -485,14 +463,14 @@ HORIZONTAL
 
 SLIDER
 173
-195
+169
 338
-228
+202
 wolf-gain-from-food
 wolf-gain-from-food
 0.0
 100.0
-25.0
+24.0
 1.0
 1
 NIL
@@ -500,9 +478,9 @@ HORIZONTAL
 
 SLIDER
 173
-231
+205
 338
-264
+238
 wolf-reproduce
 wolf-reproduce
 0.0
@@ -514,25 +492,25 @@ wolf-reproduce
 HORIZONTAL
 
 SLIDER
-30
-100
-242
-133
+-5
+75
+170
+108
 grass-regrowth-time
 grass-regrowth-time
 0
 100
-3.0
+29.0
 1
 1
 NIL
 HORIZONTAL
 
 BUTTON
-30
-140
-99
-173
+0
+110
+69
+143
 setup
 setup
 NIL
@@ -546,10 +524,10 @@ NIL
 1
 
 BUTTON
-105
-140
-180
-173
+75
+110
+150
+143
 go
 go
 T
@@ -563,10 +541,10 @@ NIL
 0
 
 PLOT
-5
-320
-340
-505
+0
+290
+335
+530
 populations
 time
 pop.
@@ -578,7 +556,7 @@ true
 true
 "" ""
 PENS
-"grass / 4" 1.0 0 -10899396 true "" "plot count grass / 4"
+"grass 1 / 4" 1.0 0 -10899396 true "" "plot count patches with [ pcolor = green ] / 4"
 "sheepone" 1.0 0 -1513240 true "" "plot count sheepone"
 "sheeptwo" 1.0 0 -2674135 true "" "plot count sheeptwo"
 "sheepthree" 1.0 0 -13345367 true "" "plot count sheepthree"
@@ -587,12 +565,15 @@ PENS
 "wolvestwo" 1.0 0 -2064490 true "" "plot count wolvestwo"
 "wolvesthree" 1.0 0 -5825686 true "" "plot count wolvesthree"
 "wolvesfour" 1.0 0 -1184463 true "" "plot count wolvesfour"
+"grass 2 / 4" 1.0 0 -8630108 true "" "plot count patches with [ pcolor = violet] / 4"
+"grass 3 / 4" 1.0 0 -7500403 true "" "plot count patches with [ pcolor = gray] / 4"
+"grass 4 / 4" 1.0 0 -13791810 true "" "plot count patches with [ pcolor = sky] / 4"
 
 MONITOR
-20
-270
-90
-315
+5
+240
+75
+285
 sheep
 count turtles with [ shape = \"sheep\"]
 3
@@ -600,10 +581,10 @@ count turtles with [ shape = \"sheep\"]
 11
 
 MONITOR
-95
-270
-162
-315
+80
+240
+147
+285
 wolves
 count turtles with [ shape = \"wolf\"]
 3
@@ -611,10 +592,10 @@ count turtles with [ shape = \"wolf\"]
 11
 
 MONITOR
-185
-270
-250
-315
+155
+240
+220
+285
 grass
 count grass / 4
 0
@@ -623,9 +604,9 @@ count grass / 4
 
 TEXTBOX
 10
-178
+152
 150
-196
+170
 Sheep settings
 11
 0.0
@@ -633,9 +614,9 @@ Sheep settings
 
 TEXTBOX
 188
-176
+150
 301
-194
+168
 Wolf settings
 11
 0.0
@@ -645,17 +626,17 @@ TEXTBOX
 5
 10
 340
-66
-Falta: 1 implementar plasticidade e custo, 2 perturbação, 3 tempo de vida das espécies e 4 gravar variáveis no final 
+35
+Falta: 1 implementar plasticidade e custo, 2 perturbação e 3 gravar variáveis no final 
 10
 0.0
 1
 
 SLIDER
-200
-145
-372
-178
+170
+115
+342
+148
 plasticity
 plasticity
 0
@@ -667,15 +648,15 @@ NIL
 HORIZONTAL
 
 SLIDER
-255
-110
-427
-143
+175
+75
+340
+108
 max-age
 max-age
 0
 100
-38.0
+60.0
 1
 1
 NIL
