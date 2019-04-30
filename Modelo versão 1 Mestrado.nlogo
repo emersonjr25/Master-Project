@@ -1,4 +1,4 @@
-globals [ max-sheep ] ; don't let sheep population grow too large ;; Sheep and wolves are both breeds of turtle.
+globals [ max-sheep  ] ; don't let sheep population grow too large ;; Sheep and wolves are both breeds of turtle.
 breed [ sheepone a-sheepone ] ; sheep is its own plural, so we use "a-sheep" as the singular.
 breed [ sheeptwo a-sheeptwo ] ; especie 2 de ovelha
 breed [ sheepthree a-sheepthree ] ; especie 3 de ovelha
@@ -8,7 +8,7 @@ breed [ wolvestwo wolftwo ] ; especie 2 de lobo
 breed [ wolvesthree wolfthree ]; especie 3 de lobo
 breed [ wolvesfour wolffour ] ; especie 4 de lobo
 turtles-own [ energy trophic-level age ] ; both wolves and sheep have energy, trophic-level and age
-patches-own [ countdown ] ; contagem regressiva para nascimento das gramíneas
+patches-own [ countdown cell-impacted ] ; contagem regressiva para nascimento das gramíneas
 
 to setup ; configuração inicial do sistema
   clear-all
@@ -18,6 +18,7 @@ to setup ; configuração inicial do sistema
    [  set max-sheep 30000  ]
   ; nascimento das gramíneas
     ask patches [
+    set cell-impacted 0
       set pcolor one-of [ green gray violet sky ]
       if pcolor != brown
         [ set countdown grass-regrowth-time ]
@@ -108,8 +109,8 @@ to go ; faz individuos se moveram e fazer as açoes criadas
   [
       move
      ; sheep eat grass, grass grows and it costs sheep energy to move
-      set energy energy - 1
-      eat-grassone
+      set energy energy - ( 1 * cost-plasticity-sheep)
+    if energy < 10 [eat-grassone]
       death ; sheep die from starvation
       reproduce-sheep  ; sheep reproduce at random rate governed by slider
   ]
@@ -117,9 +118,9 @@ to go ; faz individuos se moveram e fazer as açoes criadas
   [
       move
      ; sheep eat grass, grass grows and it costs sheep energy to move
-      set energy energy - 1
-      eat-grassone
-      eat-grasstwo
+      set energy energy - ( 1 * cost-plasticity-sheep)
+      if energy < 10 [eat-grassone
+      eat-grasstwo]
       death ; sheep die from starvation
       reproduce-sheep  ; sheep reproduce at random rate governed by slider
   ]
@@ -127,10 +128,10 @@ to go ; faz individuos se moveram e fazer as açoes criadas
   [
       move
      ; sheep eat grass, grass grows and it costs sheep energy to move
-      set energy energy - 1
-      eat-grasstwo
+      set energy energy - ( 1 * cost-plasticity-sheep)
+      if energy < 10 [eat-grasstwo
       eat-grassthree
-      eat-grassfour
+      eat-grassfour]
       death ; sheep die from starvation
       reproduce-sheep  ; sheep reproduce at random rate governed by slider
   ]
@@ -138,49 +139,49 @@ to go ; faz individuos se moveram e fazer as açoes criadas
   [
       move
      ; sheep eat grass, grass grows and it costs sheep energy to move
-      set energy energy - 1
-      eat-grassone
+      set energy energy - ( 1 * cost-plasticity-sheep)
+      if energy < 10 [eat-grassone
       eat-grasstwo
       eat-grassthree
-      eat-grassfour
+      eat-grassfour]
       death ; sheep die from starvation
       reproduce-sheep  ; sheep reproduce at random rate governed by slider
   ]
   ask wolvesone
   [
     move
-    set energy energy - 1 ; wolves lose energy as they move ;;; 1. CUSTO PLASTICIDADE MULTIPLICA O GASTO DE ENERGIA!!
-    eat-sheepfour ; wolves eat a sheep on their patch
+    set energy energy - ( 1 * cost-plasticity-wolf); wolves lose energy as they move ;;; 1. CUSTO PLASTICIDADE MULTIPLICA O GASTO DE ENERGIA!!
+    if energy < 10 [eat-sheepfour] ; wolves eat a sheep on their patch
     death ; wolves die if our of energy
     reproduce-wolves ; wolves reproduce at random rate governed by slider
   ]
    ask wolvestwo
   [
     move
-    set energy energy - 1  ; wolves lose energy as they move
-    eat-sheepthree
-    eat-sheepfour ; wolves eat a sheep on their patch
+    set energy energy - ( 1 * cost-plasticity-wolf)  ; wolves lose energy as they move
+    if energy < 10 [eat-sheepthree
+      eat-sheepfour] ; wolves eat a sheep on their patch
     death ; wolves die if our of energy
     reproduce-wolves ; wolves reproduce at random rate governed by slider
   ]
    ask wolvesthree
   [
     move
-    set energy energy - 1  ; wolves lose energy as they move
-    eat-sheeptwo
+    set energy energy - ( 1 * cost-plasticity-wolf) ; wolves lose energy as they move
+    if energy < 10 [eat-sheeptwo
     eat-sheepthree
-    eat-sheepfour ; wolves eat a sheep on their patch
+      eat-sheepfour ]; wolves eat a sheep on their patch
     death ; wolves die if our of energy
     reproduce-wolves ; wolves reproduce at random rate governed by slider
   ]
    ask wolvesfour
   [
     move
-    set energy energy - 1  ; wolves lose energy as they move
-    eat-sheepone
+    set energy energy - ( 1 * cost-plasticity-wolf)  ; wolves lose energy as they move
+   if energy < 10 [ eat-sheepone
     eat-sheeptwo
     eat-sheepthree
-    eat-sheepfour ; wolves eat a sheep on their patch
+      eat-sheepfour] ; wolves eat a sheep on their patch
     death ; wolves die if our of energy
     reproduce-wolves ; wolves reproduce at random rate governed by slider
   ]
@@ -300,7 +301,7 @@ to grow-grass  ; patch procedure
   ; countdown on brown patches: if reach 0, grow some grass
   if pcolor = brown
   [
-    let neighbors-not-brown count neighbors with [pcolor != brown]
+    let neighbors-not-brown count neighbors with [pcolor != brown OR pcolor != black]
     ifelse (countdown <= 0) and neighbors-not-brown != 0
       [
         let greens count neighbors with [pcolor = green]
@@ -349,13 +350,15 @@ to death  ; turtle procedure (i.e. both wolf nd sheep procedure)
 end
 
 to impact
-  let cell-impacted 0
+  ;;ask impacted-patches [set cell-impacted 1]
+  ask patches [
   if cell-impacted [
     ask turtles-here [die]
     ask patches [
-      set pcolor brown
-      set countdown 100 ;; 9. hilton quer sem regeneração pelo que entendi, perturbação permanente
+      set pcolor black
+      set countdown 100000 ;; 9. hilton quer sem regeneração pelo que entendi, perturbação permanente
     ]
+  ]
   ]
 end
 
@@ -363,13 +366,22 @@ to-report grass
   report patches with [pcolor != brown]
 end
 
-to-report salto
+to-report salto ;conferir poque todos estão sendo plasticos
   let tamanho 0 ;; 7. não entendi
-  if ([pcolor] of patch-here = brown) AND energy < 10 [
-    ifelse (trophic-level = "consumer") [set tamanho 3 + plasticity ][set tamanho 5 + plasticity ] ;; 8. a plasticidade não seria o tamanho?? Diferença entre comido e perturbado, teremos que colocar ele pra reconhecer X estrutura?
+  let food count neighbors with [pcolor = brown OR pcolor = black]
+  ;;if ([pcolor] of patch-here = brown) AND energy < 10 [
+    if ((food >= 3) AND energy < 5) [
+    ifelse (trophic-level = "consumer")
+    [set tamanho sheep-plasticity
+    show "fui plastico"]
+    [set tamanho wolf-plasticity
+    show "fui plastico"] ;; 8. a plasticidade não seria o tamanho?? Diferença entre comido e perturbado, teremos que colocar ele pra reconhecer X estrutura?
   ]
   report tamanho
   ;; sortear de uma distribuição de cauda longa
+end
+to output
+
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -498,7 +510,7 @@ grass-regrowth-time
 grass-regrowth-time
 0
 100
-14.0
+10.0
 1
 1
 NIL
@@ -540,9 +552,9 @@ NIL
 
 PLOT
 0
-290
+425
 335
-530
+665
 populations
 time
 pop.
@@ -631,15 +643,15 @@ Falta: 1 implementar plasticidade e custo, 2 perturbação e 3 gravar variáveis
 1
 
 SLIDER
-170
-115
-342
-148
-plasticity
-plasticity
+-5
+325
+167
+358
+sheep-plasticity
+sheep-plasticity
 0
 2
-0.0
+2.0
 1
 1
 NIL
@@ -655,6 +667,51 @@ max-age
 0
 100
 35.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+175
+290
+347
+323
+cost-plasticity-sheep
+cost-plasticity-sheep
+0
+10
+5.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+0
+290
+172
+323
+cost-plasticity-wolf
+cost-plasticity-wolf
+0
+10
+5.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+180
+340
+352
+373
+wolf-plasticity
+wolf-plasticity
+0
+5
+5.0
 1
 1
 NIL
