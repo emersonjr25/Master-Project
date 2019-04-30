@@ -7,7 +7,7 @@ breed [ wolvesone wolfone ] ; especie 1 de lobo
 breed [ wolvestwo wolftwo ] ; especie 2 de lobo
 breed [ wolvesthree wolfthree ]; especie 3 de lobo
 breed [ wolvesfour wolffour ] ; especie 4 de lobo
-turtles-own [ energy trophic-level age ] ; both wolves and sheep have energy ---
+turtles-own [ energy trophic-level age ] ; both wolves and sheep have energy, trophic-level and age
 patches-own [ countdown ] ; contagem regressiva para nascimento das gramíneas
 
 to setup ; configuração inicial do sistema
@@ -21,7 +21,6 @@ to setup ; configuração inicial do sistema
       set pcolor one-of [ green gray violet sky ]
       if pcolor != brown
         [ set countdown grass-regrowth-time ]
-     ;; [ set countdown random grass-regrowth-time ] ; initialize grass regrowth clocks randomly for brown patches --- (pode servir)
     ]
   ask turtles [set age 0] ; initial age wolves and sheeps
   create-sheepone initial-number-sheep  ; create the first sheep, then initialize their variables
@@ -150,7 +149,7 @@ to go ; faz individuos se moveram e fazer as açoes criadas
   ask wolvesone
   [
     move
-    set energy energy - 1 ; wolves lose energy as they move ;;; CUSTO PLASTICIDADE MULTIPLICA O GASTO DE ENERGIA!!
+    set energy energy - 1 ; wolves lose energy as they move ;;; 1. CUSTO PLASTICIDADE MULTIPLICA O GASTO DE ENERGIA!!
     eat-sheepfour ; wolves eat a sheep on their patch
     death ; wolves die if our of energy
     reproduce-wolves ; wolves reproduce at random rate governed by slider
@@ -185,16 +184,15 @@ to go ; faz individuos se moveram e fazer as açoes criadas
     death ; wolves die if our of energy
     reproduce-wolves ; wolves reproduce at random rate governed by slider
   ]
-  ask turtles [set age age + 1] ; --- Consumidores primários com menos idade que os secundários? idade por tick?
+  ask turtles [set age age + 1]
   ask patches [ grow-grass ]
   tick
 end
 
 to move  ; turtle procedure
-  rt random 50 ; opção 2: set heading random 360
+  rt random 50
   lt random 50
-
-  fd 1 + salto;; alterar tamanho do passo de acordo com plasticidade ---
+  fd 1 + salto ;; 2. alterar tamanho do passo de acordo com plasticidade
 end
 
 to eat-grassone  ; sheep procedure
@@ -203,7 +201,7 @@ to eat-grassone  ; sheep procedure
    [
     set pcolor brown
     set energy energy + sheep-gain-from-food  ; sheep gain energy by eating
-    set countdown grass-regrowth-time
+    set countdown grass-regrowth-time ;; 3. não faz muito sentido isso?
    ]
 end
 
@@ -330,14 +328,14 @@ to grow-grass  ; patch procedure
         ;;show g4
         ;;show percent-greens + percent-grays + percent-violets + percent-skys
 
-        let x random-float 1
+        let x random-float 1 ;; 4. falar disso com vitor depois
         if x <= g1 [set pcolor green
           set countdown grass-regrowth-time]
         if ( x > g1) AND (x <= g2)[set pcolor gray
           set countdown grass-regrowth-time]
         if ( x > g2) AND (x <= g3)[set pcolor violet
           set countdown grass-regrowth-time]
-        if ( x > g3) [set pcolor sky
+        if ( x > g3)[set pcolor sky ;; não falta um and aqui?
           set countdown grass-regrowth-time]
     ]
       [ set countdown countdown - 1 ]
@@ -347,7 +345,7 @@ end
 to death  ; turtle procedure (i.e. both wolf nd sheep procedure)
   ; when energy dips below zero, die
   if energy < 0 [ die ]
-  if age > max-age [die]
+  if age > max-age [die] ; 5. PLANTAS NÃO TERÃO TEMPO DE VIDA?
 end
 
 to impact
@@ -356,28 +354,28 @@ to impact
     ask turtles-here [die]
     ask patches [
       set pcolor brown
-      set countdown 100
+      set countdown 100 ;; 9. hilton quer sem regeneração pelo que entendi, perturbação permanente
     ]
   ]
 end
 
 to-report grass
-  report patches with [pcolor != brown] ;; SE O IMPACTO FOR DE COR DIFERENTE DE MARRON PRECISA MUDAR ISSO AQUI !!!
+  report patches with [pcolor != brown]
 end
 
 to-report salto
-  let tamanho 0
-  if ([pcolor] of patch-here = black) AND energy < 10 [
-    ifelse (trophic-level = "consumer") [set tamanho 3 + plasticity ][set tamanho 5 + plasticity ]
+  let tamanho 0 ;; 7. não entendi
+  if ([pcolor] of patch-here = brown) AND energy < 10 [
+    ifelse (trophic-level = "consumer") [set tamanho 3 + plasticity ][set tamanho 5 + plasticity ] ;; 8. a plasticidade não seria o tamanho?? Diferença entre comido e perturbado, teremos que colocar ele pra reconhecer X estrutura?
   ]
   report tamanho
   ;; sortear de uma distribuição de cauda longa
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-360
+345
 10
-1308
+1293
 525
 -1
 -1
@@ -440,7 +438,7 @@ sheep-reproduce
 sheep-reproduce
 1.0
 20.0
-3.0
+5.0
 1.0
 1
 %
@@ -455,7 +453,7 @@ initial-number-wolves
 initial-number-wolves
 0
 250
-140.0
+141.0
 1
 1
 NIL
@@ -485,7 +483,7 @@ wolf-reproduce
 wolf-reproduce
 0.0
 20.0
-5.0
+8.0
 1.0
 1
 %
@@ -500,7 +498,7 @@ grass-regrowth-time
 grass-regrowth-time
 0
 100
-29.0
+14.0
 1
 1
 NIL
@@ -656,7 +654,7 @@ max-age
 max-age
 0
 100
-60.0
+35.0
 1
 1
 NIL
