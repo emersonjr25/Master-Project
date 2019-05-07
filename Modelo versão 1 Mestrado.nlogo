@@ -150,7 +150,7 @@ to go ; faz individuos se moveram e fazer as açoes criadas
   ask wolvesone
   [
     move
-    set energy energy - ( 1 * cost-plasticity-wolf); wolves lose energy as they move ;;; 1. CUSTO PLASTICIDADE MULTIPLICA O GASTO DE ENERGIA!!
+    set energy energy - ( 1 * cost-plasticity-wolf); wolves lose energy as they move
     if energy < 10 [eat-sheepfour] ; wolves eat a sheep on their patch
     death ; wolves die if our of energy
     reproduce-wolves ; wolves reproduce at random rate governed by slider
@@ -193,7 +193,7 @@ end
 to move  ; turtle procedure
   rt random 50
   lt random 50
-  fd 1 + salto ;; 2. alterar tamanho do passo de acordo com plasticidade
+  fd 1 + salto
 end
 
 to eat-grassone  ; sheep procedure
@@ -336,7 +336,7 @@ to grow-grass  ; patch procedure
           set countdown grass-regrowth-time]
         if ( x > g2) AND (x <= g3)[set pcolor violet
           set countdown grass-regrowth-time]
-        if ( x > g3)[set pcolor sky ;; não falta um and aqui?
+        if ( x > g3)[set pcolor sky ; talvez precise testar outra cois
           set countdown grass-regrowth-time]
     ]
       [ set countdown countdown - 1 ]
@@ -346,7 +346,7 @@ end
 to death  ; turtle procedure (i.e. both wolf nd sheep procedure)
   ; when energy dips below zero, die
   if energy < 0 [ die ]
-  if age > max-age [die] ; 5. PLANTAS NÃO TERÃO TEMPO DE VIDA?
+  if age > max-age [die]
 end
 
 to impact
@@ -356,7 +356,7 @@ to impact
     ask turtles-here [die]
     ask patches [
       set pcolor black
-      set countdown 100000 ;; 9. hilton quer sem regeneração pelo que entendi, perturbação permanente
+      set countdown 100000
     ]
   ]
   ]
@@ -367,7 +367,7 @@ to-report grass
 end
 
 to-report salto ;conferir poque todos estão sendo plasticos
-  let tamanho 0 ;; 7. não entendi
+  let tamanho 0
   let food count neighbors with [pcolor = brown OR pcolor = black]
   ;;if ([pcolor] of patch-here = brown) AND energy < 10 [
     if ((food >= 3) AND energy < 5) [
@@ -375,11 +375,11 @@ to-report salto ;conferir poque todos estão sendo plasticos
     [set tamanho sheep-plasticity
     show "fui plastico"]
     [set tamanho wolf-plasticity
-    show "fui plastico"] ;; 8. a plasticidade não seria o tamanho?? Diferença entre comido e perturbado, teremos que colocar ele pra reconhecer X estrutura?
+    show "fui plastico"]
   ]
   report tamanho
-  ;; sortear de uma distribuição de cauda longa
 end
+
 to output
 
 end
@@ -428,9 +428,9 @@ HORIZONTAL
 
 SLIDER
 -5
-170
+110
 169
-203
+143
 sheep-gain-from-food
 sheep-gain-from-food
 0.0
@@ -442,15 +442,15 @@ NIL
 HORIZONTAL
 
 SLIDER
--5
-205
-169
-238
+0
+145
+170
+178
 sheep-reproduce
 sheep-reproduce
 1.0
 20.0
-5.0
+7.0
 1.0
 1
 %
@@ -465,37 +465,37 @@ initial-number-wolves
 initial-number-wolves
 0
 250
-141.0
+140.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-173
-169
-338
-202
+175
+110
+340
+143
 wolf-gain-from-food
 wolf-gain-from-food
 0.0
 100.0
-24.0
+34.0
 1.0
 1
 NIL
 HORIZONTAL
 
 SLIDER
-173
-205
-338
-238
+175
+145
+340
+178
 wolf-reproduce
 wolf-reproduce
 0.0
 20.0
-8.0
+10.0
 1.0
 1
 %
@@ -518,9 +518,9 @@ HORIZONTAL
 
 BUTTON
 0
-110
+250
 69
-143
+283
 setup
 setup
 NIL
@@ -534,10 +534,10 @@ NIL
 1
 
 BUTTON
-75
-110
-150
-143
+70
+250
+145
+283
 go
 go
 T
@@ -551,10 +551,10 @@ NIL
 0
 
 PLOT
-0
-425
-335
-665
+10
+295
+345
+525
 populations
 time
 pop.
@@ -580,10 +580,10 @@ PENS
 "grass 4 / 4" 1.0 0 -13791810 true "" "plot count patches with [ pcolor = sky] / 4"
 
 MONITOR
-5
-240
-75
-285
+170
+250
+225
+295
 sheep
 count turtles with [ shape = \"sheep\"]
 3
@@ -591,10 +591,10 @@ count turtles with [ shape = \"sheep\"]
 11
 
 MONITOR
-80
-240
-147
+230
+250
 285
+295
 wolves
 count turtles with [ shape = \"wolf\"]
 3
@@ -602,10 +602,10 @@ count turtles with [ shape = \"wolf\"]
 11
 
 MONITOR
-155
-240
-220
-285
+290
+250
+340
+295
 grass
 count grass / 4
 0
@@ -613,40 +613,20 @@ count grass / 4
 11
 
 TEXTBOX
-10
-152
-150
-170
-Sheep settings
-11
-0.0
-0
-
-TEXTBOX
-188
-150
-301
-168
-Wolf settings
-11
-0.0
-0
-
-TEXTBOX
 5
 10
 340
 35
-Falta: 1 implementar plasticidade e custo, 2 perturbação e 3 gravar variáveis no final 
+Falta: 1 implementar plasticidade e custo, 2 perturbação e 3 gravar variáveis no final e puxar arquivo gradientland 
 10
 0.0
 1
 
 SLIDER
--5
-325
-167
-358
+0
+180
+172
+213
 sheep-plasticity
 sheep-plasticity
 0
@@ -674,44 +654,44 @@ HORIZONTAL
 
 SLIDER
 175
-290
-347
-323
-cost-plasticity-sheep
-cost-plasticity-sheep
+215
+340
+248
+cost-plasticity-wolf
+cost-plasticity-wolf
 0
 10
-5.0
+2.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-0
-290
-172
-323
-cost-plasticity-wolf
-cost-plasticity-wolf
-0
-10
-5.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
+175
 180
 340
-352
-373
+213
 wolf-plasticity
 wolf-plasticity
 0
 5
 5.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+0
+215
+172
+248
+cost-plasticity-sheep
+cost-plasticity-sheep
+0
+10
+2.0
 1
 1
 NIL
