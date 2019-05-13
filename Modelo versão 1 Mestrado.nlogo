@@ -617,7 +617,7 @@ TEXTBOX
 10
 340
 35
-Falta: 1 implementar plasticidade e custo, 2 perturbação e 3 gravar variáveis no final e puxar arquivo gradientland 
+Falta: 1 implementar plasticidade MÉDIA, 2 perturbação e 3 gravar variáveis no final e puxar arquivo gradientland 
 10
 0.0
 1
