@@ -1,4 +1,4 @@
-globals [ max-sheep   population-history] ; don't let sheep population grow too large ;; Sheep and wolves are both breeds of turtle.
+globals [ max-sheep  population-history ] ; don't let sheep population grow too large ;; Sheep and wolves are both breeds of turtle. ;;;;;
 breed [ sheepone a-sheepone ] ; sheep is its own plural, so we use "a-sheep" as the singular.
 breed [ sheeptwo a-sheeptwo ] ; especie 2 de ovelha
 breed [ sheepthree a-sheepthree ] ; especie 3 de ovelha
@@ -99,7 +99,7 @@ to setup ; configuração inicial do sistema
   ]
   reset-ticks
 
-  let pupulation-history list
+  ;;;let pupulation-history list
 end
 
 to go ; faz individuos se moveram e fazer as açoes criadas
@@ -452,7 +452,7 @@ sheep-gain-from-food
 sheep-gain-from-food
 0.0
 100.0
-44.0
+40.0
 1.0
 1
 NIL
@@ -467,7 +467,7 @@ sheep-reproduce
 sheep-reproduce
 1.0
 20.0
-1.0
+3.0
 1.0
 1
 %
@@ -497,7 +497,7 @@ wolf-gain-from-food
 wolf-gain-from-food
 0.0
 100.0
-80.0
+40.0
 1.0
 1
 NIL
@@ -512,7 +512,7 @@ wolf-reproduce
 wolf-reproduce
 0.0
 20.0
-2.0
+10.0
 1.0
 1
 %
@@ -663,7 +663,7 @@ max-age
 max-age
 0
 100
-70.0
+50.0
 1
 1
 NIL
@@ -693,7 +693,7 @@ wolf-plasticity
 wolf-plasticity
 0
 5
-4.0
+2.0
 1
 1
 NIL
@@ -708,7 +708,7 @@ cost-plasticity-sheep
 cost-plasticity-sheep
 0
 10
-3.0
+2.0
 1
 1
 NIL
