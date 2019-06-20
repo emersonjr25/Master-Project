@@ -1,4 +1,4 @@
-globals [ max-sheep  ] ; don't let sheep population grow too large ;; Sheep and wolves are both breeds of turtle.
+globals [ max-sheep  population-history ] ; don't let sheep population grow too large ;; Sheep and wolves are both breeds of turtle.
 breed [ sheepone a-sheepone ] ; sheep is its own plural, so we use "a-sheep" as the singular.
 breed [ sheeptwo a-sheeptwo ] ; especie 2 de ovelha
 breed [ sheepthree a-sheepthree ] ; especie 3 de ovelha
@@ -98,6 +98,8 @@ to setup ; configuração inicial do sistema
     set trophic-level "predator"
   ]
   reset-ticks
+
+  ;;;let population-history list
 end
 
 to go ; faz individuos se moveram e fazer as açoes criadas
@@ -109,7 +111,7 @@ to go ; faz individuos se moveram e fazer as açoes criadas
   [
       move
      ; sheep eat grass, grass grows and it costs sheep energy to move
-      set energy energy - ( 1 * cost-plasticity-sheep)
+      set energy energy - ( 1 + cost-plasticity-sheep)
       if energy < 10 [eat-grassone]
       death ; sheep die from starvation
       reproduce-sheep  ; sheep reproduce at random rate governed by slider
@@ -118,7 +120,7 @@ to go ; faz individuos se moveram e fazer as açoes criadas
   [
       move
      ; sheep eat grass, grass grows and it costs sheep energy to move
-      set energy energy - ( 1 * cost-plasticity-sheep)
+      set energy energy - ( 1 + cost-plasticity-sheep)
       if energy < 10 [eat-grassone
       eat-grasstwo]
       death ; sheep die from starvation
@@ -128,7 +130,7 @@ to go ; faz individuos se moveram e fazer as açoes criadas
   [
       move
      ; sheep eat grass, grass grows and it costs sheep energy to move
-      set energy energy - ( 1 * cost-plasticity-sheep)
+      set energy energy - ( 1 + cost-plasticity-sheep)
       if energy < 10 [eat-grasstwo
       eat-grassthree
       eat-grassfour]
@@ -139,7 +141,7 @@ to go ; faz individuos se moveram e fazer as açoes criadas
   [
       move
      ; sheep eat grass, grass grows and it costs sheep energy to move
-      set energy energy - ( 1 * cost-plasticity-sheep)
+      set energy energy - ( 1 + cost-plasticity-sheep)
       if energy < 10 [eat-grassone
       eat-grasstwo
       eat-grassthree
@@ -150,7 +152,7 @@ to go ; faz individuos se moveram e fazer as açoes criadas
   ask wolvesone
   [
     move
-    set energy energy - ( 1 * cost-plasticity-wolf); wolves lose energy as they move
+    set energy energy - ( 1 + cost-plasticity-wolf); wolves lose energy as they move
     if energy < 10 [eat-sheepfour] ; wolves eat a sheep on their patch
     death ; wolves die if our of energy
     reproduce-wolves ; wolves reproduce at random rate governed by slider
@@ -158,7 +160,7 @@ to go ; faz individuos se moveram e fazer as açoes criadas
    ask wolvestwo
   [
     move
-    set energy energy - ( 1 * cost-plasticity-wolf)  ; wolves lose energy as they move
+    set energy energy - ( 1 + cost-plasticity-wolf)  ; wolves lose energy as they move
     if energy < 10 [eat-sheepthree
     eat-sheepfour] ; wolves eat a sheep on their patch
     death ; wolves die if our of energy
@@ -167,7 +169,7 @@ to go ; faz individuos se moveram e fazer as açoes criadas
    ask wolvesthree
   [
     move
-    set energy energy - ( 1 * cost-plasticity-wolf) ; wolves lose energy as they move
+    set energy energy - ( 1 + cost-plasticity-wolf) ; wolves lose energy as they move
     if energy < 10 [eat-sheeptwo
     eat-sheepthree
     eat-sheepfour ]; wolves eat a sheep on their patch
@@ -177,7 +179,7 @@ to go ; faz individuos se moveram e fazer as açoes criadas
    ask wolvesfour
   [
     move
-    set energy energy - ( 1 * cost-plasticity-wolf)  ; wolves lose energy as they move
+    set energy energy - ( 1 + cost-plasticity-wolf)  ; wolves lose energy as they move
     if energy < 10 [ eat-sheepone
     eat-sheeptwo
     eat-sheepthree
@@ -363,21 +365,31 @@ to impact
 end
 
 to-report grass
-  report patches with [pcolor != brown]
+  report patches with [pcolor != brown] ; contagem de gramíneas
 end
 
-to-report salto ;conferir poque todos estão sendo plasticos
+to-report plastic-jump
+  let ps 0
+   ifelse (trophic-level = "consumer")
+    [set ps random-normal sheep-plasticity 0.5
+    show (word "fui plastico ovelha " ps)]
+    [set ps random-normal wolf-plasticity 0.5
+    show (word "fui plastico lobo " ps)]
+  report ps
+end
+
+to-report salto
   let tamanho 0
-  let food count neighbors with [pcolor = brown OR pcolor = black]
+  let not-food count neighbors with [pcolor = brown OR pcolor = black]
   ;;if ([pcolor] of patch-here = brown) AND energy < 10 [
-    if ((food >= 5) AND energy < 5) [ ;; TALVEZ PRECISE COLOCAR SÓ PRA COMER COM MENOS QUANTIDADE DE ENERGIA QUE 10, OU AUMENTAR VIZINHANÇA... Só é Plástico quando está próximo a morrer? Ou qualquer energia?
-    ifelse (trophic-level = "consumer")
-    [set tamanho sheep-plasticity
-    show "fui plastico ovelha"]
-    [set tamanho wolf-plasticity
-    show "fui plastico lobo"]
+    if ((not-food >= 5) AND energy < 5) [
+       set tamanho plastic-jump
   ]
   report tamanho
+end
+
+to-report check-stability
+
 end
 
 to output
@@ -435,7 +447,7 @@ sheep-gain-from-food
 sheep-gain-from-food
 0.0
 100.0
-50.0
+40.0
 1.0
 1
 NIL
@@ -480,7 +492,7 @@ wolf-gain-from-food
 wolf-gain-from-food
 0.0
 100.0
-80.0
+40.0
 1.0
 1
 NIL
@@ -612,16 +624,6 @@ count grass / 4
 1
 11
 
-TEXTBOX
-5
-10
-340
-35
-Falta: 1 implementar plasticidade MÉDIA, 2 perturbação e 3 gravar variáveis no final e puxar arquivo gradientland 
-10
-0.0
-1
-
 SLIDER
 0
 180
@@ -646,7 +648,7 @@ max-age
 max-age
 0
 100
-70.0
+50.0
 1
 1
 NIL
