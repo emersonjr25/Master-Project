@@ -371,9 +371,9 @@ end
 to-report plastic-jump
   let ps 0
    ifelse (trophic-level = "consumer")
-    [set ps random-normal sheep-plasticity 0.5
+    [set ps random-normal sheep-plasticity 0.2 ;;; MODIFIQUEI
     show (word "fui plastico ovelha " ps)]
-    [set ps random-normal wolf-plasticity 0.5
+    [set ps random-normal wolf-plasticity 0.2 ;;; MODIFIQUEI
     show (word "fui plastico lobo " ps)]
   report ps
 end
@@ -447,7 +447,7 @@ sheep-gain-from-food
 sheep-gain-from-food
 0.0
 100.0
-40.0
+45.0
 1.0
 1
 NIL
@@ -462,7 +462,7 @@ sheep-reproduce
 sheep-reproduce
 1.0
 20.0
-3.0
+5.0
 1.0
 1
 %
@@ -492,7 +492,7 @@ wolf-gain-from-food
 wolf-gain-from-food
 0.0
 100.0
-40.0
+65.0
 1.0
 1
 NIL
@@ -522,7 +522,7 @@ grass-regrowth-time
 grass-regrowth-time
 0
 100
-10.0
+20.0
 1
 1
 NIL
@@ -632,8 +632,8 @@ SLIDER
 sheep-plasticity
 sheep-plasticity
 0
-2
-1.0
+10
+2.0
 1
 1
 NIL
@@ -648,7 +648,7 @@ max-age
 max-age
 0
 100
-50.0
+70.0
 1
 1
 NIL
@@ -677,8 +677,8 @@ SLIDER
 wolf-plasticity
 wolf-plasticity
 0
-5
-2.0
+10
+3.0
 1
 1
 NIL
@@ -693,7 +693,7 @@ cost-plasticity-sheep
 cost-plasticity-sheep
 0
 10
-2.0
+1.0
 1
 1
 NIL
