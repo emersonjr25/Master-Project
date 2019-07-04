@@ -698,7 +698,7 @@ cost-plasticity-wolf
 cost-plasticity-wolf
 0
 10
-2.9
+1.3
 0.1
 1
 NIL
