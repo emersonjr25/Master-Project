@@ -161,8 +161,18 @@ to go ; faz individuos se moveram e fazer as açoes criadas
   [
     move
     set energy energy - ( 1 + cost-plasticity-wolf)  ; wolves lose energy as they move
-    if energy < 10 [eat-sheepthree
-    eat-sheepfour] ; wolves eat a sheep on their patch
+    if (energy < 10) AND (any?  other turtles-here with [shape = "sheep"])[
+
+    let context [0] ;;always can move
+    if any? sheepthree-here [ set context lput 3 context]
+    if any? sheepfour-here  [ set context lput 4 context]
+    set context remove 0 context
+      ifelse(empty? context)[]
+       [ let x one-of context
+          if (x = 3)[eat-sheepthree]
+          if (x = 4)[eat-sheepfour]
+        ]
+    ] ; wolves eat a sheep on their patch
     death ; wolves die if our of energy
     reproduce-wolves ; wolves reproduce at random rate governed by slider
   ]
@@ -170,9 +180,20 @@ to go ; faz individuos se moveram e fazer as açoes criadas
   [
     move
     set energy energy - ( 1 + cost-plasticity-wolf) ; wolves lose energy as they move
-    if energy < 10 [eat-sheeptwo
-    eat-sheepthree
-    eat-sheepfour ]; wolves eat a sheep on their patch
+    if ( energy < 10) AND (any?  other turtles-here with [shape = "sheep"])[
+    let context [0] ;;always can move
+    if any? sheeptwo-here [ set context lput 2 context]
+    if any? sheepthree-here [ set context lput 3 context]
+    if any? sheepfour-here  [ set context lput 4 context]
+    set context remove 0 context
+      ifelse(empty? context)[]
+       [
+    let x one-of context
+    if (x = 2)[eat-sheeptwo]
+    if (x = 3)[eat-sheepthree]
+    if (x = 4)[eat-sheepfour]
+      ]
+    ]; wolves eat a sheep on their patch
     death ; wolves die if our of energy
     reproduce-wolves ; wolves reproduce at random rate governed by slider
   ]
@@ -180,10 +201,22 @@ to go ; faz individuos se moveram e fazer as açoes criadas
   [
     move
     set energy energy - ( 1 + cost-plasticity-wolf)  ; wolves lose energy as they move
-    if energy < 10 [ eat-sheepone
-    eat-sheeptwo
-    eat-sheepthree
-    eat-sheepfour] ; wolves eat a sheep on their patch
+    if ( energy < 10) AND (any?  other turtles-here with [shape = "sheep"])[
+    let context [0] ;;always can move
+    if any? sheepone-here   [ set context lput 1 context]
+    if any? sheeptwo-here   [ set context lput 2 context]
+    if any? sheepthree-here [ set context lput 3 context]
+    if any? sheepfour-here  [ set context lput 4 context]
+    set context remove 0 context
+      ifelse(empty? context)[]
+       [
+    let x one-of context
+    if (x = 1)[eat-sheepone]
+    if (x = 2)[eat-sheeptwo]
+    if (x = 3)[eat-sheepthree]
+    if (x = 4)[eat-sheepfour]
+      ]
+    ] ; wolves eat a sheep on their patch
     death ; wolves die if our of energy
     reproduce-wolves ; wolves reproduce at random rate governed by slider
   ]
@@ -195,7 +228,9 @@ end
 to move  ; turtle procedure
   rt random 50
   lt random 50
-  fd 1 + salto
+  let x salto
+  fd 1 + x
+  set energy energy - (x / 10)
 end
 
 to eat-grassone  ; sheep procedure
@@ -375,7 +410,7 @@ to-report plastic-jump
     show (word "fui plastico ovelha " ps)]
     [set ps random-normal wolf-plasticity 0.2 ;;; MODIFIQUEI
     show (word "fui plastico lobo " ps)]
-  report ps
+  ifelse(ps < 0)[report 0.1][report ps]
 end
 
 to-report salto
@@ -663,8 +698,8 @@ cost-plasticity-wolf
 cost-plasticity-wolf
 0
 10
-2.0
-1
+1.3
+0.1
 1
 NIL
 HORIZONTAL
@@ -694,7 +729,7 @@ cost-plasticity-sheep
 0
 10
 1.0
-1
+0.1
 1
 NIL
 HORIZONTAL
