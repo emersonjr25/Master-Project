@@ -12,7 +12,7 @@ patches-own [ countdown cell-impacted ] ; contagem regressiva para nascimento da
 
 to setup ; configuração inicial do sistema
   clear-all
-  resize-world -45 45 -25 23 ; size of world
+  resize-world -50 50 -50 50 ; size of world
   ifelse netlogo-web?
    [  set max-sheep 10000  ]
    [  set max-sheep 30000  ]
@@ -112,7 +112,9 @@ to go ; faz individuos se moveram e fazer as açoes criadas
       move
      ; sheep eat grass, grass grows and it costs sheep energy to move
       set energy energy - ( 1 + cost-plasticity-sheep)
-      if energy < 10 [eat-grassone]
+      if energy < 10 [
+      eat-grass green 1
+      ]
       death ; sheep die from starvation
       reproduce-sheep  ; sheep reproduce at random rate governed by slider
   ]
@@ -121,8 +123,10 @@ to go ; faz individuos se moveram e fazer as açoes criadas
       move
      ; sheep eat grass, grass grows and it costs sheep energy to move
       set energy energy - ( 1 + cost-plasticity-sheep)
-      if energy < 10 [eat-grassone
-      eat-grasstwo]
+      if energy < 10 [
+      eat-grass green 2
+      eat-grass gray  2
+      ]
       death ; sheep die from starvation
       reproduce-sheep  ; sheep reproduce at random rate governed by slider
   ]
@@ -131,9 +135,11 @@ to go ; faz individuos se moveram e fazer as açoes criadas
       move
      ; sheep eat grass, grass grows and it costs sheep energy to move
       set energy energy - ( 1 + cost-plasticity-sheep)
-      if energy < 10 [eat-grasstwo
-      eat-grassthree
-      eat-grassfour]
+      if energy < 10 [
+      eat-grass gray   3
+      eat-grass violet 3
+      eat-grass sky    3
+      ]
       death ; sheep die from starvation
       reproduce-sheep  ; sheep reproduce at random rate governed by slider
   ]
@@ -142,10 +148,12 @@ to go ; faz individuos se moveram e fazer as açoes criadas
       move
      ; sheep eat grass, grass grows and it costs sheep energy to move
       set energy energy - ( 1 + cost-plasticity-sheep)
-      if energy < 10 [eat-grassone
-      eat-grasstwo
-      eat-grassthree
-      eat-grassfour]
+      if energy < 10 [
+      eat-grass green  4
+      eat-grass gray   4
+      eat-grass violet 4
+      eat-grass sky    4
+      ]
       death ; sheep die from starvation
       reproduce-sheep  ; sheep reproduce at random rate governed by slider
   ]
@@ -153,7 +161,9 @@ to go ; faz individuos se moveram e fazer as açoes criadas
   [
     move
     set energy energy - ( 1 + cost-plasticity-wolf); wolves lose energy as they move
-    if energy < 10 [eat-sheepfour] ; wolves eat a sheep on their patch
+    if energy < 10 [
+    eat-sheep sheepfour  1
+    ] ; wolves eat a sheep on their patch
     death ; wolves die if our of energy
     reproduce-wolves ; wolves reproduce at random rate governed by slider
   ]
@@ -169,8 +179,8 @@ to go ; faz individuos se moveram e fazer as açoes criadas
     set context remove 0 context
       ifelse(empty? context)[]
        [ let x one-of context
-          if (x = 3)[eat-sheepthree]
-          if (x = 4)[eat-sheepfour]
+          if (x = 3)[eat-sheep sheepthree 2]
+          if (x = 4)[eat-sheep sheepfour  2]
         ]
     ] ; wolves eat a sheep on their patch
     death ; wolves die if our of energy
@@ -189,9 +199,9 @@ to go ; faz individuos se moveram e fazer as açoes criadas
       ifelse(empty? context)[]
        [
     let x one-of context
-    if (x = 2)[eat-sheeptwo]
-    if (x = 3)[eat-sheepthree]
-    if (x = 4)[eat-sheepfour]
+    if (x = 2)[eat-sheep sheeptwo 3]
+    if (x = 3)[eat-sheep sheepthree 3]
+    if (x = 4)[eat-sheep sheepfour 3]
       ]
     ]; wolves eat a sheep on their patch
     death ; wolves die if our of energy
@@ -211,10 +221,10 @@ to go ; faz individuos se moveram e fazer as açoes criadas
       ifelse(empty? context)[]
        [
     let x one-of context
-    if (x = 1)[eat-sheepone]
-    if (x = 2)[eat-sheeptwo]
-    if (x = 3)[eat-sheepthree]
-    if (x = 4)[eat-sheepfour]
+    if (x = 1)[eat-sheep sheepone   4]
+    if (x = 2)[eat-sheep sheeptwo   4]
+    if (x = 3)[eat-sheep sheepthree 4]
+    if (x = 4)[eat-sheep sheepfour  4]
       ]
     ] ; wolves eat a sheep on their patch
     death ; wolves die if our of energy
@@ -233,104 +243,54 @@ to move  ; turtle procedure
   set energy energy - (x / 10)
 end
 
-to eat-grassone  ; sheep procedure
+to eat-grass [grasstype number-of-foods] ; sheep procedure
   ; sheep eat grass, turn the patch brown
-  if pcolor = green
+  if pcolor = grasstype
    [
     set pcolor brown
-    set energy energy + sheep-gain-from-food  ; sheep gain energy by eating
+    set energy energy + (sheep-gain-from-food / number-of-foods) ; sheep gain energy by eating
     set countdown grass-regrowth-time
+    show grasstype
    ]
 end
 
-to eat-grasstwo  ; sheep procedure
-  ; sheep eat grass, turn the patch brown
-  if pcolor = gray
-   [
-    set pcolor brown
-    set energy energy + sheep-gain-from-food  ; sheep gain energy by eating
-    set countdown grass-regrowth-time
-   ]
-end
-
-to eat-grassthree  ; sheep procedure
-  ; sheep eat grass, turn the patch brown
-  if pcolor = violet
-   [
-    set pcolor brown
-    set energy energy + sheep-gain-from-food  ; sheep gain energy by eating
-    set countdown grass-regrowth-time
-   ]
-end
-
-to eat-grassfour  ; sheep procedure
-  ; sheep eat grass, turn the patch brown
-  if pcolor = sky
-   [
-    set pcolor brown
-    set energy energy + sheep-gain-from-food  ; sheep gain energy by eating
-    set countdown grass-regrowth-time
-   ]
-end
-
-to eat-sheepone  ; wolf procedure
-  let preyone one-of sheepone-here                    ; grab a random sheep
+to eat-sheep [sheeptype number-of-foods]  ; wolf procedure
+  let preyone one-of turtles-here with [breed = sheeptype]                     ; grab a random sheep
   if preyone != nobody                             ; did we get one?  if so,
   [
     ask preyone [ die ]                            ; kill it, and...
-    set energy energy + wolf-gain-from-food     ; get energy from eating
-  ]
-end
-
-to eat-sheeptwo  ; wolf procedure
-  let preytwo one-of sheeptwo-here                    ; grab a random sheep
-  if preytwo != nobody                             ; did we get one?  if so,
-  [
-    ask preytwo [ die ]                            ; kill it, and...
-    set energy energy + wolf-gain-from-food     ; get energy from eating
-  ]
-
-end
-
-to eat-sheepthree  ; wolf procedure
-  let preythree one-of sheepthree-here                    ; grab a random sheep
-  if preythree != nobody                             ; did we get one?  if so,
-  [
-    ask preythree [ die ]                            ; kill it, and...
-    set energy energy + wolf-gain-from-food     ; get energy from eating
-  ]
-end
-
-to eat-sheepfour  ; wolf procedure
-  let preyfour one-of sheepfour-here                    ; grab a random sheep
-  if preyfour != nobody                             ; did we get one?  if so,
-  [
-    ask preyfour [ die ]                            ; kill it, and...
-    set energy energy + wolf-gain-from-food     ; get energy from eating
+    set energy energy + (wolf-gain-from-food / number-of-foods )     ; get energy from eating
+    show sheeptype
   ]
 end
 
 to reproduce-sheep  ; sheep procedure
+ if energy >= 20 [
   if random-float 100 < sheep-reproduce ; throw "dice" to see if you will reproduce
   [
-    set energy (energy / 2)                ; divide energy between parent and offspring
+    set energy energy - 10                ; divide energy between parent and offspring
     hatch 1 [
+      set energy 15
       rt random-float 360
       fd 1
       set age 0
     ]   ; hatch an offspring and move it forward 1 step ;;
   ]
+  ]
 end
 
 to reproduce-wolves  ; wolf procedure
+  if energy >= 20 [
   if random-float 100 < wolf-reproduce ; throw "dice" to see if you will reproduce
   [
-    set energy (energy / 2)               ; divide energy between parent and offspring
+    set energy energy - 10              ; divide energy between parent and offspring
     hatch 1 [
+      set energy 15
       rt random-float 360
       fd 1
       set age 0
     ]  ; hatch an offspring and move it forward 1 step
+  ]
   ]
 end
 
@@ -386,19 +346,6 @@ to death  ; turtle procedure (i.e. both wolf nd sheep procedure)
   if age > max-age [die]
 end
 
-to impact
-  ;;ask impacted-patches [set cell-impacted 1]
-  ask patches [
-  if cell-impacted [
-    ask turtles-here [die]
-    ask patches [
-      set pcolor black
-      set countdown 100000
-    ]
-  ]
-  ]
-end
-
 to-report grass
   report patches with [pcolor != brown] ; contagem de gramíneas
 end
@@ -423,22 +370,86 @@ to-report salto
   report tamanho
 end
 
-to-report check-stability
-
+to impact
+  ask patches [
+  if cell-impacted = 1 [
+    ask turtles-here [die]
+    ask patches [
+      set pcolor black
+      set countdown 100000
+    ]
+  ]
+  ]
 end
 
-to output
+to input
+  set-current-directory "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Perturbações"
+  let filename 0
+  set filename "habitat_destruidof03p30.txt"
+  if (ticks = 10) [ file-open filename ]
+  if is-number? 1 [ set cell-impacted 1]
+  file-close
+end
+
+to-report output
+  let abundance-turtles count turtles
+  let abundance-patches count patches
+  let abundance-total abundance-turtles + abundance-patches
+  let abundance-relative-patchesgreen count patches with [ pcolor = green ] / abundance-total
+  let abundance-relative-patchesviolet count patches with [ pcolor = violet ] / abundance-total
+  let abundance-relative-patchesgray count patches with [ pcolor = gray ] / abundance-total
+  let abundance-relative-patchessky count patches with [ pcolor = sky ] / abundance-total
+  let abundance-relative-sheepone count sheepone / abundance-total
+  let abundance-relative-sheeptwo count sheeptwo / abundance-total
+  let abundance-relative-sheepthree count sheepthree / abundance-total
+  let abundance-relative-sheepfour count sheepfour / abundance-total
+  let abundance-relative-wolvesone count wolvesone / abundance-total
+  let abundance-relative-wolvestwo count wolvestwo / abundance-total
+  let abundance-relative-wolvesthree count wolvesthree / abundance-total
+  let abundance-relative-wolvesfour count wolvesfour / abundance-total
+  report abundance-relative-patchesgreen
+  report abundance-relative-patchesviolet
+  report abundance-relative-patchesgray
+  report abundance-relative-patchessky
+  report abundance-relative-sheepone
+  report abundance-relative-sheeptwo
+  report abundance-relative-sheepthree
+  report abundance-relative-sheepfour
+  report abundance-relative-wolvesone
+  report abundance-relative-wolvestwo
+  report abundance-relative-wolvesthree
+  report abundance-relative-wolvesfour
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  let richness1 0 ifelse any? sheepone [ set richness1 1][ set richness1 0]
+  let richness2 0 ifelse any? sheeptwo [ set richness2 1] [ set richness2 0]
+  let richness3 0 ifelse any? sheepthree [ set richness3 1] [ set richness3 0]
+  let richness4 0 ifelse any? sheepfour [ set richness4 1] [ set richness4 0]
+  let richness5 0 ifelse any? wolvesone [ set richness5 1] [ set richness5 0]
+  let richness6 0 ifelse any? wolvestwo [ set richness6 1] [ set richness6 0]
+  let richness7 0 ifelse any? wolvesthree [ set richness7 1] [ set richness7 0]
+  let richness8 0 ifelse any? wolvesfour [ set richness8 1] [ set richness8 0]
+  let richness9 0 ifelse any? patches with [pcolor = green] [ set richness9 1] [ set richness9 0]
+  let richness10 0 ifelse any? patches with [pcolor = violet] [ set richness10 1] [ set richness10 0]
+  let richness11 0 ifelse any? patches with [pcolor = gray] [ set richness11 1] [ set richness11 0]
+  let richness12 0 ifelse any? patches with [pcolor = sky] [ set richness12 1] [ set richness12 0]
+  let richness richness1 + richness2 + richness3 + richness4 + richness5 + richness6 + richness7 + richness8 + richness9 + richness10 + richness11 + richness12
+  report richness
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  let equabilidade 0
+end
+
+to-report check-stability
 
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
 345
 10
-1293
-525
+853
+519
 -1
 -1
-10.33
+4.9505
 1
 14
 1
@@ -448,10 +459,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--45
-45
--25
-23
+-50
+50
+-50
+50
 1
 1
 1
@@ -467,7 +478,7 @@ initial-number-sheep
 initial-number-sheep
 0
 250
-100.0
+150.0
 1
 1
 NIL
@@ -482,7 +493,7 @@ sheep-gain-from-food
 sheep-gain-from-food
 0.0
 100.0
-45.0
+30.0
 1.0
 1
 NIL
@@ -497,7 +508,7 @@ sheep-reproduce
 sheep-reproduce
 1.0
 20.0
-5.0
+8.0
 1.0
 1
 %
@@ -512,7 +523,7 @@ initial-number-wolves
 initial-number-wolves
 0
 250
-100.0
+150.0
 1
 1
 NIL
@@ -527,7 +538,7 @@ wolf-gain-from-food
 wolf-gain-from-food
 0.0
 100.0
-65.0
+50.0
 1.0
 1
 NIL
@@ -542,7 +553,7 @@ wolf-reproduce
 wolf-reproduce
 0.0
 20.0
-10.0
+13.0
 1.0
 1
 %
@@ -557,7 +568,7 @@ grass-regrowth-time
 grass-regrowth-time
 0
 100
-20.0
+10.0
 1
 1
 NIL
@@ -613,7 +624,7 @@ true
 true
 "" ""
 PENS
-"grass 1 / 4" 1.0 0 -10899396 true "" "plot count patches with [ pcolor = green ] / 4"
+"grass 1 / 4" 1.0 0 -10899396 true "" "plot count patches with [ pcolor = green ]"
 "sheepone" 1.0 0 -1513240 true "" "plot count sheepone"
 "sheeptwo" 1.0 0 -2674135 true "" "plot count sheeptwo"
 "sheepthree" 1.0 0 -13345367 true "" "plot count sheepthree"
@@ -622,9 +633,9 @@ PENS
 "wolvestwo" 1.0 0 -2064490 true "" "plot count wolvestwo"
 "wolvesthree" 1.0 0 -5825686 true "" "plot count wolvesthree"
 "wolvesfour" 1.0 0 -1184463 true "" "plot count wolvesfour"
-"grass 2 / 4" 1.0 0 -8630108 true "" "plot count patches with [ pcolor = violet] / 4"
-"grass 3 / 4" 1.0 0 -7500403 true "" "plot count patches with [ pcolor = gray] / 4"
-"grass 4 / 4" 1.0 0 -13791810 true "" "plot count patches with [ pcolor = sky] / 4"
+"grass 2 / 4" 1.0 0 -8630108 true "" "plot count patches with [ pcolor = violet]"
+"grass 3 / 4" 1.0 0 -7500403 true "" "plot count patches with [ pcolor = gray]"
+"grass 4 / 4" 1.0 0 -13791810 true "" "plot count patches with [ pcolor = sky] "
 
 MONITOR
 170
@@ -654,7 +665,7 @@ MONITOR
 340
 295
 grass
-count grass / 4
+count grass
 0
 1
 11
@@ -697,8 +708,8 @@ SLIDER
 cost-plasticity-wolf
 cost-plasticity-wolf
 0
-10
-1.3
+1
+0.3
 0.1
 1
 NIL
@@ -727,8 +738,8 @@ SLIDER
 cost-plasticity-sheep
 cost-plasticity-sheep
 0
-10
-1.0
+1
+0.2
 0.1
 1
 NIL
