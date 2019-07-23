@@ -251,7 +251,7 @@ to eat-grass [grasstype number-of-foods] ; sheep procedure
     set pcolor brown
     set energy energy + (sheep-gain-from-food / number-of-foods) ; sheep gain energy by eating
     set countdown grass-regrowth-time
-    show grasstype
+    ;show grasstype
    ]
 end
 
@@ -261,7 +261,7 @@ to eat-sheep [sheeptype number-of-foods]  ; wolf procedure
   [
     ask preyone [ die ]                            ; kill it, and...
     set energy energy + (wolf-gain-from-food / number-of-foods )     ; get energy from eating
-    show sheeptype
+    ;show sheeptype
   ]
 end
 
@@ -355,9 +355,11 @@ to-report plastic-jump
   let ps 0
    ifelse (trophic-level = "consumer")
     [set ps random-normal sheep-plasticity 0.2 ;;; MODIFIQUEI
-    show (word "fui plastico ovelha " ps)]
+    ;show (word "fui plastico ovelha " ps)
+  ]
     [set ps random-normal wolf-plasticity 0.2 ;;; MODIFIQUEI
-    show (word "fui plastico lobo " ps)]
+    ;show (word "fui plastico lobo " ps)
+  ]
   ifelse(ps < 0)[report 0.1][report ps]
 end
 
@@ -376,15 +378,15 @@ to impact
   ;LOAD-PATCH-DATA
 
   ; We check to make sure the file exists first
-  ; ifelse ( file-exists? "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/Perturbacoes/habitat_destruidof03p30.txt" )
-  ifelse ( file-exists? "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Perturbações/habitat_destruidof03p30.txt" )
+   ifelse ( file-exists? "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/Perturbacoes/habitat_destruidof03p30.txt" )
+ ; ifelse ( file-exists? "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Perturbações/habitat_destruidof03p30.txt" )
   [
     ; We are saving the data into a list, so it only needs to be loaded once.
     set patch-data []
 
     ; This opens the file, so we can use it.
-    ; file-open "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/Perturbacoes/habitat_destruidof03p30.txt"
-    file-open "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Perturbações/habitat_destruidof03p30.txt"
+     file-open "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/Perturbacoes/habitat_destruidof03p30.txt"
+   ; file-open "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Perturbações/habitat_destruidof03p30.txt"
 
     ; Read in all the data in the file
     while [ not file-at-end? ]
@@ -423,7 +425,7 @@ let coluna 0 ;x
   ]
 end
 
-to-report output
+to output
 
   ; RELATIVE ABUNDANCE
 
@@ -442,42 +444,63 @@ to-report output
   let abundance-relative-wolvestwo count wolvestwo / abundance-total
   let abundance-relative-wolvesthree count wolvesthree / abundance-total
   let abundance-relative-wolvesfour count wolvesfour / abundance-total
-  report abundance-relative-patchesgreen
-  report abundance-relative-patchesviolet
-  report abundance-relative-patchesgray
-  report abundance-relative-patchessky
-  report abundance-relative-sheepone
-  report abundance-relative-sheeptwo
-  report abundance-relative-sheepthree
-  report abundance-relative-sheepfour
-  report abundance-relative-wolvesone
-  report abundance-relative-wolvestwo
-  report abundance-relative-wolvesthree
-  report abundance-relative-wolvesfour
+
 
   ; RICHNESS
 
-  let richness1 0 ifelse any? sheepone [ set richness1 1][ set richness1 0]
-  let richness2 0 ifelse any? sheeptwo [ set richness2 1] [ set richness2 0]
-  let richness3 0 ifelse any? sheepthree [ set richness3 1] [ set richness3 0]
-  let richness4 0 ifelse any? sheepfour [ set richness4 1] [ set richness4 0]
-  let richness5 0 ifelse any? wolvesone [ set richness5 1] [ set richness5 0]
-  let richness6 0 ifelse any? wolvestwo [ set richness6 1] [ set richness6 0]
-  let richness7 0 ifelse any? wolvesthree [ set richness7 1] [ set richness7 0]
-  let richness8 0 ifelse any? wolvesfour [ set richness8 1] [ set richness8 0]
-  let richness9 0 ifelse any? patches with [pcolor = green] [ set richness9 1] [ set richness9 0]
-  let richness10 0 ifelse any? patches with [pcolor = violet] [ set richness10 1] [ set richness10 0]
-  let richness11 0 ifelse any? patches with [pcolor = gray] [ set richness11 1] [ set richness11 0]
-  let richness12 0 ifelse any? patches with [pcolor = sky] [ set richness12 1] [ set richness12 0]
+  let richness1 0
+  ifelse any? sheepone [ set richness1 1][ set richness1 0]
+  let richness2 0
+  ifelse any? sheeptwo [ set richness2 1] [ set richness2 0]
+  let richness3 0
+  ifelse any? sheepthree [ set richness3 1] [ set richness3 0]
+  let richness4 0
+  ifelse any? sheepfour [ set richness4 1] [ set richness4 0]
+  let richness5 0
+  ifelse any? wolvesone [ set richness5 1] [ set richness5 0]
+  let richness6 0
+  ifelse any? wolvestwo [ set richness6 1] [ set richness6 0]
+  let richness7 0
+  ifelse any? wolvesthree [ set richness7 1] [ set richness7 0]
+  let richness8 0
+  ifelse any? wolvesfour [ set richness8 1] [ set richness8 0]
+  let richness9 0
+  ifelse any? patches with [pcolor = green] [ set richness9 1] [ set richness9 0]
+  let richness10 0
+  ifelse any? patches with [pcolor = violet] [ set richness10 1] [ set richness10 0]
+  let richness11 0
+  ifelse any? patches with [pcolor = gray] [ set richness11 1] [ set richness11 0]
+  let richness12 0
+  ifelse any? patches with [pcolor = sky] [ set richness12 1] [ set richness12 0]
   let richness richness1 + richness2 + richness3 + richness4 + richness5 + richness6 + richness7 + richness8 + richness9 + richness10 + richness11 + richness12
-  report richness
+  ;report richness
 
   ; EVENESSS (Pielou)
     ; Shannon (soma final depois de fazer para cada especie) = AbundanceRelative (OK) . LogNaturalAbundanceRelative
+   let shannon 0
+   if abundance-relative-patchesgreen   > 0 [ set shannon shannon + (abundance-relative-patchesgreen * ln abundance-relative-patchesgreen )]
+   if abundance-relative-patchesviolet  > 0 [ set shannon shannon + (abundance-relative-patchesviolet * ln abundance-relative-patchesviolet )]
+   if abundance-relative-patchesgray    > 0 [ set shannon shannon + (abundance-relative-patchesgray   * ln abundance-relative-patchesgray)]
+   if abundance-relative-patchessky     > 0 [ set shannon shannon + (abundance-relative-patchessky    * ln abundance-relative-patchessky)]
+   if abundance-relative-sheepone       > 0 [ set shannon shannon + (abundance-relative-sheepone      * ln abundance-relative-sheepone)]
+   if abundance-relative-sheeptwo       > 0 [ set shannon shannon + (abundance-relative-sheeptwo      * ln abundance-relative-sheeptwo )]
+   if abundance-relative-sheepthree     > 0 [ set shannon shannon + (abundance-relative-sheepthree    * ln abundance-relative-sheepthree)]
+   if abundance-relative-sheepfour      > 0 [ set shannon shannon + (abundance-relative-sheepfour     * ln abundance-relative-sheepfour )]
+   if abundance-relative-wolvesone      > 0 [ set shannon shannon + (abundance-relative-wolvesone     * ln abundance-relative-wolvesone)]
+   if abundance-relative-wolvestwo      > 0 [ set shannon shannon + (abundance-relative-wolvestwo     * ln abundance-relative-wolvestwo )]
+   if abundance-relative-wolvesthree    > 0 [ set shannon shannon + (abundance-relative-wolvesthree   * ln  abundance-relative-wolvesthree)]
+   if abundance-relative-wolvesfour     > 0 [ set shannon shannon + (abundance-relative-wolvesfour    * ln abundance-relative-wolvesfour) ]
+   set shannon (-1 * shannon)
+  let Evenness ( shannon / ln richness)
+  ;report Evennes
 
-    ; Evenness (Shannon / ShannonMax) ShannonMax = LogNaturalRichness
+  let filename (word  sheep-gain-from-food "_" wolf-gain-from-food"_"replicate-number ".csv")
+  set-current-directory "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/"
+  if (file-exists? filename) [file-delete filename]
+  file-open filename
+  file-print  (word richness ";" shannon ";" Evenness)
 
-  let equabilidade 0
+  file-close
 end
 
 to-report check-stability
@@ -803,6 +826,21 @@ PENS
 "grass 2" 1.0 0 -8630108 true "" "plot count patches with [ pcolor = violet]"
 "grass 3" 1.0 0 -7500403 true "" "plot count patches with [ pcolor = gray]"
 "grass 4" 1.0 0 -13791810 true "" "plot count patches with [ pcolor = sky] "
+
+SLIDER
+25
+350
+197
+383
+replicate-number
+replicate-number
+0
+100
+50.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -1241,10 +1279,12 @@ repeat 75 [ go ]
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="experiment" repetitions="1" runMetricsEveryStep="true">
+  <experiment name="experiment" repetitions="1" runMetricsEveryStep="false">
     <setup>setup</setup>
     <go>go</go>
-    <timeLimit steps="5000"/>
+    <final>output</final>
+    <timeLimit steps="1000"/>
+    <exitCondition>not any? turtles</exitCondition>
     <metric>count patches with [ pcolor = green ]</metric>
     <metric>count patches with [ pcolor = violet ]</metric>
     <metric>count patches with [ pcolor = gray ]</metric>
@@ -1325,6 +1365,7 @@ repeat 75 [ go ]
     <enumeratedValueSet variable="wolf-plasticity">
       <value value="3"/>
     </enumeratedValueSet>
+    <steppedValueSet variable="replicate-number" first="1" step="1" last="100"/>
   </experiment>
 </experiments>
 @#$#@#$#@
