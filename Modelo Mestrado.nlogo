@@ -1,4 +1,4 @@
-globals [ max-sheep  population-history ] ; don't let sheep population grow too large ;; Sheep and wolves are both breeds of turtle.
+globals [ max-sheep  population-history  patch-data] ; don't let sheep population grow too large ;; Sheep and wolves are both breeds of turtle.
 breed [ sheepone a-sheepone ] ; sheep is its own plural, so we use "a-sheep" as the singular.
 breed [ sheeptwo a-sheeptwo ] ; especie 2 de ovelha
 breed [ sheepthree a-sheepthree ] ; especie 3 de ovelha
@@ -12,7 +12,7 @@ patches-own [ countdown cell-impacted ] ; contagem regressiva para nascimento da
 
 to setup ; configuração inicial do sistema
   clear-all
-  resize-world -50 50 -50 50 ; size of world
+ ; resize-world -50 50 -50 50 ; size of world
   ifelse netlogo-web?
    [  set max-sheep 10000  ]
    [  set max-sheep 30000  ]
@@ -103,6 +103,7 @@ to setup ; configuração inicial do sistema
 end
 
 to go ; faz individuos se moveram e fazer as açoes criadas
+  if ticks = 15 [ impact ]
   ; stop the simulation of no wolves or sheep
   if not any? turtles [ stop ]
   ; stop the model if there are no wolves and the number of sheep gets very large
@@ -265,12 +266,12 @@ to eat-sheep [sheeptype number-of-foods]  ; wolf procedure
 end
 
 to reproduce-sheep  ; sheep procedure
- if energy >= 20 [
+ if energy > 10 [ ; mudar pra 15 em outra possibilidade
   if random-float 100 < sheep-reproduce ; throw "dice" to see if you will reproduce
   [
     set energy energy - 10                ; divide energy between parent and offspring
     hatch 1 [
-      set energy 15
+      set energy 5 ; mudar pra 10 em outra rodada
       rt random-float 360
       fd 1
       set age 0
@@ -280,12 +281,12 @@ to reproduce-sheep  ; sheep procedure
 end
 
 to reproduce-wolves  ; wolf procedure
-  if energy >= 20 [
+  if energy > 10 [ ; mudar pra 15 em outra possibilidade
   if random-float 100 < wolf-reproduce ; throw "dice" to see if you will reproduce
   [
     set energy energy - 10              ; divide energy between parent and offspring
     hatch 1 [
-      set energy 15
+      set energy 5 ; mudar pra 10 em outra rodada
       rt random-float 360
       fd 1
       set age 0
@@ -371,27 +372,61 @@ to-report salto
 end
 
 to impact
-  ask patches [
-  if cell-impacted = 1 [
-    ask turtles-here [die]
-    ask patches [
-      set pcolor black
-      set countdown 100000
-    ]
-  ]
-  ]
-end
 
-to input
-  set-current-directory "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Perturbações"
-  let filename 0
-  set filename "habitat_destruidof03p30.txt"
-  if (ticks = 10) [ file-open filename ]
-  if is-number? 1 [ set cell-impacted 1]
-  file-close
+  ;LOAD-PATCH-DATA
+
+  ; We check to make sure the file exists first
+  ; ifelse ( file-exists? "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/Perturbacoes/habitat_destruidof03p30.txt" )
+  ifelse ( file-exists? "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Perturbações/habitat_destruidof03p30.txt" )
+  [
+    ; We are saving the data into a list, so it only needs to be loaded once.
+    set patch-data []
+
+    ; This opens the file, so we can use it.
+    ; file-open "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/Perturbacoes/habitat_destruidof03p30.txt"
+    file-open "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Perturbações/habitat_destruidof03p30.txt"
+
+    ; Read in all the data in the file
+    while [ not file-at-end? ]
+    [
+      ; file-read gives you variables.  In this case numbers.
+      ; We store them in a double list (ex [[1 1 9.9999] [1 2 9.9999] ...
+      ; Each iteration we append the next three-tuple to the current list
+      set patch-data sentence patch-data (list file-read)
+    ]
+    ; Done reading in patch information.  Close the file.
+    file-close
+  ]
+  [ ];user-message "There is no File IO Patch Data.txt file in current directory!" ]
+
+let linha 0 ;y
+let coluna 0 ;x
+ while[linha != (max-pycor + 1)]
+    [
+      while[coluna != (max-pxcor + 1)]
+      [
+          ask patch coluna linha [set cell-impacted item (linha + ((max-pycor + 1) * coluna) ) patch-data ]
+        ;"MORE CODE"
+        set coluna coluna + 1
+      ]
+      set coluna 0
+      set linha linha + 1
+    ]
+
+ ; IMPACT
+
+  ask patches with [cell-impacted = 1]
+  [
+    ask turtles-here [die]
+    set pcolor black
+    set countdown 100000
+  ]
 end
 
 to-report output
+
+  ; RELATIVE ABUNDANCE
+
   let abundance-turtles count turtles
   let abundance-patches count patches
   let abundance-total abundance-turtles + abundance-patches
@@ -419,7 +454,9 @@ to-report output
   report abundance-relative-wolvestwo
   report abundance-relative-wolvesthree
   report abundance-relative-wolvesfour
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  ; RICHNESS
+
   let richness1 0 ifelse any? sheepone [ set richness1 1][ set richness1 0]
   let richness2 0 ifelse any? sheeptwo [ set richness2 1] [ set richness2 0]
   let richness3 0 ifelse any? sheepthree [ set richness3 1] [ set richness3 0]
@@ -434,7 +471,12 @@ to-report output
   let richness12 0 ifelse any? patches with [pcolor = sky] [ set richness12 1] [ set richness12 0]
   let richness richness1 + richness2 + richness3 + richness4 + richness5 + richness6 + richness7 + richness8 + richness9 + richness10 + richness11 + richness12
   report richness
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  ; EVENESSS (Pielou)
+    ; Shannon (soma final depois de fazer para cada especie) = AbundanceRelative (OK) . LogNaturalAbundanceRelative
+
+    ; Evenness (Shannon / ShannonMax) ShannonMax = LogNaturalRichness
+
   let equabilidade 0
 end
 
@@ -445,8 +487,8 @@ end
 GRAPHICS-WINDOW
 345
 10
-853
-519
+848
+514
 -1
 -1
 4.9505
@@ -459,10 +501,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--50
-50
--50
-50
+0
+99
+0
+99
 1
 1
 1
@@ -471,9 +513,9 @@ ticks
 
 SLIDER
 -5
-40
+10
 169
-73
+43
 initial-number-sheep
 initial-number-sheep
 0
@@ -486,14 +528,14 @@ HORIZONTAL
 
 SLIDER
 -5
-110
+80
 169
-143
+113
 sheep-gain-from-food
 sheep-gain-from-food
 0.0
 100.0
-30.0
+10.0
 1.0
 1
 NIL
@@ -501,44 +543,44 @@ HORIZONTAL
 
 SLIDER
 0
-145
+115
 170
-178
+148
 sheep-reproduce
 sheep-reproduce
 1.0
-20.0
-8.0
-1.0
-1
-%
-HORIZONTAL
-
-SLIDER
-175
-40
-340
-73
-initial-number-wolves
-initial-number-wolves
-0
-250
-150.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-175
-110
-340
-143
-wolf-gain-from-food
-wolf-gain-from-food
-0.0
-100.0
 50.0
+5.0
+1.0
+1
+%
+HORIZONTAL
+
+SLIDER
+175
+10
+340
+43
+initial-number-wolves
+initial-number-wolves
+0
+250
+150.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+175
+80
+340
+113
+wolf-gain-from-food
+wolf-gain-from-food
+0.0
+100.0
+100.0
 1.0
 1
 NIL
@@ -546,14 +588,14 @@ HORIZONTAL
 
 SLIDER
 175
-145
+115
 340
-178
+148
 wolf-reproduce
 wolf-reproduce
 0.0
-20.0
-13.0
+50.0
+10.0
 1.0
 1
 %
@@ -561,24 +603,24 @@ HORIZONTAL
 
 SLIDER
 -5
-75
+45
 170
-108
+78
 grass-regrowth-time
 grass-regrowth-time
 0
 100
-10.0
+7.0
 1
 1
 NIL
 HORIZONTAL
 
 BUTTON
-0
-250
-69
-283
+75
+230
+144
+263
 setup
 setup
 NIL
@@ -592,10 +634,10 @@ NIL
 1
 
 BUTTON
-70
-250
-145
-283
+165
+230
+235
+263
 go
 go
 T
@@ -609,22 +651,21 @@ NIL
 0
 
 PLOT
-10
-295
-345
-525
-populations
+850
+245
+1190
+475
+Turtles
 time
-pop.
+pop
 0.0
 100.0
 0.0
-100.0
+400.0
 true
 true
 "" ""
 PENS
-"grass 1 / 4" 1.0 0 -10899396 true "" "plot count patches with [ pcolor = green ]"
 "sheepone" 1.0 0 -1513240 true "" "plot count sheepone"
 "sheeptwo" 1.0 0 -2674135 true "" "plot count sheeptwo"
 "sheepthree" 1.0 0 -13345367 true "" "plot count sheepthree"
@@ -633,15 +674,12 @@ PENS
 "wolvestwo" 1.0 0 -2064490 true "" "plot count wolvestwo"
 "wolvesthree" 1.0 0 -5825686 true "" "plot count wolvesthree"
 "wolvesfour" 1.0 0 -1184463 true "" "plot count wolvesfour"
-"grass 2 / 4" 1.0 0 -8630108 true "" "plot count patches with [ pcolor = violet]"
-"grass 3 / 4" 1.0 0 -7500403 true "" "plot count patches with [ pcolor = gray]"
-"grass 4 / 4" 1.0 0 -13791810 true "" "plot count patches with [ pcolor = sky] "
 
 MONITOR
-170
-250
-225
-295
+75
+275
+130
+320
 sheep
 count turtles with [ shape = \"sheep\"]
 3
@@ -649,10 +687,10 @@ count turtles with [ shape = \"sheep\"]
 11
 
 MONITOR
-230
-250
-285
-295
+135
+275
+190
+320
 wolves
 count turtles with [ shape = \"wolf\"]
 3
@@ -660,21 +698,21 @@ count turtles with [ shape = \"wolf\"]
 11
 
 MONITOR
-290
-250
-340
-295
+195
+275
+245
+320
 grass
-count grass
+count grass with [pcolor != black]
 0
 1
 11
 
 SLIDER
 0
-180
+150
 172
-213
+183
 sheep-plasticity
 sheep-plasticity
 0
@@ -687,9 +725,9 @@ HORIZONTAL
 
 SLIDER
 175
-75
+45
 340
-108
+78
 max-age
 max-age
 0
@@ -702,9 +740,9 @@ HORIZONTAL
 
 SLIDER
 175
-215
+185
 340
-248
+218
 cost-plasticity-wolf
 cost-plasticity-wolf
 0
@@ -717,9 +755,9 @@ HORIZONTAL
 
 SLIDER
 175
-180
+150
 340
-213
+183
 wolf-plasticity
 wolf-plasticity
 0
@@ -732,9 +770,9 @@ HORIZONTAL
 
 SLIDER
 0
-215
+185
 172
-248
+218
 cost-plasticity-sheep
 cost-plasticity-sheep
 0
@@ -744,6 +782,27 @@ cost-plasticity-sheep
 1
 NIL
 HORIZONTAL
+
+PLOT
+850
+10
+1190
+240
+Grasses
+time
+pop
+0.0
+100.0
+0.0
+3000.0
+true
+true
+"" ""
+PENS
+"grass 1" 1.0 0 -10899396 true "" "plot count patches with [ pcolor = green ]"
+"grass 2" 1.0 0 -8630108 true "" "plot count patches with [ pcolor = violet]"
+"grass 3" 1.0 0 -7500403 true "" "plot count patches with [ pcolor = gray]"
+"grass 4" 1.0 0 -13791810 true "" "plot count patches with [ pcolor = sky] "
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -1181,6 +1240,93 @@ setup
 repeat 75 [ go ]
 @#$#@#$#@
 @#$#@#$#@
+<experiments>
+  <experiment name="experiment" repetitions="1" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="5000"/>
+    <metric>count patches with [ pcolor = green ]</metric>
+    <metric>count patches with [ pcolor = violet ]</metric>
+    <metric>count patches with [ pcolor = gray ]</metric>
+    <metric>count patches with [ pcolor = sky ]</metric>
+    <metric>count turtles with [ breed = sheepone]</metric>
+    <metric>count turtles with [ breed = sheeptwo]</metric>
+    <metric>count turtles with [ breed = sheepthree]</metric>
+    <metric>count turtles with [ breed = sheepfour]</metric>
+    <metric>count turtles with [ breed = wolvesone]</metric>
+    <metric>count turtles with [ breed = wolvestwo]</metric>
+    <metric>count turtles with [ breed = wolvesthree]</metric>
+    <metric>count turtles with [ breed = wolvesfour]</metric>
+    <enumeratedValueSet variable="sheep-gain-from-food">
+      <value value="10"/>
+      <value value="20"/>
+      <value value="30"/>
+      <value value="40"/>
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="wolf-gain-from-food">
+      <value value="10"/>
+      <value value="20"/>
+      <value value="30"/>
+      <value value="40"/>
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="sheep-reproduce">
+      <value value="2"/>
+      <value value="5"/>
+      <value value="7"/>
+      <value value="9"/>
+      <value value="11"/>
+      <value value="13"/>
+      <value value="15"/>
+      <value value="17"/>
+      <value value="19"/>
+      <value value="21"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="wolf-reproduce">
+      <value value="2"/>
+      <value value="5"/>
+      <value value="7"/>
+      <value value="9"/>
+      <value value="11"/>
+      <value value="13"/>
+      <value value="15"/>
+      <value value="17"/>
+      <value value="19"/>
+      <value value="21"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max-age">
+      <value value="70"/>
+      <value value="110"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="grass-regrowth-time">
+      <value value="5"/>
+      <value value="10"/>
+      <value value="15"/>
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-number-wolves">
+      <value value="150"/>
+      <value value="300"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-number-sheep">
+      <value value="150"/>
+      <value value="300"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cost-plasticity-sheep">
+      <value value="0.2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cost-plasticity-wolf">
+      <value value="0.3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="sheep-plasticity">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="wolf-plasticity">
+      <value value="3"/>
+    </enumeratedValueSet>
+  </experiment>
+</experiments>
 @#$#@#$#@
 @#$#@#$#@
 default
