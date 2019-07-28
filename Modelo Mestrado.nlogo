@@ -1,4 +1,4 @@
-globals [ max-sheep  population-history  patch-data] ; don't let sheep population grow too large ;; Sheep and wolves are both breeds of turtle.
+globals [ max-sheep patch-data] ; don't let sheep population grow too large ;; Sheep and wolves are both breeds of turtle.
 breed [ sheepone a-sheepone ] ; sheep is its own plural, so we use "a-sheep" as the singular.
 breed [ sheeptwo a-sheeptwo ] ; especie 2 de ovelha
 breed [ sheepthree a-sheepthree ] ; especie 3 de ovelha
@@ -12,7 +12,6 @@ patches-own [ countdown cell-impacted ] ; contagem regressiva para nascimento da
 
 to setup ; configuração inicial do sistema
   clear-all
- ; resize-world -50 50 -50 50 ; size of world
   ifelse netlogo-web?
    [  set max-sheep 10000  ]
    [  set max-sheep 30000  ]
@@ -99,11 +98,11 @@ to setup ; configuração inicial do sistema
   ]
   reset-ticks
 
-  ;;;let population-history list
+
 end
 
 to go ; faz individuos se moveram e fazer as açoes criadas
-  if ticks = 15 [ impact ]
+  if ticks = 1100 [ impact ]
   ; stop the simulation of no wolves or sheep
   if not any? turtles [ stop ]
   ; stop the model if there are no wolves and the number of sheep gets very large
@@ -299,7 +298,7 @@ to grow-grass  ; patch procedure
   ; countdown on brown patches: if reach 0, grow some grass
   if pcolor = brown
   [
-    let neighbors-not-brown count neighbors with [pcolor != brown OR pcolor != black]
+    let neighbors-not-brown count neighbors with [pcolor != brown AND pcolor != black] ;;; AQUII
     ifelse (countdown <= 0) and neighbors-not-brown != 0
       [
         let greens count neighbors with [pcolor = green]
@@ -378,15 +377,15 @@ to impact
   ;LOAD-PATCH-DATA
 
   ; We check to make sure the file exists first
-   ifelse ( file-exists? "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/Perturbacoes/habitat_destruidof03p30.txt" )
- ; ifelse ( file-exists? "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Perturbações/habitat_destruidof03p30.txt" )
+   ;ifelse ( file-exists? "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/Perturbacoes/habitat_destruidof03p30.txt" )
+   ifelse ( file-exists? "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Perturbações/habitat_destruidof03p30.txt" )
   [
     ; We are saving the data into a list, so it only needs to be loaded once.
     set patch-data []
 
     ; This opens the file, so we can use it.
-     file-open "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/Perturbacoes/habitat_destruidof03p30.txt"
-   ; file-open "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Perturbações/habitat_destruidof03p30.txt"
+     ;file-open "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/Perturbacoes/habitat_destruidof03p30.txt"
+   file-open "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Perturbações/habitat_destruidof03p30.txt"
 
     ; Read in all the data in the file
     while [ not file-at-end? ]
@@ -423,6 +422,7 @@ let coluna 0 ;x
     set pcolor black
     set countdown 100000
   ]
+
 end
 
 to output
@@ -430,7 +430,7 @@ to output
   ; RELATIVE ABUNDANCE
 
   let abundance-turtles count turtles
-  let abundance-patches count patches
+  let abundance-patches count patches with [pcolor != black AND pcolor != brown] ;; AQUIII!!!
   let abundance-total abundance-turtles + abundance-patches
   let abundance-relative-patchesgreen count patches with [ pcolor = green ] / abundance-total
   let abundance-relative-patchesviolet count patches with [ pcolor = violet ] / abundance-total
@@ -444,7 +444,6 @@ to output
   let abundance-relative-wolvestwo count wolvestwo / abundance-total
   let abundance-relative-wolvesthree count wolvesthree / abundance-total
   let abundance-relative-wolvesfour count wolvesfour / abundance-total
-
 
   ; RICHNESS
 
@@ -473,12 +472,11 @@ to output
   let richness12 0
   ifelse any? patches with [pcolor = sky] [ set richness12 1] [ set richness12 0]
   let richness richness1 + richness2 + richness3 + richness4 + richness5 + richness6 + richness7 + richness8 + richness9 + richness10 + richness11 + richness12
-  ;report richness
 
-  ; EVENESSS (Pielou)
     ; Shannon (soma final depois de fazer para cada especie) = AbundanceRelative (OK) . LogNaturalAbundanceRelative
+
    let shannon 0
-   if abundance-relative-patchesgreen   > 0 [ set shannon shannon + (abundance-relative-patchesgreen * ln abundance-relative-patchesgreen )]
+   if abundance-relative-patchesgreen   > 0 [ set shannon shannon + (abundance-relative-patchesgreen  * ln abundance-relative-patchesgreen )]
    if abundance-relative-patchesviolet  > 0 [ set shannon shannon + (abundance-relative-patchesviolet * ln abundance-relative-patchesviolet )]
    if abundance-relative-patchesgray    > 0 [ set shannon shannon + (abundance-relative-patchesgray   * ln abundance-relative-patchesgray)]
    if abundance-relative-patchessky     > 0 [ set shannon shannon + (abundance-relative-patchessky    * ln abundance-relative-patchessky)]
@@ -491,20 +489,34 @@ to output
    if abundance-relative-wolvesthree    > 0 [ set shannon shannon + (abundance-relative-wolvesthree   * ln  abundance-relative-wolvesthree)]
    if abundance-relative-wolvesfour     > 0 [ set shannon shannon + (abundance-relative-wolvesfour    * ln abundance-relative-wolvesfour) ]
    set shannon (-1 * shannon)
-  let Evenness ( shannon / ln richness)
-  ;report Evennes
 
-  let filename (word  sheep-gain-from-food "_" wolf-gain-from-food"_"replicate-number ".csv")
-  set-current-directory "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/"
+  ; EVENESSS (Pielou)
+
+  let Evenness ( shannon / ln richness) ;report evenness
+
+  ;impact report
+  let sizeimp 0
+  let imp count patches with [ pcolor = black ]
+  let little "little"
+  let big "big"
+  ifelse imp < 50000 [ set sizeimp little ] [set sizeimp big]
+
+  ;output
+
+  let filename (word "plasticity" "s" sheep-plasticity "w" wolf-plasticity "_" "cost" "s" cost-plasticity-sheep "w" cost-plasticity-wolf "_"
+                     "foodsheep" sheep-gain-from-food "_" "foodwolf" wolf-gain-from-food"_" "reproduce" "s" sheep-reproduce "w" wolf-reproduce "_"
+                     "grassreg" grass-regrowth-time "_"  "_" "sizeimp" sizeimp "_" "rep" replicate-number ".csv")
+  ;set-current-directory "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/"
+  set-current-directory "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/behavioralspace"
   if (file-exists? filename) [file-delete filename]
   file-open filename
-  file-print  (word richness ";" shannon ";" Evenness)
-
+  file-print
+      (word "Richness; Shannon; Evenness; AbRelPgre; AbRelPvio; AbRelPgray; AbRelPsky; AbRelSone; AbRelStwo; AbRelSthree; AbRelSfou; AbRelWone; AbRelWtwo; AbRelWthree; AbRelWfour ")
+  file-print
+      (word richness ";" shannon ";" Evenness ";" abundance-relative-patchesgreen ";" abundance-relative-patchesviolet ";" abundance-relative-patchesgray ";"
+            abundance-relative-patchessky ";" abundance-relative-sheepone ";" abundance-relative-sheeptwo ";" abundance-relative-sheepthree ";" abundance-relative-sheepfour ";"
+            abundance-relative-wolvesone ";" abundance-relative-wolvestwo ";" abundance-relative-wolvesthree ";" abundance-relative-wolvesfour)
   file-close
-end
-
-to-report check-stability
-
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -542,7 +554,7 @@ SLIDER
 initial-number-sheep
 initial-number-sheep
 0
-250
+300
 150.0
 1
 1
@@ -573,7 +585,7 @@ sheep-reproduce
 sheep-reproduce
 1.0
 50.0
-5.0
+25.0
 1.0
 1
 %
@@ -587,7 +599,7 @@ SLIDER
 initial-number-wolves
 initial-number-wolves
 0
-250
+300
 150.0
 1
 1
@@ -603,7 +615,7 @@ wolf-gain-from-food
 wolf-gain-from-food
 0.0
 100.0
-100.0
+20.0
 1.0
 1
 NIL
@@ -618,7 +630,7 @@ wolf-reproduce
 wolf-reproduce
 0.0
 50.0
-10.0
+5.0
 1.0
 1
 %
@@ -633,7 +645,7 @@ grass-regrowth-time
 grass-regrowth-time
 0
 100
-7.0
+10.0
 1
 1
 NIL
@@ -755,7 +767,7 @@ max-age
 max-age
 0
 100
-70.0
+100.0
 1
 1
 NIL
@@ -836,7 +848,7 @@ replicate-number
 replicate-number
 0
 100
-50.0
+1.0
 1
 1
 NIL
@@ -1279,12 +1291,12 @@ repeat 75 [ go ]
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="experiment" repetitions="1" runMetricsEveryStep="false">
+  <experiment name="experimentone" repetitions="1" runMetricsEveryStep="false">
     <setup>setup</setup>
     <go>go</go>
     <final>output</final>
     <timeLimit steps="1000"/>
-    <exitCondition>not any? turtles</exitCondition>
+    <exitCondition>not any? turtles with [ shape = "wolf"]</exitCondition>
     <metric>count patches with [ pcolor = green ]</metric>
     <metric>count patches with [ pcolor = violet ]</metric>
     <metric>count patches with [ pcolor = gray ]</metric>
@@ -1302,56 +1314,38 @@ repeat 75 [ go ]
       <value value="20"/>
       <value value="30"/>
       <value value="40"/>
-      <value value="50"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="wolf-gain-from-food">
-      <value value="10"/>
       <value value="20"/>
       <value value="30"/>
       <value value="40"/>
       <value value="50"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="sheep-reproduce">
-      <value value="2"/>
       <value value="5"/>
-      <value value="7"/>
-      <value value="9"/>
-      <value value="11"/>
-      <value value="13"/>
+      <value value="10"/>
       <value value="15"/>
-      <value value="17"/>
-      <value value="19"/>
-      <value value="21"/>
+      <value value="25"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="wolf-reproduce">
-      <value value="2"/>
       <value value="5"/>
-      <value value="7"/>
-      <value value="9"/>
-      <value value="11"/>
-      <value value="13"/>
+      <value value="10"/>
       <value value="15"/>
-      <value value="17"/>
-      <value value="19"/>
-      <value value="21"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="max-age">
-      <value value="70"/>
-      <value value="110"/>
+      <value value="25"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="grass-regrowth-time">
       <value value="5"/>
       <value value="10"/>
       <value value="15"/>
-      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max-age">
+      <value value="100"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="initial-number-wolves">
       <value value="150"/>
-      <value value="300"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="initial-number-sheep">
       <value value="150"/>
-      <value value="300"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="cost-plasticity-sheep">
       <value value="0.2"/>
@@ -1365,7 +1359,7 @@ repeat 75 [ go ]
     <enumeratedValueSet variable="wolf-plasticity">
       <value value="3"/>
     </enumeratedValueSet>
-    <steppedValueSet variable="replicate-number" first="1" step="1" last="100"/>
+    <steppedValueSet variable="replicate-number" first="1" step="1" last="1"/>
   </experiment>
 </experiments>
 @#$#@#$#@
