@@ -12,9 +12,10 @@ patches-own [ countdown cell-impacted ] ; contagem regressiva para nascimento da
 
 to setup ; configuração inicial do sistema
   clear-all
-  ifelse netlogo-web?
-   [  set max-sheep 10000  ]
-   [  set max-sheep 30000  ]
+  random-seed replicate-number ;;; sets the seed to differentiate replicate and allow replicability
+ ; ifelse netlogo-web?
+  ;; [  set max-sheep 10000  ]
+  ; [  set max-sheep 30000  ]
   ; nascimento das gramíneas
     ask patches [
     set cell-impacted 0
@@ -511,7 +512,7 @@ to output
   if (file-exists? filename) [file-delete filename]
   file-open filename
   file-print
-      (word "ticks;sheep-plasticity;wolf-plasticity;cost-plasticity-sheep;cost-plasticity-wolf;sheep-gain-from-food;wolf-gain-from-food;sheep-reproduce;wolf-reproduce;grass-regrowth-time;sizeimp;replicate-number;Richness; Shannon; Evenness; AbRelPgre; AbRelPvio; AbRelPgray; AbRelPsky; AbRelSone; AbRelStwo; AbRelSthree; AbRelSfou; AbRelWone; AbRelWtwo; AbRelWthree; AbRelWfour ")
+      (word "ticks;sheep_plasticity;wolf_plasticity;cost_plasticity_sheep;cost_plasticity_wolf;sheep_gain_from_food;wolf_gain_from_food;sheep_reproduce;wolf_reproduce;grass_regrowth_time;sizeimp;replicate-number;Richness; Shannon; Evenness; AbRelPgre; AbRelPvio; AbRelPgray; AbRelPsky; AbRelSone; AbRelStwo; AbRelSthree; AbRelSfou; AbRelWone; AbRelWtwo; AbRelWthree; AbRelWfour ")
   file-print
       (word ticks ";"sheep-plasticity";"wolf-plasticity";"cost-plasticity-sheep";"cost-plasticity-wolf";"sheep-gain-from-food";"wolf-gain-from-food";"sheep-reproduce";"wolf-reproduce";"grass-regrowth-time";"sizeimp";"replicate-number";"richness ";" shannon ";" Evenness ";" abundance-relative-patchesgreen ";" abundance-relative-patchesviolet ";" abundance-relative-patchesgray ";"
             abundance-relative-patchessky ";" abundance-relative-sheepone ";" abundance-relative-sheeptwo ";" abundance-relative-sheepthree ";" abundance-relative-sheepfour ";"
@@ -848,7 +849,7 @@ replicate-number
 replicate-number
 0
 100
-1.0
+2.0
 1
 1
 NIL
