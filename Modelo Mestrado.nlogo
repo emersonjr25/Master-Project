@@ -106,7 +106,7 @@ to go ; faz individuos se moveram e fazer as açoes criadas
   ; stop the simulation of no wolves or sheep
   if not any? turtles [ stop ]
   ; stop the model if there are no wolves and the number of sheep gets very large
-  if not any? turtles with [ shape = "wolf"] and count turtles with [shape = "sheep"] > max-sheep [ user-message "The sheeps have inherited the earth" stop ]
+ ; if not any? turtles with [ shape = "wolf"] and count turtles with [shape = "sheep"] > max-sheep [ user-message "The sheeps have inherited the earth" stop ]
   ask sheepone
   [
       move
@@ -506,14 +506,14 @@ to output
   let filename (word "plasticity" "s" sheep-plasticity "w" wolf-plasticity "_" "cost" "s" cost-plasticity-sheep "w" cost-plasticity-wolf "_"
                      "foodsheep" sheep-gain-from-food "_" "foodwolf" wolf-gain-from-food"_" "reproduce" "s" sheep-reproduce "w" wolf-reproduce "_"
                      "grassreg" grass-regrowth-time "_"  "_" "sizeimp" sizeimp "_" "rep" replicate-number ".csv")
-  ;set-current-directory "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/"
-  set-current-directory "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/behavioralspace"
+  set-current-directory "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/output"
+  ;set-current-directory "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/behavioralspace"
   if (file-exists? filename) [file-delete filename]
   file-open filename
   file-print
-      (word "Richness; Shannon; Evenness; AbRelPgre; AbRelPvio; AbRelPgray; AbRelPsky; AbRelSone; AbRelStwo; AbRelSthree; AbRelSfou; AbRelWone; AbRelWtwo; AbRelWthree; AbRelWfour ")
+      (word "ticks;sheep-plasticity;wolf-plasticity;cost-plasticity-sheep;cost-plasticity-wolf;sheep-gain-from-food;wolf-gain-from-food;sheep-reproduce;wolf-reproduce;grass-regrowth-time;sizeimp;replicate-number;Richness; Shannon; Evenness; AbRelPgre; AbRelPvio; AbRelPgray; AbRelPsky; AbRelSone; AbRelStwo; AbRelSthree; AbRelSfou; AbRelWone; AbRelWtwo; AbRelWthree; AbRelWfour ")
   file-print
-      (word richness ";" shannon ";" Evenness ";" abundance-relative-patchesgreen ";" abundance-relative-patchesviolet ";" abundance-relative-patchesgray ";"
+      (word ticks ";"sheep-plasticity";"wolf-plasticity";"cost-plasticity-sheep";"cost-plasticity-wolf";"sheep-gain-from-food";"wolf-gain-from-food";"sheep-reproduce";"wolf-reproduce";"grass-regrowth-time";"sizeimp";"replicate-number";"richness ";" shannon ";" Evenness ";" abundance-relative-patchesgreen ";" abundance-relative-patchesviolet ";" abundance-relative-patchesgray ";"
             abundance-relative-patchessky ";" abundance-relative-sheepone ";" abundance-relative-sheeptwo ";" abundance-relative-sheepthree ";" abundance-relative-sheepfour ";"
             abundance-relative-wolvesone ";" abundance-relative-wolvestwo ";" abundance-relative-wolvesthree ";" abundance-relative-wolvesfour)
   file-close
@@ -752,7 +752,7 @@ sheep-plasticity
 sheep-plasticity
 0
 10
-2.0
+5.0
 1
 1
 NIL
@@ -782,7 +782,7 @@ cost-plasticity-wolf
 cost-plasticity-wolf
 0
 1
-0.3
+0.4
 0.1
 1
 NIL
