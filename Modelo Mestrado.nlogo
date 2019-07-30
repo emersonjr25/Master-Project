@@ -570,7 +570,7 @@ sheep-gain-from-food
 sheep-gain-from-food
 0.0
 100.0
-10.0
+20.0
 1.0
 1
 NIL
@@ -585,7 +585,7 @@ sheep-reproduce
 sheep-reproduce
 1.0
 50.0
-25.0
+15.0
 1.0
 1
 %
@@ -615,7 +615,7 @@ wolf-gain-from-food
 wolf-gain-from-food
 0.0
 100.0
-20.0
+40.0
 1.0
 1
 NIL
@@ -645,7 +645,7 @@ grass-regrowth-time
 grass-regrowth-time
 0
 100
-10.0
+5.0
 1
 1
 NIL
@@ -1295,7 +1295,7 @@ repeat 75 [ go ]
     <setup>setup</setup>
     <go>go</go>
     <final>output</final>
-    <timeLimit steps="1000"/>
+    <timeLimit steps="500"/>
     <exitCondition>not any? turtles with [ shape = "wolf"]</exitCondition>
     <metric>count patches with [ pcolor = green ]</metric>
     <metric>count patches with [ pcolor = violet ]</metric>
