@@ -1,4 +1,4 @@
-globals [ max-sheep patch-data] ; don't let sheep population grow too large ;; Sheep and wolves are both breeds of turtle.
+globals [ patch-data ] ; put and pull archive impact
 breed [ sheepone a-sheepone ] ; sheep is its own plural, so we use "a-sheep" as the singular.
 breed [ sheeptwo a-sheeptwo ] ; especie 2 de ovelha
 breed [ sheepthree a-sheepthree ] ; especie 3 de ovelha
@@ -13,9 +13,6 @@ patches-own [ countdown cell-impacted ] ; contagem regressiva para nascimento da
 to setup ; configuração inicial do sistema
   clear-all
   random-seed replicate-number ;;; sets the seed to differentiate replicate and allow replicability
- ; ifelse netlogo-web?
-  ;; [  set max-sheep 10000  ]
-  ; [  set max-sheep 30000  ]
   ; nascimento das gramíneas
     ask patches [
     set cell-impacted 0
@@ -98,16 +95,12 @@ to setup ; configuração inicial do sistema
     set trophic-level "predator"
   ]
   reset-ticks
-
-
 end
 
 to go ; faz individuos se moveram e fazer as açoes criadas
   if ticks = 1100 [ impact ]
   ; stop the simulation of no wolves or sheep
   if not any? turtles [ stop ]
-  ; stop the model if there are no wolves and the number of sheep gets very large
- ; if not any? turtles with [ shape = "wolf"] and count turtles with [shape = "sheep"] > max-sheep [ user-message "The sheeps have inherited the earth" stop ]
   ask sheepone
   [
       move
@@ -266,12 +259,12 @@ to eat-sheep [sheeptype number-of-foods]  ; wolf procedure
 end
 
 to reproduce-sheep  ; sheep procedure
- if energy > 10 [ ; mudar pra 15 em outra possibilidade
+ if energy > 10 [
   if random-float 100 < sheep-reproduce ; throw "dice" to see if you will reproduce
   [
     set energy energy - 10                ; divide energy between parent and offspring
     hatch 1 [
-      set energy 5 ; mudar pra 10 em outra rodada
+      set energy 5
       rt random-float 360
       fd 1
       set age 0
@@ -281,12 +274,12 @@ to reproduce-sheep  ; sheep procedure
 end
 
 to reproduce-wolves  ; wolf procedure
-  if energy > 10 [ ; mudar pra 15 em outra possibilidade
+  if energy > 10 [
   if random-float 100 < wolf-reproduce ; throw "dice" to see if you will reproduce
   [
     set energy energy - 10              ; divide energy between parent and offspring
     hatch 1 [
-      set energy 5 ; mudar pra 10 em outra rodada
+      set energy 5
       rt random-float 360
       fd 1
       set age 0
@@ -299,7 +292,7 @@ to grow-grass  ; patch procedure
   ; countdown on brown patches: if reach 0, grow some grass
   if pcolor = brown
   [
-    let neighbors-not-brown count neighbors with [pcolor != brown AND pcolor != black] ;;; AQUII
+    let neighbors-not-brown count neighbors with [pcolor != brown AND pcolor != black]
     ifelse (countdown <= 0) and neighbors-not-brown != 0
       [
         let greens count neighbors with [pcolor = green]
@@ -360,7 +353,7 @@ to-report plastic-jump
     [set ps random-normal wolf-plasticity 0.2 ;;; MODIFIQUEI
     ;show (word "fui plastico lobo " ps)
   ]
-  ifelse(ps < 0)[report 0.1][report ps]
+  ifelse(ps <= 0)[report 0.1][report ps]
 end
 
 to-report salto
@@ -431,7 +424,7 @@ to output
   ; RELATIVE ABUNDANCE
 
   let abundance-turtles count turtles
-  let abundance-patches count patches with [pcolor != black AND pcolor != brown] ;; AQUIII!!!
+  let abundance-patches count patches with [pcolor != black AND pcolor != brown]
   let abundance-total abundance-turtles + abundance-patches
   let abundance-relative-patchesgreen count patches with [ pcolor = green ] / abundance-total
   let abundance-relative-patchesviolet count patches with [ pcolor = violet ] / abundance-total
@@ -507,15 +500,17 @@ to output
   let filename (word "plasticity" "s" sheep-plasticity "w" wolf-plasticity "_" "cost" "s" cost-plasticity-sheep "w" cost-plasticity-wolf "_"
                      "foodsheep" sheep-gain-from-food "_" "foodwolf" wolf-gain-from-food"_" "reproduce" "s" sheep-reproduce "w" wolf-reproduce "_"
                      "grassreg" grass-regrowth-time "_"  "_" "sizeimp" sizeimp "_" "rep" replicate-number ".csv")
-  set-current-directory "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/output"
-  ;set-current-directory "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/behavioralspace"
+  ;set-current-directory "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/output"
+  set-current-directory "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/behavioralspace"
   if (file-exists? filename) [file-delete filename]
   file-open filename
   file-print
-      (word "ticks;sheep_plasticity;wolf_plasticity;cost_plasticity_sheep;cost_plasticity_wolf;sheep_gain_from_food;wolf_gain_from_food;sheep_reproduce;wolf_reproduce;grass_regrowth_time;sizeimp;replicate-number;Richness; Shannon; Evenness; AbRelPgre; AbRelPvio; AbRelPgray; AbRelPsky; AbRelSone; AbRelStwo; AbRelSthree; AbRelSfou; AbRelWone; AbRelWtwo; AbRelWthree; AbRelWfour ")
+      (word "ticks; sheep_plasticity; wolf_plasticity; cost_plasticity_sheep; cost_plasticity_wolf; sheep_gain_from_food; wolf_gain_from_food; sheep_reproduce; wolf_reproduce; grass_regrowth_time; sizeimp; replicate-number; Richness; Shannon; Evenness; AbRelPgre; AbRelPvio; AbRelPgray; AbRelPsky; AbRelSone; AbRelStwo; AbRelSthree; AbRelSfou; AbRelWone; AbRelWtwo; AbRelWthree; AbRelWfour")
   file-print
-      (word ticks ";"sheep-plasticity";"wolf-plasticity";"cost-plasticity-sheep";"cost-plasticity-wolf";"sheep-gain-from-food";"wolf-gain-from-food";"sheep-reproduce";"wolf-reproduce";"grass-regrowth-time";"sizeimp";"replicate-number";"richness ";" shannon ";" Evenness ";" abundance-relative-patchesgreen ";" abundance-relative-patchesviolet ";" abundance-relative-patchesgray ";"
-            abundance-relative-patchessky ";" abundance-relative-sheepone ";" abundance-relative-sheeptwo ";" abundance-relative-sheepthree ";" abundance-relative-sheepfour ";"
+      (word ticks ";" sheep-plasticity ";" wolf-plasticity ";"cost-plasticity-sheep ";" cost-plasticity-wolf ";" sheep-gain-from-food ";" wolf-gain-from-food ";"
+            sheep-reproduce ";" wolf-reproduce ";" grass-regrowth-time ";" sizeimp ";" replicate-number ";" richness ";" shannon ";" Evenness ";"
+            abundance-relative-patchesgreen ";" abundance-relative-patchesviolet ";" abundance-relative-patchesgray ";" abundance-relative-patchessky ";"
+            abundance-relative-sheepone ";" abundance-relative-sheeptwo ";" abundance-relative-sheepthree ";" abundance-relative-sheepfour ";"
             abundance-relative-wolvesone ";" abundance-relative-wolvestwo ";" abundance-relative-wolvesthree ";" abundance-relative-wolvesfour)
   file-close
 end
@@ -616,7 +611,7 @@ wolf-gain-from-food
 wolf-gain-from-food
 0.0
 100.0
-40.0
+50.0
 1.0
 1
 NIL
@@ -753,7 +748,7 @@ sheep-plasticity
 sheep-plasticity
 0
 10
-5.0
+2.0
 1
 1
 NIL
@@ -783,7 +778,7 @@ cost-plasticity-wolf
 cost-plasticity-wolf
 0
 1
-0.4
+0.3
 0.1
 1
 NIL
@@ -849,7 +844,7 @@ replicate-number
 replicate-number
 0
 100
-2.0
+1.0
 1
 1
 NIL
@@ -1297,7 +1292,7 @@ repeat 75 [ go ]
     <go>go</go>
     <final>output</final>
     <timeLimit steps="500"/>
-    <exitCondition>not any? turtles with [ shape = "wolf"]</exitCondition>
+    <exitCondition>not any? turtles with [ breed = sheepone] OR not any? turtles with [ breed = sheeptwo] OR not any? turtles with [ breed = sheepthree] OR not any? turtles with [ breed = sheepfour] OR not any? turtles with [ breed = wolvesone] OR not any? turtles with [ breed = wolvestwo] OR not any? turtles with [ breed = wolvesthree] OR not any? turtles with [ breed = wolvesfour]</exitCondition>
     <metric>count patches with [ pcolor = green ]</metric>
     <metric>count patches with [ pcolor = violet ]</metric>
     <metric>count patches with [ pcolor = gray ]</metric>
@@ -1311,19 +1306,16 @@ repeat 75 [ go ]
     <metric>count turtles with [ breed = wolvesthree]</metric>
     <metric>count turtles with [ breed = wolvesfour]</metric>
     <enumeratedValueSet variable="sheep-gain-from-food">
-      <value value="10"/>
       <value value="20"/>
       <value value="30"/>
       <value value="40"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="wolf-gain-from-food">
-      <value value="20"/>
       <value value="30"/>
       <value value="40"/>
       <value value="50"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="sheep-reproduce">
-      <value value="5"/>
       <value value="10"/>
       <value value="15"/>
       <value value="25"/>
@@ -1332,7 +1324,6 @@ repeat 75 [ go ]
       <value value="5"/>
       <value value="10"/>
       <value value="15"/>
-      <value value="25"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="grass-regrowth-time">
       <value value="5"/>
@@ -1360,7 +1351,73 @@ repeat 75 [ go ]
     <enumeratedValueSet variable="wolf-plasticity">
       <value value="3"/>
     </enumeratedValueSet>
-    <steppedValueSet variable="replicate-number" first="1" step="1" last="1"/>
+    <steppedValueSet variable="replicate-number" first="1" step="1" last="100"/>
+  </experiment>
+  <experiment name="experimenttwo" repetitions="1" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <final>output</final>
+    <timeLimit steps="500"/>
+    <exitCondition>not any? turtles with [ shape = "wolf"]</exitCondition>
+    <metric>count patches with [ pcolor = green ]</metric>
+    <metric>count patches with [ pcolor = violet ]</metric>
+    <metric>count patches with [ pcolor = gray ]</metric>
+    <metric>count patches with [ pcolor = sky ]</metric>
+    <metric>count turtles with [ breed = sheepone]</metric>
+    <metric>count turtles with [ breed = sheeptwo]</metric>
+    <metric>count turtles with [ breed = sheepthree]</metric>
+    <metric>count turtles with [ breed = sheepfour]</metric>
+    <metric>count turtles with [ breed = wolvesone]</metric>
+    <metric>count turtles with [ breed = wolvestwo]</metric>
+    <metric>count turtles with [ breed = wolvesthree]</metric>
+    <metric>count turtles with [ breed = wolvesfour]</metric>
+    <enumeratedValueSet variable="sheep-gain-from-food">
+      <value value="20"/>
+      <value value="30"/>
+      <value value="40"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="wolf-gain-from-food">
+      <value value="30"/>
+      <value value="40"/>
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="sheep-reproduce">
+      <value value="10"/>
+      <value value="15"/>
+      <value value="25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="wolf-reproduce">
+      <value value="5"/>
+      <value value="10"/>
+      <value value="15"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="grass-regrowth-time">
+      <value value="5"/>
+      <value value="10"/>
+      <value value="15"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max-age">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-number-wolves">
+      <value value="150"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-number-sheep">
+      <value value="150"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cost-plasticity-sheep">
+      <value value="0.2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cost-plasticity-wolf">
+      <value value="0.3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="sheep-plasticity">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="wolf-plasticity">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="replicate-number" first="1" step="1" last="100"/>
   </experiment>
 </experiments>
 @#$#@#$#@
