@@ -1,5 +1,5 @@
-install.packages("here")
-install.packages("beepr")
+#install.packages("here")
+#install.packages("beepr")
 library(here)
 library(dplyr)
 library(data.table) # fread is a faster file reader than read.table
@@ -17,9 +17,9 @@ save(tmp, file = "all.output.RData", compress = TRUE)
 species <- do.call(rbind, tmp)
 
 #sheep-plasticity;wolf-plasticity;cost-plasticity-sheep;cost-plasticity-wolf;sheep-gain-from-food;wolf-gain-from-food;wolf-gain-from-food;sheep-reproduce;wolf-reproduce;grass-regrowth-time;sizeimp;replicate-number;Richness; Shannon; Evenness; AbRelPgre; AbRelPvio; AbRelPgray; AbRelPsky; AbRelSone; AbRelStwo; AbRelSthree; AbRelSfou; AbRelWone; AbRelWtwo; AbRelWthree; AbRelWfour
-
+ summary(species)
 species %>% 
-   group_by (ticks,
+   group_by (
             sheep_plasticity,
             wolf_plasticity,
             cost_plasticity_sheep,
@@ -31,4 +31,5 @@ species %>%
             grass_regrowth_time) %>%
    summarize(mean_Richness = mean(Richness , na.rm = TRUE),
              sd_Richness = sd(Richness , na.rm = TRUE)) -> Richness_per_set
-
+summary(Richness_per_set)
+write.csv2(Richness_per_set,"richness.csv", row.names = F)

@@ -31,15 +31,15 @@ to setup ; configuração inicial do sistema
     set trophic-level "consumer"
   ]
 
-  create-sheeptwo initial-number-sheep
-  [
-    set shape "sheep"
-    set color red
-    set size 1.5  ; easier to see
-    set energy random (2 * sheep-gain-from-food)
-    setxy random-xcor random-ycor
-    set trophic-level "consumer"
-  ]
+;  create-sheeptwo initial-number-sheep
+;  [
+;    set shape "sheep"
+;    set color red
+;    set size 1.5  ; easier to see
+;    set energy random (2 * sheep-gain-from-food)
+;    setxy random-xcor random-ycor
+;    set trophic-level "consumer"
+;  ]
    create-sheepthree initial-number-sheep
   [
     set shape "sheep"
@@ -76,15 +76,15 @@ to setup ; configuração inicial do sistema
     setxy random-xcor random-ycor
     set trophic-level "predator"
   ]
-  create-wolvesthree initial-number-wolves
-  [
-    set shape "wolf"
-    set color magenta
-    set size 1.5  ; easier to see
-    set energy random (2 * wolf-gain-from-food)
-    setxy random-xcor random-ycor
-    set trophic-level "predator"
-  ]
+;  create-wolvesthree initial-number-wolves
+;  [
+;    set shape "wolf"
+;    set color magenta
+;    set size 1.5  ; easier to see
+;    set energy random (2 * wolf-gain-from-food)
+;    setxy random-xcor random-ycor
+;    set trophic-level "predator"
+;  ]
   create-wolvesfour initial-number-wolves
   [
     set shape "wolf"
@@ -98,7 +98,7 @@ to setup ; configuração inicial do sistema
 end
 
 to go ; faz individuos se moveram e fazer as açoes criadas
-  if ticks = 1100 [ impact ]
+  if ticks = 501 [ impact ]
   ; stop the simulation of no wolves or sheep
   if not any? turtles [ stop ]
   ask sheepone
@@ -112,18 +112,18 @@ to go ; faz individuos se moveram e fazer as açoes criadas
       death ; sheep die from starvation
       reproduce-sheep  ; sheep reproduce at random rate governed by slider
   ]
-  ask sheeptwo
-  [
-      move
-     ; sheep eat grass, grass grows and it costs sheep energy to move
-      set energy energy - ( 1 + cost-plasticity-sheep)
-      if energy < 10 [
-      eat-grass green 2
-      eat-grass gray  2
-      ]
-      death ; sheep die from starvation
-      reproduce-sheep  ; sheep reproduce at random rate governed by slider
-  ]
+;  ask sheeptwo
+;  [
+;      move
+;     ; sheep eat grass, grass grows and it costs sheep energy to move
+;      set energy energy - ( 1 + cost-plasticity-sheep)
+;      if energy < 10 [
+;      eat-grass green 2
+;      eat-grass gray  2
+;      ]
+;      death ; sheep die from starvation
+;      reproduce-sheep  ; sheep reproduce at random rate governed by slider
+;  ]
    ask sheepthree
   [
       move
@@ -180,27 +180,27 @@ to go ; faz individuos se moveram e fazer as açoes criadas
     death ; wolves die if our of energy
     reproduce-wolves ; wolves reproduce at random rate governed by slider
   ]
-   ask wolvesthree
-  [
-    move
-    set energy energy - ( 1 + cost-plasticity-wolf) ; wolves lose energy as they move
-    if ( energy < 10) AND (any?  other turtles-here with [shape = "sheep"])[
-    let context [0] ;;always can move
-    if any? sheeptwo-here [ set context lput 2 context]
-    if any? sheepthree-here [ set context lput 3 context]
-    if any? sheepfour-here  [ set context lput 4 context]
-    set context remove 0 context
-      ifelse(empty? context)[]
-       [
-    let x one-of context
-    if (x = 2)[eat-sheep sheeptwo 3]
-    if (x = 3)[eat-sheep sheepthree 3]
-    if (x = 4)[eat-sheep sheepfour 3]
-      ]
-    ]; wolves eat a sheep on their patch
-    death ; wolves die if our of energy
-    reproduce-wolves ; wolves reproduce at random rate governed by slider
-  ]
+;   ask wolvesthree
+;  [
+;    move
+;    set energy energy - ( 1 + cost-plasticity-wolf) ; wolves lose energy as they move
+;    if ( energy < 10) AND (any?  other turtles-here with [shape = "sheep"])[
+;    let context [0] ;;always can move
+;    if any? sheeptwo-here [ set context lput 2 context]
+;    if any? sheepthree-here [ set context lput 3 context]
+;    if any? sheepfour-here  [ set context lput 4 context]
+;    set context remove 0 context
+;      ifelse(empty? context)[]
+;       [
+;    let x one-of context
+;    if (x = 2)[eat-sheep sheeptwo 3]
+;    if (x = 3)[eat-sheep sheepthree 3]
+;    if (x = 4)[eat-sheep sheepfour 3]
+;      ]
+;    ]; wolves eat a sheep on their patch
+;    death ; wolves die if our of energy
+;    reproduce-wolves ; wolves reproduce at random rate governed by slider
+;  ]
    ask wolvesfour
   [
     move
@@ -373,6 +373,7 @@ to impact
   ; We check to make sure the file exists first
    ;ifelse ( file-exists? "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/Perturbacoes/habitat_destruidof03p30.txt" )
    ifelse ( file-exists? "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Perturbações/habitat_destruidof03p30.txt" )
+   ;ifelse ( file-exists? "/Users/Nuevissimos/Documents/Emerson/MestradoEmerson-master/Perturbações/habitat_destruidof03p30.txt" )
   [
     ; We are saving the data into a list, so it only needs to be loaded once.
     set patch-data []
@@ -380,7 +381,7 @@ to impact
     ; This opens the file, so we can use it.
      ;file-open "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/Perturbacoes/habitat_destruidof03p30.txt"
    file-open "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Perturbações/habitat_destruidof03p30.txt"
-
+   ;file-open "/Users/Nuevissimos/Documents/Emerson/MestradoEmerson-master/Perturbações/habitat_destruidof03p30.txt"
     ; Read in all the data in the file
     while [ not file-at-end? ]
     [
@@ -502,6 +503,7 @@ to output
                      "grassreg" grass-regrowth-time "_"  "_" "sizeimp" sizeimp "_" "rep" replicate-number ".csv")
   ;set-current-directory "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/output"
   set-current-directory "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/behavioralspace"
+  ;set-current-directory "/Users/Nuevissimos/Documents/Emerson/MestradoEmerson-master/behavioralspace"
   if (file-exists? filename) [file-delete filename]
   file-open filename
   file-print
@@ -566,7 +568,7 @@ sheep-gain-from-food
 sheep-gain-from-food
 0.0
 100.0
-20.0
+40.0
 1.0
 1
 NIL
@@ -581,7 +583,7 @@ sheep-reproduce
 sheep-reproduce
 1.0
 50.0
-15.0
+25.0
 1.0
 1
 %
@@ -626,7 +628,7 @@ wolf-reproduce
 wolf-reproduce
 0.0
 50.0
-5.0
+15.0
 1.0
 1
 %
@@ -641,7 +643,7 @@ grass-regrowth-time
 grass-regrowth-time
 0
 100
-5.0
+15.0
 1
 1
 NIL
@@ -748,7 +750,7 @@ sheep-plasticity
 sheep-plasticity
 0
 10
-2.0
+8.0
 1
 1
 NIL
@@ -778,7 +780,7 @@ cost-plasticity-wolf
 cost-plasticity-wolf
 0
 1
-0.3
+0.9
 0.1
 1
 NIL
@@ -793,7 +795,7 @@ wolf-plasticity
 wolf-plasticity
 0
 10
-3.0
+9.0
 1
 1
 NIL
@@ -808,7 +810,7 @@ cost-plasticity-sheep
 cost-plasticity-sheep
 0
 1
-0.2
+0.8
 0.1
 1
 NIL
@@ -1287,12 +1289,76 @@ repeat 75 [ go ]
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="experimentone" repetitions="1" runMetricsEveryStep="false">
+  <experiment name="experimentfast" repetitions="1" runMetricsEveryStep="false">
     <setup>setup</setup>
     <go>go</go>
     <final>output</final>
     <timeLimit steps="500"/>
-    <exitCondition>not any? turtles with [ breed = sheepone] OR not any? turtles with [ breed = sheeptwo] OR not any? turtles with [ breed = sheepthree] OR not any? turtles with [ breed = sheepfour] OR not any? turtles with [ breed = wolvesone] OR not any? turtles with [ breed = wolvestwo] OR not any? turtles with [ breed = wolvesthree] OR not any? turtles with [ breed = wolvesfour]</exitCondition>
+    <exitCondition>not any? turtles with [ breed = sheepone] OR not any? turtles with [ breed = sheepthree] OR not any? turtles with [ breed = sheepfour] OR not any? turtles with [ breed = wolvesone] OR not any? turtles with [ breed = wolvestwo] OR not any? turtles with [ breed = wolvesfour]</exitCondition>
+    <metric>count patches with [ pcolor = green ]</metric>
+    <metric>count patches with [ pcolor = violet ]</metric>
+    <metric>count patches with [ pcolor = gray ]</metric>
+    <metric>count patches with [ pcolor = sky ]</metric>
+    <metric>count turtles with [ breed = sheepone]</metric>
+    <metric>count turtles with [ breed = sheepthree]</metric>
+    <metric>count turtles with [ breed = sheepfour]</metric>
+    <metric>count turtles with [ breed = wolvesone]</metric>
+    <metric>count turtles with [ breed = wolvestwo]</metric>
+    <metric>count turtles with [ breed = wolvesfour]</metric>
+    <enumeratedValueSet variable="sheep-gain-from-food">
+      <value value="20"/>
+      <value value="30"/>
+      <value value="40"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="wolf-gain-from-food">
+      <value value="30"/>
+      <value value="40"/>
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="sheep-reproduce">
+      <value value="10"/>
+      <value value="15"/>
+      <value value="25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="wolf-reproduce">
+      <value value="5"/>
+      <value value="10"/>
+      <value value="15"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="grass-regrowth-time">
+      <value value="5"/>
+      <value value="10"/>
+      <value value="15"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max-age">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-number-wolves">
+      <value value="150"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-number-sheep">
+      <value value="150"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cost-plasticity-sheep">
+      <value value="0.2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cost-plasticity-wolf">
+      <value value="0.3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="sheep-plasticity">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="wolf-plasticity">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="replicate-number" first="1" step="1" last="100"/>
+  </experiment>
+  <experiment name="experimentprincipalbaixoC" repetitions="1" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <final>output</final>
+    <timeLimit steps="500"/>
+    <exitCondition>not any? turtles with [ shape = "wolf"]</exitCondition>
     <metric>count patches with [ pcolor = green ]</metric>
     <metric>count patches with [ pcolor = violet ]</metric>
     <metric>count patches with [ pcolor = gray ]</metric>
@@ -1353,7 +1419,7 @@ repeat 75 [ go ]
     </enumeratedValueSet>
     <steppedValueSet variable="replicate-number" first="1" step="1" last="100"/>
   </experiment>
-  <experiment name="experimenttwo" repetitions="1" runMetricsEveryStep="false">
+  <experiment name="experimentprincipalaltoC" repetitions="1" runMetricsEveryStep="false">
     <setup>setup</setup>
     <go>go</go>
     <final>output</final>
@@ -1406,10 +1472,10 @@ repeat 75 [ go ]
       <value value="150"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="cost-plasticity-sheep">
-      <value value="0.2"/>
+      <value value="0.8"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="cost-plasticity-wolf">
-      <value value="0.3"/>
+      <value value="0.9"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="sheep-plasticity">
       <value value="2"/>
