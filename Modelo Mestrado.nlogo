@@ -1587,6 +1587,69 @@ repeat 75 [ go ]
     </enumeratedValueSet>
     <steppedValueSet variable="replicate-number" first="1" step="1" last="100"/>
   </experiment>
+  <experiment name="Simulações finais" repetitions="1" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <final>output</final>
+    <timeLimit steps="500"/>
+    <metric>count patches with [ pcolor = green ]</metric>
+    <metric>count patches with [ pcolor = violet ]</metric>
+    <metric>count patches with [ pcolor = gray ]</metric>
+    <metric>count patches with [ pcolor = sky ]</metric>
+    <metric>count turtles with [ breed = sheepone]</metric>
+    <metric>count turtles with [ breed = sheeptwo]</metric>
+    <metric>count turtles with [ breed = sheepthree]</metric>
+    <metric>count turtles with [ breed = sheepfour]</metric>
+    <metric>count turtles with [ breed = wolvesone]</metric>
+    <metric>count turtles with [ breed = wolvestwo]</metric>
+    <metric>count turtles with [ breed = wolvesthree]</metric>
+    <metric>count turtles with [ breed = wolvesfour]</metric>
+    <enumeratedValueSet variable="sheep-gain-from-food">
+      <value value="20"/>
+      <value value="30"/>
+      <value value="40"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="wolf-gain-from-food">
+      <value value="30"/>
+      <value value="40"/>
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="sheep-reproduce">
+      <value value="10"/>
+      <value value="15"/>
+      <value value="25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="wolf-reproduce">
+      <value value="5"/>
+      <value value="10"/>
+      <value value="15"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="grass-regrowth-time">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max-age">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-number-wolves">
+      <value value="150"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-number-sheep">
+      <value value="150"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cost-plasticity-sheep">
+      <value value="0.2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cost-plasticity-wolf">
+      <value value="0.3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="sheep-plasticity">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="wolf-plasticity">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="replicate-number" first="1" step="1" last="1000"/>
+  </experiment>
 </experiments>
 @#$#@#$#@
 @#$#@#$#@
