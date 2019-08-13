@@ -368,8 +368,11 @@ end
 
 to impact
 
-  ;LOAD-PATCH-DATA
+;LOAD-PATCH-DATA
 
+  ;Model Version 1
+
+  if model-version = "Low-Perturbation-Low-fractality" [
   ; We check to make sure the file exists first
    ;ifelse ( file-exists? "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/Perturbacoes/habitat_destruidof03p30.txt" )
    ifelse ( file-exists? "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Perturbações/habitat_destruidof03p30.txt" )
@@ -393,7 +396,96 @@ to impact
     ; Done reading in patch information.  Close the file.
     file-close
   ]
-  [ ];user-message "There is no File IO Patch Data.txt file in current directory!" ]
+  [ ]
+  ];user-message "There is no File IO Patch Data.txt file in current directory!" ]
+
+  ;Model Version 2
+
+  if model-version = "Low-Perturbation-High-fractality" [
+  ; We check to make sure the file exists first
+   ;ifelse ( file-exists? "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/Perturbacoes/habitat_destruidof03p30.txt" )
+   ifelse ( file-exists? "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Perturbações/habitat_destruidof07p30.txt" )
+   ;ifelse ( file-exists? "/Users/Nuevissimos/Documents/Emerson/MestradoEmerson-master/Perturbações/habitat_destruidof03p30.txt" )
+  [
+    ; We are saving the data into a list, so it only needs to be loaded once.
+    set patch-data []
+
+    ; This opens the file, so we can use it.
+     ;file-open "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/Perturbacoes/habitat_destruidof03p30.txt"
+   file-open "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Perturbações/habitat_destruidof07p30.txt"
+   ;file-open "/Users/Nuevissimos/Documents/Emerson/MestradoEmerson-master/Perturbações/habitat_destruidof03p30.txt"
+    ; Read in all the data in the file
+    while [ not file-at-end? ]
+    [
+      ; file-read gives you variables.  In this case numbers.
+      ; We store them in a double list (ex [[1 1 9.9999] [1 2 9.9999] ...
+      ; Each iteration we append the next three-tuple to the current list
+      set patch-data sentence patch-data (list file-read)
+    ]
+    ; Done reading in patch information.  Close the file.
+    file-close
+  ]
+  [ ]
+  ];user-message "There is no File IO Patch Data.txt file in current directory!" ]
+
+  ;Model Version 3
+
+  if model-version = "High-Perturbation-Low-fractality" [
+  ; We check to make sure the file exists first
+   ;ifelse ( file-exists? "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/Perturbacoes/habitat_destruidof03p30.txt" )
+   ifelse ( file-exists? "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Perturbações/habitat_destruidof03p75.txt" )
+   ;ifelse ( file-exists? "/Users/Nuevissimos/Documents/Emerson/MestradoEmerson-master/Perturbações/habitat_destruidof03p30.txt" )
+  [
+    ; We are saving the data into a list, so it only needs to be loaded once.
+    set patch-data []
+
+    ; This opens the file, so we can use it.
+     ;file-open "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/Perturbacoes/habitat_destruidof03p30.txt"
+   file-open "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Perturbações/habitat_destruidof03p75.txt"
+   ;file-open "/Users/Nuevissimos/Documents/Emerson/MestradoEmerson-master/Perturbações/habitat_destruidof03p30.txt"
+    ; Read in all the data in the file
+    while [ not file-at-end? ]
+    [
+      ; file-read gives you variables.  In this case numbers.
+      ; We store them in a double list (ex [[1 1 9.9999] [1 2 9.9999] ...
+      ; Each iteration we append the next three-tuple to the current list
+      set patch-data sentence patch-data (list file-read)
+    ]
+    ; Done reading in patch information.  Close the file.
+    file-close
+  ]
+  [ ]
+  ];user-message "There is no File IO Patch Data.txt file in current directory!" ]
+
+  ;Model Version 4
+
+  if model-version = "High-Perturbation-High-fractality" [
+  ; We check to make sure the file exists first
+   ;ifelse ( file-exists? "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/Perturbacoes/habitat_destruidof03p30.txt" )
+   ifelse ( file-exists? "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Perturbações/habitat_destruidof07p75.txt" )
+   ;ifelse ( file-exists? "/Users/Nuevissimos/Documents/Emerson/MestradoEmerson-master/Perturbações/habitat_destruidof03p30.txt" )
+  [
+    ; We are saving the data into a list, so it only needs to be loaded once.
+    set patch-data []
+
+    ; This opens the file, so we can use it.
+     ;file-open "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/Perturbacoes/habitat_destruidof03p30.txt"
+   file-open "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Perturbações/habitat_destruidof07p75.txt"
+   ;file-open "/Users/Nuevissimos/Documents/Emerson/MestradoEmerson-master/Perturbações/habitat_destruidof03p30.txt"
+    ; Read in all the data in the file
+    while [ not file-at-end? ]
+    [
+      ; file-read gives you variables.  In this case numbers.
+      ; We store them in a double list (ex [[1 1 9.9999] [1 2 9.9999] ...
+      ; Each iteration we append the next three-tuple to the current list
+      set patch-data sentence patch-data (list file-read)
+    ]
+    ; Done reading in patch information.  Close the file.
+    file-close
+  ]
+  [ ]
+  ];user-message "There is no File IO Patch Data.txt file in current directory!" ]
+
 
 let linha 0 ;y
 let coluna 0 ;x
@@ -568,7 +660,7 @@ sheep-gain-from-food
 sheep-gain-from-food
 0.0
 100.0
-40.0
+30.0
 1.0
 1
 NIL
@@ -628,7 +720,7 @@ wolf-reproduce
 wolf-reproduce
 0.0
 50.0
-15.0
+10.0
 1.0
 1
 %
@@ -643,7 +735,7 @@ grass-regrowth-time
 grass-regrowth-time
 0
 100
-15.0
+5.0
 1
 1
 NIL
@@ -838,10 +930,10 @@ PENS
 "grass 4" 1.0 0 -13791810 true "" "plot count patches with [ pcolor = sky] "
 
 SLIDER
-25
-350
-197
-383
+70
+380
+242
+413
 replicate-number
 replicate-number
 0
@@ -851,6 +943,16 @@ replicate-number
 1
 NIL
 HORIZONTAL
+
+CHOOSER
+40
+330
+272
+375
+model-version
+model-version
+"Low-Perturbation-Low-fractality" "Low-Perturbation-High-fractality" "High-Perturbation-Low-fractality" "High-Perturbation-High-fractality"
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
