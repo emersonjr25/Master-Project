@@ -1,11 +1,11 @@
 globals [ patch-data ] ; put and pull archive impact
 breed [ sheepone a-sheepone ] ; sheep is its own plural, so we use "a-sheep" as the singular.
-breed [ sheeptwo a-sheeptwo ] ; especie 2 de ovelha
+;breed [ sheeptwo a-sheeptwo ] ; especie 2 de ovelha
 breed [ sheepthree a-sheepthree ] ; especie 3 de ovelha
 breed [ sheepfour a-sheepfour ] ; especie 4 de ovelha
 breed [ wolvesone wolfone ] ; especie 1 de lobo
 breed [ wolvestwo wolftwo ] ; especie 2 de lobo
-breed [ wolvesthree wolfthree ]; especie 3 de lobo
+;breed [ wolvesthree wolfthree ]; especie 3 de lobo
 breed [ wolvesfour wolffour ] ; especie 4 de lobo
 turtles-own [ energy trophic-level age ] ; both wolves and sheep have energy, trophic-level and age
 patches-own [ countdown cell-impacted ] ; contagem regressiva para nascimento das gramíneas
@@ -98,7 +98,6 @@ to setup ; configuração inicial do sistema
 end
 
 to go ; faz individuos se moveram e fazer as açoes criadas
-  if ticks = 501 [ impact ]
   ; stop the simulation of no wolves or sheep
   if not any? turtles [ stop ]
   ask sheepone
@@ -208,7 +207,6 @@ to go ; faz individuos se moveram e fazer as açoes criadas
     if ( energy < 10) AND (any?  other turtles-here with [shape = "sheep"])[
     let context [0] ;;always can move
     if any? sheepone-here   [ set context lput 1 context]
-    if any? sheeptwo-here   [ set context lput 2 context]
     if any? sheepthree-here [ set context lput 3 context]
     if any? sheepfour-here  [ set context lput 4 context]
     set context remove 0 context
@@ -216,7 +214,6 @@ to go ; faz individuos se moveram e fazer as açoes criadas
        [
     let x one-of context
     if (x = 1)[eat-sheep sheepone   4]
-    if (x = 2)[eat-sheep sheeptwo   4]
     if (x = 3)[eat-sheep sheepthree 4]
     if (x = 4)[eat-sheep sheepfour  4]
       ]
@@ -226,6 +223,9 @@ to go ; faz individuos se moveram e fazer as açoes criadas
   ]
   ask turtles [set age age + 1]
   ask patches [ grow-grass ]
+  if ticks = 500 [ output ]
+  if ticks = 501 [ impact ]
+  if ticks = 999 [ output ]
   tick
 end
 
@@ -244,7 +244,6 @@ to eat-grass [grasstype number-of-foods] ; sheep procedure
     set pcolor brown
     set energy energy + (sheep-gain-from-food / number-of-foods) ; sheep gain energy by eating
     set countdown grass-regrowth-time
-    ;show grasstype
    ]
 end
 
@@ -254,7 +253,6 @@ to eat-sheep [sheeptype number-of-foods]  ; wolf procedure
   [
     ask preyone [ die ]                            ; kill it, and...
     set energy energy + (wolf-gain-from-food / number-of-foods )     ; get energy from eating
-    ;show sheeptype
   ]
 end
 
@@ -299,26 +297,15 @@ to grow-grass  ; patch procedure
         let grays count neighbors with [pcolor = gray]
         let violets count neighbors with [pcolor  = violet]
         let skys count neighbors with [pcolor = sky]
-           ;;;;show (word "vizinhos =" count neighbors)
         let percent-greens greens / neighbors-not-brown
-           ;;;;show (word "percent-greens  =" percent-greens )
         let percent-grays grays /  neighbors-not-brown
-           ;;;;show (word "percent-grays greens ="percent-grays)
         let percent-violets violets /  neighbors-not-brown
-           ;;;;show (word "percent-violets  =" percent-violets)
         let percent-skys skys /  neighbors-not-brown
-           ;;;;show (word "percent-skys =" percent-skys)
-
 
         let g1  0 + percent-greens
-        ;;show g1
         let g2  g1 + percent-grays
-        ;;show g2
         let g3  g2 + percent-violets
-        ;;show g3
-        let g4  g3 + percent-skys ;; tem que somar um
-        ;;show g4
-        ;;show percent-greens + percent-grays + percent-violets + percent-skys
+        let g4  g3 + percent-skys
 
         let x random-float 1
         if x <= g1 [set pcolor green
@@ -347,11 +334,9 @@ end
 to-report plastic-jump
   let ps 0
    ifelse (trophic-level = "consumer")
-    [set ps random-normal sheep-plasticity 0.2 ;;; MODIFIQUEI
-    ;show (word "fui plastico ovelha " ps)
+    [set ps random-normal sheep-plasticity 0.2
   ]
-    [set ps random-normal wolf-plasticity 0.2 ;;; MODIFIQUEI
-    ;show (word "fui plastico lobo " ps)
+    [set ps random-normal wolf-plasticity 0.2
   ]
   ifelse(ps <= 0)[report 0.1][report ps]
 end
@@ -359,7 +344,6 @@ end
 to-report salto
   let tamanho 0
   let not-food count neighbors with [pcolor = brown OR pcolor = black]
-  ;;if ([pcolor] of patch-here = brown) AND energy < 10 [
     if ((not-food >= 5) AND energy < 5) [
        set tamanho plastic-jump
   ]
@@ -372,120 +356,104 @@ to impact
 
   ;Model Version 1
 
-  if model-version = "Low-Perturbation-Low-fractality" [
-  ; We check to make sure the file exists first
-   ;ifelse ( file-exists? "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/Perturbacoes/habitat_destruidof03p30.txt" )
-   ifelse ( file-exists? "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Perturbações/habitat_destruidof03p30.txt" )
-   ;ifelse ( file-exists? "/Users/Nuevissimos/Documents/Emerson/MestradoEmerson-master/Perturbações/habitat_destruidof03p30.txt" )
+  if model-version = "LowPerturbationLowfractality" [
+  let rep replicate-number
+  if replicate-number < 10 [set rep (word "00" replicate-number)]
+  if (replicate-number >= 10) AND (replicate-number < 100) [set rep (word "0" rep)]
+  if replicate-number >= 100 [ set rep rep ]
+  let file (word "0.30_030_00" rep ".txt")
+    let filename (word "C:/Users/emers/Dropbox/Coisas minhas/Mestrado e doutorado em Ecologia - UFBA/Projeto plasticidade/Perturbações/habitat_destruidof03p30/" file)
+    ; let filename (word "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/Perturbacoes/habitat_destruidof03p30.txt" file)
+    ; let filename (word "/Users/Nuevissimos/Documents/Emerson/MestradoEmerson-master/Perturbações/habitat_destruidof03p30.txt" file)
+   ifelse ( file-exists? filename )
   [
     ; We are saving the data into a list, so it only needs to be loaded once.
-    set patch-data []
-
+   set patch-data []
     ; This opens the file, so we can use it.
-     ;file-open "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/Perturbacoes/habitat_destruidof03p30.txt"
-   file-open "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Perturbações/habitat_destruidof03p30.txt"
-   ;file-open "/Users/Nuevissimos/Documents/Emerson/MestradoEmerson-master/Perturbações/habitat_destruidof03p30.txt"
+   file-open filename
     ; Read in all the data in the file
     while [ not file-at-end? ]
     [
       ; file-read gives you variables.  In this case numbers.
-      ; We store them in a double list (ex [[1 1 9.9999] [1 2 9.9999] ...
-      ; Each iteration we append the next three-tuple to the current list
       set patch-data sentence patch-data (list file-read)
     ]
     ; Done reading in patch information.  Close the file.
     file-close
   ]
   [ ]
-  ];user-message "There is no File IO Patch Data.txt file in current directory!" ]
+  ]
 
   ;Model Version 2
 
-  if model-version = "Low-Perturbation-High-fractality" [
-  ; We check to make sure the file exists first
-   ;ifelse ( file-exists? "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/Perturbacoes/habitat_destruidof03p30.txt" )
-   ifelse ( file-exists? "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Perturbações/habitat_destruidof07p30.txt" )
-   ;ifelse ( file-exists? "/Users/Nuevissimos/Documents/Emerson/MestradoEmerson-master/Perturbações/habitat_destruidof03p30.txt" )
+  if model-version = "LowPerturbationHighfractality" [
+  let rep replicate-number
+  if replicate-number < 10 [set rep (word "00" replicate-number)]
+  if (replicate-number >= 10) AND (replicate-number < 100) [set rep (word "0" rep)]
+  if replicate-number >= 100 [ set rep rep ]
+  let file (word "0.70_030_00" rep ".txt")
+    let filename (word "C:/Users/emers/Dropbox/Coisas minhas/Mestrado e doutorado em Ecologia - UFBA/Projeto plasticidade/Perturbações/habitat_destruidof07p30/" file)
+     ; let filename (word "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/Perturbacoes/habitat_destruidof07p30.txt" file)
+     ; let filename (word "/Users/Nuevissimos/Documents/Emerson/MestradoEmerson-master/Perturbações/habitat_destruidof07p30.txt" file)
+   ifelse ( file-exists? filename )
   [
-    ; We are saving the data into a list, so it only needs to be loaded once.
     set patch-data []
-
-    ; This opens the file, so we can use it.
-     ;file-open "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/Perturbacoes/habitat_destruidof03p30.txt"
-   file-open "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Perturbações/habitat_destruidof07p30.txt"
-   ;file-open "/Users/Nuevissimos/Documents/Emerson/MestradoEmerson-master/Perturbações/habitat_destruidof03p30.txt"
-    ; Read in all the data in the file
-    while [ not file-at-end? ]
+   file-open filename
+   while [ not file-at-end? ]
     [
-      ; file-read gives you variables.  In this case numbers.
-      ; We store them in a double list (ex [[1 1 9.9999] [1 2 9.9999] ...
-      ; Each iteration we append the next three-tuple to the current list
       set patch-data sentence patch-data (list file-read)
     ]
-    ; Done reading in patch information.  Close the file.
     file-close
   ]
   [ ]
-  ];user-message "There is no File IO Patch Data.txt file in current directory!" ]
+  ]
 
   ;Model Version 3
 
-  if model-version = "High-Perturbation-Low-fractality" [
-  ; We check to make sure the file exists first
-   ;ifelse ( file-exists? "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/Perturbacoes/habitat_destruidof03p30.txt" )
-   ifelse ( file-exists? "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Perturbações/habitat_destruidof03p75.txt" )
-   ;ifelse ( file-exists? "/Users/Nuevissimos/Documents/Emerson/MestradoEmerson-master/Perturbações/habitat_destruidof03p30.txt" )
+  if model-version = "HighPerturbationLowfractality" [
+  let rep replicate-number
+  if replicate-number < 10 [set rep (word "00" replicate-number)]
+  if (replicate-number >= 10) AND (replicate-number < 100) [set rep (word "0" rep)]
+  if replicate-number >= 100 [ set rep rep ]
+  let file (word "0.30_075_00" rep ".txt")
+  let filename (word "C:/Users/emers/Dropbox/Coisas minhas/Mestrado e doutorado em Ecologia - UFBA/Projeto plasticidade/Perturbações/habitat_destruidof03p75/" file)
+   ; let filename (word "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/Perturbacoes/habitat_destruidof03p75.txt" file)
+   ; let filename (word "/Users/Nuevissimos/Documents/Emerson/MestradoEmerson-master/Perturbações/habitat_destruidof03p75.txt" file)
+   ifelse ( file-exists? filename )
   [
-    ; We are saving the data into a list, so it only needs to be loaded once.
-    set patch-data []
-
-    ; This opens the file, so we can use it.
-     ;file-open "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/Perturbacoes/habitat_destruidof03p30.txt"
-   file-open "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Perturbações/habitat_destruidof03p75.txt"
-   ;file-open "/Users/Nuevissimos/Documents/Emerson/MestradoEmerson-master/Perturbações/habitat_destruidof03p30.txt"
-    ; Read in all the data in the file
-    while [ not file-at-end? ]
+   set patch-data []
+   file-open filename
+   while [ not file-at-end? ]
     [
-      ; file-read gives you variables.  In this case numbers.
-      ; We store them in a double list (ex [[1 1 9.9999] [1 2 9.9999] ...
-      ; Each iteration we append the next three-tuple to the current list
       set patch-data sentence patch-data (list file-read)
     ]
-    ; Done reading in patch information.  Close the file.
     file-close
   ]
   [ ]
-  ];user-message "There is no File IO Patch Data.txt file in current directory!" ]
+  ]
 
   ;Model Version 4
 
-  if model-version = "High-Perturbation-High-fractality" [
-  ; We check to make sure the file exists first
-   ;ifelse ( file-exists? "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/Perturbacoes/habitat_destruidof03p30.txt" )
-   ifelse ( file-exists? "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Perturbações/habitat_destruidof07p75.txt" )
-   ;ifelse ( file-exists? "/Users/Nuevissimos/Documents/Emerson/MestradoEmerson-master/Perturbações/habitat_destruidof03p30.txt" )
+  if model-version = "HighPerturbationHighfractality" [
+  let rep replicate-number
+  if replicate-number < 10 [set rep (word "00" replicate-number)]
+  if (replicate-number >= 10) AND (replicate-number < 100) [set rep (word "0" rep)]
+  if replicate-number >= 100 [ set rep rep ]
+  let file (word "0.70_075_00" rep ".txt")
+  let filename (word "C:/Users/emers/Dropbox/Coisas minhas/Mestrado e doutorado em Ecologia - UFBA/Projeto plasticidade/Perturbações/habitat_destruidof07p75/" file)
+   ; let filename (word "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/Perturbacoes/habitat_destruidof07p75.txt" file)
+   ; let filename (word "/Users/Nuevissimos/Documents/Emerson/MestradoEmerson-master/Perturbações/habitat_destruidof07p75.txt" file)
+   ifelse ( file-exists? filename )
   [
-    ; We are saving the data into a list, so it only needs to be loaded once.
     set patch-data []
-
-    ; This opens the file, so we can use it.
-     ;file-open "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/Perturbacoes/habitat_destruidof03p30.txt"
-   file-open "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Perturbações/habitat_destruidof07p75.txt"
-   ;file-open "/Users/Nuevissimos/Documents/Emerson/MestradoEmerson-master/Perturbações/habitat_destruidof03p30.txt"
-    ; Read in all the data in the file
+    file-open filename
     while [ not file-at-end? ]
     [
-      ; file-read gives you variables.  In this case numbers.
-      ; We store them in a double list (ex [[1 1 9.9999] [1 2 9.9999] ...
-      ; Each iteration we append the next three-tuple to the current list
       set patch-data sentence patch-data (list file-read)
     ]
-    ; Done reading in patch information.  Close the file.
     file-close
   ]
   [ ]
-  ];user-message "There is no File IO Patch Data.txt file in current directory!" ]
-
+  ]
 
 let linha 0 ;y
 let coluna 0 ;x
@@ -493,8 +461,7 @@ let coluna 0 ;x
     [
       while[coluna != (max-pxcor + 1)]
       [
-          ask patch coluna linha [set cell-impacted item (linha + ((max-pycor + 1) * coluna) ) patch-data ]
-        ;"MORE CODE"
+        ask patch coluna linha [set cell-impacted item (linha + ((max-pycor + 1) * coluna) ) patch-data ]
         set coluna coluna + 1
       ]
       set coluna 0
@@ -509,7 +476,6 @@ let coluna 0 ;x
     set pcolor black
     set countdown 100000
   ]
-
 end
 
 to output
@@ -524,20 +490,16 @@ to output
   let abundance-relative-patchesgray count patches with [ pcolor = gray ] / abundance-total
   let abundance-relative-patchessky count patches with [ pcolor = sky ] / abundance-total
   let abundance-relative-sheepone count sheepone / abundance-total
-  let abundance-relative-sheeptwo count sheeptwo / abundance-total
   let abundance-relative-sheepthree count sheepthree / abundance-total
   let abundance-relative-sheepfour count sheepfour / abundance-total
   let abundance-relative-wolvesone count wolvesone / abundance-total
   let abundance-relative-wolvestwo count wolvestwo / abundance-total
-  let abundance-relative-wolvesthree count wolvesthree / abundance-total
   let abundance-relative-wolvesfour count wolvesfour / abundance-total
 
   ; RICHNESS
 
   let richness1 0
   ifelse any? sheepone [ set richness1 1][ set richness1 0]
-  let richness2 0
-  ifelse any? sheeptwo [ set richness2 1] [ set richness2 0]
   let richness3 0
   ifelse any? sheepthree [ set richness3 1] [ set richness3 0]
   let richness4 0
@@ -546,8 +508,6 @@ to output
   ifelse any? wolvesone [ set richness5 1] [ set richness5 0]
   let richness6 0
   ifelse any? wolvestwo [ set richness6 1] [ set richness6 0]
-  let richness7 0
-  ifelse any? wolvesthree [ set richness7 1] [ set richness7 0]
   let richness8 0
   ifelse any? wolvesfour [ set richness8 1] [ set richness8 0]
   let richness9 0
@@ -558,9 +518,9 @@ to output
   ifelse any? patches with [pcolor = gray] [ set richness11 1] [ set richness11 0]
   let richness12 0
   ifelse any? patches with [pcolor = sky] [ set richness12 1] [ set richness12 0]
-  let richness richness1 + richness2 + richness3 + richness4 + richness5 + richness6 + richness7 + richness8 + richness9 + richness10 + richness11 + richness12
+  let richness richness1 + richness3 + richness4 + richness5 + richness6 + richness8 + richness9 + richness10 + richness11 + richness12
 
-    ; Shannon (soma final depois de fazer para cada especie) = AbundanceRelative (OK) . LogNaturalAbundanceRelative
+  ; Shannon
 
    let shannon 0
    if abundance-relative-patchesgreen   > 0 [ set shannon shannon + (abundance-relative-patchesgreen  * ln abundance-relative-patchesgreen )]
@@ -568,12 +528,10 @@ to output
    if abundance-relative-patchesgray    > 0 [ set shannon shannon + (abundance-relative-patchesgray   * ln abundance-relative-patchesgray)]
    if abundance-relative-patchessky     > 0 [ set shannon shannon + (abundance-relative-patchessky    * ln abundance-relative-patchessky)]
    if abundance-relative-sheepone       > 0 [ set shannon shannon + (abundance-relative-sheepone      * ln abundance-relative-sheepone)]
-   if abundance-relative-sheeptwo       > 0 [ set shannon shannon + (abundance-relative-sheeptwo      * ln abundance-relative-sheeptwo )]
    if abundance-relative-sheepthree     > 0 [ set shannon shannon + (abundance-relative-sheepthree    * ln abundance-relative-sheepthree)]
    if abundance-relative-sheepfour      > 0 [ set shannon shannon + (abundance-relative-sheepfour     * ln abundance-relative-sheepfour )]
    if abundance-relative-wolvesone      > 0 [ set shannon shannon + (abundance-relative-wolvesone     * ln abundance-relative-wolvesone)]
    if abundance-relative-wolvestwo      > 0 [ set shannon shannon + (abundance-relative-wolvestwo     * ln abundance-relative-wolvestwo )]
-   if abundance-relative-wolvesthree    > 0 [ set shannon shannon + (abundance-relative-wolvesthree   * ln  abundance-relative-wolvesthree)]
    if abundance-relative-wolvesfour     > 0 [ set shannon shannon + (abundance-relative-wolvesfour    * ln abundance-relative-wolvesfour) ]
    set shannon (-1 * shannon)
 
@@ -581,31 +539,24 @@ to output
 
   let Evenness ( shannon / ln richness) ;report evenness
 
-  ;impact report
-  let sizeimp 0
-  let imp count patches with [ pcolor = black ]
-  let little "little"
-  let big "big"
-  ifelse imp < 50000 [ set sizeimp little ] [set sizeimp big]
+  ; Output
 
-  ;output
-
-  let filename (word "plasticity" "s" sheep-plasticity "w" wolf-plasticity "_" "cost" "s" cost-plasticity-sheep "w" cost-plasticity-wolf "_"
+  let filename (word ticks "_" "plasticity" "s" sheep-plasticity "w" wolf-plasticity "_" "cost" "s" cost-plasticity-sheep "w" cost-plasticity-wolf "_"
                      "foodsheep" sheep-gain-from-food "_" "foodwolf" wolf-gain-from-food"_" "reproduce" "s" sheep-reproduce "w" wolf-reproduce "_"
-                     "grassreg" grass-regrowth-time "_"  "_" "sizeimp" sizeimp "_" "rep" replicate-number ".csv")
+                     "grassreg" grass-regrowth-time "_" model-version "_" "rep" replicate-number ".csv")
   ;set-current-directory "C:/Users/vrios/Google Drive/projetos/nuevo/emerson/MestradoEmerson-master/output"
   set-current-directory "C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/behavioralspace"
   ;set-current-directory "/Users/Nuevissimos/Documents/Emerson/MestradoEmerson-master/behavioralspace"
   if (file-exists? filename) [file-delete filename]
   file-open filename
   file-print
-      (word "ticks; sheep_plasticity; wolf_plasticity; cost_plasticity_sheep; cost_plasticity_wolf; sheep_gain_from_food; wolf_gain_from_food; sheep_reproduce; wolf_reproduce; grass_regrowth_time; sizeimp; replicate-number; Richness; Shannon; Evenness; AbRelPgre; AbRelPvio; AbRelPgray; AbRelPsky; AbRelSone; AbRelStwo; AbRelSthree; AbRelSfou; AbRelWone; AbRelWtwo; AbRelWthree; AbRelWfour")
+      (word "ticks; sheep_plasticity; wolf_plasticity; cost_plasticity_sheep; cost_plasticity_wolf; sheep_gain_from_food; wolf_gain_from_food; sheep_reproduce; wolf_reproduce; grass_regrowth_time; model-version; replicate-number; Richness; Shannon; Evenness; AbRelPgre; AbRelPvio; AbRelPgray; AbRelPsky; AbRelSone;  AbRelSthree; AbRelSfou; AbRelWone; AbRelWtwo;  AbRelWfour")
   file-print
       (word ticks ";" sheep-plasticity ";" wolf-plasticity ";"cost-plasticity-sheep ";" cost-plasticity-wolf ";" sheep-gain-from-food ";" wolf-gain-from-food ";"
-            sheep-reproduce ";" wolf-reproduce ";" grass-regrowth-time ";" sizeimp ";" replicate-number ";" richness ";" shannon ";" Evenness ";"
+            sheep-reproduce ";" wolf-reproduce ";" grass-regrowth-time ";" model-version ";" replicate-number ";" richness ";" shannon ";" Evenness ";"
             abundance-relative-patchesgreen ";" abundance-relative-patchesviolet ";" abundance-relative-patchesgray ";" abundance-relative-patchessky ";"
-            abundance-relative-sheepone ";" abundance-relative-sheeptwo ";" abundance-relative-sheepthree ";" abundance-relative-sheepfour ";"
-            abundance-relative-wolvesone ";" abundance-relative-wolvestwo ";" abundance-relative-wolvesthree ";" abundance-relative-wolvesfour)
+            abundance-relative-sheepone ";" abundance-relative-sheepthree ";" abundance-relative-sheepfour ";"
+            abundance-relative-wolvesone ";" abundance-relative-wolvestwo ";" abundance-relative-wolvesfour)
   file-close
 end
 @#$#@#$#@
@@ -660,7 +611,7 @@ sheep-gain-from-food
 sheep-gain-from-food
 0.0
 100.0
-30.0
+20.0
 1.0
 1
 NIL
@@ -720,7 +671,7 @@ wolf-reproduce
 wolf-reproduce
 0.0
 50.0
-10.0
+5.0
 1.0
 1
 %
@@ -792,12 +743,10 @@ true
 "" ""
 PENS
 "sheepone" 1.0 0 -1513240 true "" "plot count sheepone"
-"sheeptwo" 1.0 0 -2674135 true "" "plot count sheeptwo"
 "sheepthree" 1.0 0 -13345367 true "" "plot count sheepthree"
 "sheepfour" 1.0 0 -955883 true "" "plot count sheepfour"
 "wolvesone" 1.0 0 -16777216 true "" "plot count wolvesone"
 "wolvestwo" 1.0 0 -2064490 true "" "plot count wolvestwo"
-"wolvesthree" 1.0 0 -5825686 true "" "plot count wolvesthree"
 "wolvesfour" 1.0 0 -1184463 true "" "plot count wolvesfour"
 
 MONITOR
@@ -842,7 +791,7 @@ sheep-plasticity
 sheep-plasticity
 0
 10
-8.0
+2.0
 1
 1
 NIL
@@ -872,7 +821,7 @@ cost-plasticity-wolf
 cost-plasticity-wolf
 0
 1
-0.9
+0.3
 0.1
 1
 NIL
@@ -887,7 +836,7 @@ wolf-plasticity
 wolf-plasticity
 0
 10
-9.0
+3.0
 1
 1
 NIL
@@ -902,7 +851,7 @@ cost-plasticity-sheep
 cost-plasticity-sheep
 0
 1
-0.8
+0.2
 0.1
 1
 NIL
@@ -936,9 +885,9 @@ SLIDER
 413
 replicate-number
 replicate-number
-0
-100
-1.0
+1
+1000
+440.0
 1
 1
 NIL
@@ -951,7 +900,24 @@ CHOOSER
 375
 model-version
 model-version
-"Low-Perturbation-Low-fractality" "Low-Perturbation-High-fractality" "High-Perturbation-Low-fractality" "High-Perturbation-High-fractality"
+"LowPerturbationLowfractality" "LowPerturbationHighfractality" "HighPerturbationLowfractality" "HighPerturbationHighfractality"
+0
+
+BUTTON
+120
+420
+187
+453
+NIL
+impact
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
 1
 
 @#$#@#$#@
@@ -1391,7 +1357,7 @@ repeat 75 [ go ]
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="experimentfast" repetitions="1" runMetricsEveryStep="false">
+  <experiment name="PrimeiroExperimento (nao serve)" repetitions="1" runMetricsEveryStep="false">
     <setup>setup</setup>
     <go>go</go>
     <final>output</final>
@@ -1455,7 +1421,7 @@ repeat 75 [ go ]
     </enumeratedValueSet>
     <steppedValueSet variable="replicate-number" first="1" step="1" last="100"/>
   </experiment>
-  <experiment name="experimentprincipalbaixoC" repetitions="1" runMetricsEveryStep="false">
+  <experiment name="SegundoExperimento (não serve)" repetitions="1" runMetricsEveryStep="false">
     <setup>setup</setup>
     <go>go</go>
     <final>output</final>
@@ -1466,12 +1432,10 @@ repeat 75 [ go ]
     <metric>count patches with [ pcolor = gray ]</metric>
     <metric>count patches with [ pcolor = sky ]</metric>
     <metric>count turtles with [ breed = sheepone]</metric>
-    <metric>count turtles with [ breed = sheeptwo]</metric>
     <metric>count turtles with [ breed = sheepthree]</metric>
     <metric>count turtles with [ breed = sheepfour]</metric>
     <metric>count turtles with [ breed = wolvesone]</metric>
     <metric>count turtles with [ breed = wolvestwo]</metric>
-    <metric>count turtles with [ breed = wolvesthree]</metric>
     <metric>count turtles with [ breed = wolvesfour]</metric>
     <enumeratedValueSet variable="sheep-gain-from-food">
       <value value="20"/>
@@ -1521,108 +1485,31 @@ repeat 75 [ go ]
     </enumeratedValueSet>
     <steppedValueSet variable="replicate-number" first="1" step="1" last="100"/>
   </experiment>
-  <experiment name="experimentprincipalaltoC" repetitions="1" runMetricsEveryStep="false">
+  <experiment name="Simulação FINAL (resultados) Contexto 1" repetitions="1" runMetricsEveryStep="false">
     <setup>setup</setup>
     <go>go</go>
-    <final>output</final>
-    <timeLimit steps="500"/>
-    <exitCondition>not any? turtles with [ shape = "wolf"]</exitCondition>
+    <timeLimit steps="1000"/>
     <metric>count patches with [ pcolor = green ]</metric>
     <metric>count patches with [ pcolor = violet ]</metric>
     <metric>count patches with [ pcolor = gray ]</metric>
     <metric>count patches with [ pcolor = sky ]</metric>
     <metric>count turtles with [ breed = sheepone]</metric>
-    <metric>count turtles with [ breed = sheeptwo]</metric>
     <metric>count turtles with [ breed = sheepthree]</metric>
     <metric>count turtles with [ breed = sheepfour]</metric>
     <metric>count turtles with [ breed = wolvesone]</metric>
     <metric>count turtles with [ breed = wolvestwo]</metric>
-    <metric>count turtles with [ breed = wolvesthree]</metric>
     <metric>count turtles with [ breed = wolvesfour]</metric>
     <enumeratedValueSet variable="sheep-gain-from-food">
       <value value="20"/>
-      <value value="30"/>
-      <value value="40"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="wolf-gain-from-food">
-      <value value="30"/>
-      <value value="40"/>
       <value value="50"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="sheep-reproduce">
-      <value value="10"/>
-      <value value="15"/>
       <value value="25"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="wolf-reproduce">
       <value value="5"/>
-      <value value="10"/>
-      <value value="15"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="grass-regrowth-time">
-      <value value="5"/>
-      <value value="10"/>
-      <value value="15"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="max-age">
-      <value value="100"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="initial-number-wolves">
-      <value value="150"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="initial-number-sheep">
-      <value value="150"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="cost-plasticity-sheep">
-      <value value="0.8"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="cost-plasticity-wolf">
-      <value value="0.9"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="sheep-plasticity">
-      <value value="2"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="wolf-plasticity">
-      <value value="3"/>
-    </enumeratedValueSet>
-    <steppedValueSet variable="replicate-number" first="1" step="1" last="100"/>
-  </experiment>
-  <experiment name="Simulações finais" repetitions="1" runMetricsEveryStep="false">
-    <setup>setup</setup>
-    <go>go</go>
-    <final>output</final>
-    <timeLimit steps="500"/>
-    <metric>count patches with [ pcolor = green ]</metric>
-    <metric>count patches with [ pcolor = violet ]</metric>
-    <metric>count patches with [ pcolor = gray ]</metric>
-    <metric>count patches with [ pcolor = sky ]</metric>
-    <metric>count turtles with [ breed = sheepone]</metric>
-    <metric>count turtles with [ breed = sheeptwo]</metric>
-    <metric>count turtles with [ breed = sheepthree]</metric>
-    <metric>count turtles with [ breed = sheepfour]</metric>
-    <metric>count turtles with [ breed = wolvesone]</metric>
-    <metric>count turtles with [ breed = wolvestwo]</metric>
-    <metric>count turtles with [ breed = wolvesthree]</metric>
-    <metric>count turtles with [ breed = wolvesfour]</metric>
-    <enumeratedValueSet variable="sheep-gain-from-food">
-      <value value="20"/>
-      <value value="30"/>
-      <value value="40"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="wolf-gain-from-food">
-      <value value="30"/>
-      <value value="40"/>
-      <value value="50"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="sheep-reproduce">
-      <value value="10"/>
-      <value value="15"/>
-      <value value="25"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="wolf-reproduce">
-      <value value="5"/>
-      <value value="10"/>
-      <value value="15"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="grass-regrowth-time">
       <value value="5"/>
@@ -1649,6 +1536,302 @@ repeat 75 [ go ]
       <value value="3"/>
     </enumeratedValueSet>
     <steppedValueSet variable="replicate-number" first="1" step="1" last="1000"/>
+    <enumeratedValueSet variable="model-version">
+      <value value="&quot;LowPerturbationLowfractality&quot;"/>
+      <value value="&quot;LowPerturbationHighfractality&quot;"/>
+      <value value="&quot;HighPerturbationLowfractality&quot;"/>
+      <value value="&quot;HighPerturbationHighfractality&quot;"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="Simulação FINAL (resultados) Contexto 2" repetitions="1" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="1000"/>
+    <metric>count patches with [ pcolor = green ]</metric>
+    <metric>count patches with [ pcolor = violet ]</metric>
+    <metric>count patches with [ pcolor = gray ]</metric>
+    <metric>count patches with [ pcolor = sky ]</metric>
+    <metric>count turtles with [ breed = sheepone]</metric>
+    <metric>count turtles with [ breed = sheepthree]</metric>
+    <metric>count turtles with [ breed = sheepfour]</metric>
+    <metric>count turtles with [ breed = wolvesone]</metric>
+    <metric>count turtles with [ breed = wolvestwo]</metric>
+    <metric>count turtles with [ breed = wolvesfour]</metric>
+    <enumeratedValueSet variable="sheep-gain-from-food">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="wolf-gain-from-food">
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="sheep-reproduce">
+      <value value="25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="wolf-reproduce">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="grass-regrowth-time">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max-age">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-number-wolves">
+      <value value="150"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-number-sheep">
+      <value value="150"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cost-plasticity-sheep">
+      <value value="0.2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cost-plasticity-wolf">
+      <value value="0.3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="sheep-plasticity">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="wolf-plasticity">
+      <value value="6"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="replicate-number" first="1" step="1" last="1000"/>
+    <enumeratedValueSet variable="model-version">
+      <value value="&quot;LowPerturbationLowfractality&quot;"/>
+      <value value="&quot;LowPerturbationHighfractality&quot;"/>
+      <value value="&quot;HighPerturbationLowfractality&quot;"/>
+      <value value="&quot;HighPerturbationHighfractality&quot;"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="Simulação FINAL (resultados) Contexto 3" repetitions="1" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="1000"/>
+    <metric>count patches with [ pcolor = green ]</metric>
+    <metric>count patches with [ pcolor = violet ]</metric>
+    <metric>count patches with [ pcolor = gray ]</metric>
+    <metric>count patches with [ pcolor = sky ]</metric>
+    <metric>count turtles with [ breed = sheepone]</metric>
+    <metric>count turtles with [ breed = sheepthree]</metric>
+    <metric>count turtles with [ breed = sheepfour]</metric>
+    <metric>count turtles with [ breed = wolvesone]</metric>
+    <metric>count turtles with [ breed = wolvestwo]</metric>
+    <metric>count turtles with [ breed = wolvesfour]</metric>
+    <enumeratedValueSet variable="sheep-gain-from-food">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="wolf-gain-from-food">
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="sheep-reproduce">
+      <value value="25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="wolf-reproduce">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="grass-regrowth-time">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max-age">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-number-wolves">
+      <value value="150"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-number-sheep">
+      <value value="150"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cost-plasticity-sheep">
+      <value value="0.2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cost-plasticity-wolf">
+      <value value="0.3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="sheep-plasticity">
+      <value value="8"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="wolf-plasticity">
+      <value value="9"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="replicate-number" first="1" step="1" last="1000"/>
+    <enumeratedValueSet variable="model-version">
+      <value value="&quot;LowPerturbationLowfractality&quot;"/>
+      <value value="&quot;LowPerturbationHighfractality&quot;"/>
+      <value value="&quot;HighPerturbationLowfractality&quot;"/>
+      <value value="&quot;HighPerturbationHighfractality&quot;"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="Simulação FINAL (resultados) Contexto 4" repetitions="1" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="1000"/>
+    <metric>count patches with [ pcolor = green ]</metric>
+    <metric>count patches with [ pcolor = violet ]</metric>
+    <metric>count patches with [ pcolor = gray ]</metric>
+    <metric>count patches with [ pcolor = sky ]</metric>
+    <metric>count turtles with [ breed = sheepone]</metric>
+    <metric>count turtles with [ breed = sheepthree]</metric>
+    <metric>count turtles with [ breed = sheepfour]</metric>
+    <metric>count turtles with [ breed = wolvesone]</metric>
+    <metric>count turtles with [ breed = wolvestwo]</metric>
+    <metric>count turtles with [ breed = wolvesfour]</metric>
+    <enumeratedValueSet variable="sheep-gain-from-food">
+      <value value="30"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="wolf-gain-from-food">
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="sheep-reproduce">
+      <value value="25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="wolf-reproduce">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="grass-regrowth-time">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max-age">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-number-wolves">
+      <value value="150"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-number-sheep">
+      <value value="150"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cost-plasticity-sheep">
+      <value value="0.8"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cost-plasticity-wolf">
+      <value value="0.9"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="sheep-plasticity">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="wolf-plasticity">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="replicate-number" first="1" step="1" last="1000"/>
+    <enumeratedValueSet variable="model-version">
+      <value value="&quot;LowPerturbationLowfractality&quot;"/>
+      <value value="&quot;LowPerturbationHighfractality&quot;"/>
+      <value value="&quot;HighPerturbationLowfractality&quot;"/>
+      <value value="&quot;HighPerturbationHighfractality&quot;"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="Simulação FINAL (resultados) Contexto 5" repetitions="1" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="1000"/>
+    <metric>count patches with [ pcolor = green ]</metric>
+    <metric>count patches with [ pcolor = violet ]</metric>
+    <metric>count patches with [ pcolor = gray ]</metric>
+    <metric>count patches with [ pcolor = sky ]</metric>
+    <metric>count turtles with [ breed = sheepone]</metric>
+    <metric>count turtles with [ breed = sheepthree]</metric>
+    <metric>count turtles with [ breed = sheepfour]</metric>
+    <metric>count turtles with [ breed = wolvesone]</metric>
+    <metric>count turtles with [ breed = wolvestwo]</metric>
+    <metric>count turtles with [ breed = wolvesfour]</metric>
+    <enumeratedValueSet variable="sheep-gain-from-food">
+      <value value="30"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="wolf-gain-from-food">
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="sheep-reproduce">
+      <value value="25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="wolf-reproduce">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="grass-regrowth-time">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max-age">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-number-wolves">
+      <value value="150"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-number-sheep">
+      <value value="150"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cost-plasticity-sheep">
+      <value value="0.8"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cost-plasticity-wolf">
+      <value value="0.9"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="sheep-plasticity">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="wolf-plasticity">
+      <value value="6"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="replicate-number" first="1" step="1" last="1000"/>
+    <enumeratedValueSet variable="model-version">
+      <value value="&quot;LowPerturbationLowfractality&quot;"/>
+      <value value="&quot;LowPerturbationHighfractality&quot;"/>
+      <value value="&quot;HighPerturbationLowfractality&quot;"/>
+      <value value="&quot;HighPerturbationHighfractality&quot;"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="Simulação FINAL (resultados) Contexto 6" repetitions="1" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="1000"/>
+    <metric>count patches with [ pcolor = green ]</metric>
+    <metric>count patches with [ pcolor = violet ]</metric>
+    <metric>count patches with [ pcolor = gray ]</metric>
+    <metric>count patches with [ pcolor = sky ]</metric>
+    <metric>count turtles with [ breed = sheepone]</metric>
+    <metric>count turtles with [ breed = sheepthree]</metric>
+    <metric>count turtles with [ breed = sheepfour]</metric>
+    <metric>count turtles with [ breed = wolvesone]</metric>
+    <metric>count turtles with [ breed = wolvestwo]</metric>
+    <metric>count turtles with [ breed = wolvesfour]</metric>
+    <enumeratedValueSet variable="sheep-gain-from-food">
+      <value value="30"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="wolf-gain-from-food">
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="sheep-reproduce">
+      <value value="25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="wolf-reproduce">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="grass-regrowth-time">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max-age">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-number-wolves">
+      <value value="150"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-number-sheep">
+      <value value="150"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cost-plasticity-sheep">
+      <value value="0.8"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cost-plasticity-wolf">
+      <value value="0.9"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="sheep-plasticity">
+      <value value="8"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="wolf-plasticity">
+      <value value="9"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="replicate-number" first="1" step="1" last="1000"/>
+    <enumeratedValueSet variable="model-version">
+      <value value="&quot;LowPerturbationLowfractality&quot;"/>
+      <value value="&quot;LowPerturbationHighfractality&quot;"/>
+      <value value="&quot;HighPerturbationLowfractality&quot;"/>
+      <value value="&quot;HighPerturbationHighfractality&quot;"/>
+    </enumeratedValueSet>
   </experiment>
 </experiments>
 @#$#@#$#@
