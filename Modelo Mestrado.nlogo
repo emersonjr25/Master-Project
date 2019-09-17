@@ -496,6 +496,19 @@ to output
   let abundance-relative-wolvestwo count wolvestwo / abundance-total
   let abundance-relative-wolvesfour count wolvesfour / abundance-total
 
+  ; ABUNDANCE TOTAL
+
+  let abundance-total-patchesgreen count patches with [ pcolor = green ]
+  let abundance-total-patchesviolet count patches with [ pcolor = violet ]
+  let abundance-total-patchesgray count patches with [ pcolor = gray ]
+  let abundance-total-patchessky count patches with [ pcolor = sky ]
+  let abundance-total-sheepone count sheepone
+  let abundance-total-sheepthree count sheepthree
+  let abundance-total-sheepfour count sheepfour
+  let abundance-total-wolvesone count wolvesone
+  let abundance-total-wolvestwo count wolvestwo
+  let abundance-total-wolvesfour count wolvesfour
+
   ; RICHNESS
 
   let richness1 0
@@ -550,13 +563,15 @@ to output
   if (file-exists? filename) [file-delete filename]
   file-open filename
   file-print
-      (word "ticks; sheep_plasticity; wolf_plasticity; cost_plasticity_sheep; cost_plasticity_wolf; sheep_gain_from_food; wolf_gain_from_food; sheep_reproduce; wolf_reproduce; grass_regrowth_time; model-version; replicate-number; Richness; Shannon; Evenness; AbRelPgre; AbRelPvio; AbRelPgray; AbRelPsky; AbRelSone;  AbRelSthree; AbRelSfou; AbRelWone; AbRelWtwo;  AbRelWfour")
+      (word "ticks; sheep_plasticity; wolf_plasticity; cost_plasticity_sheep; cost_plasticity_wolf; sheep_gain_from_food; wolf_gain_from_food; sheep_reproduce; wolf_reproduce; grass_regrowth_time; model-version; replicate-number; Richness; Shannon; Evenness; AbRelPgre; AbRelPvio; AbRelPgray; AbRelPsky; AbRelSone;  AbRelSthree; AbRelSfou; AbRelWone; AbRelWtwo;  AbRelWfour; abto-patchesgreen; abto-patchesviolet; abto-patchesgray; ab-to-patchessky; abto-sheepone; abu-to-sheepthree; ab-to-sheepfour; ab-to-wolvesone; abto-wolvestwo; abto-wolvesfour; abundance-total")
   file-print
       (word ticks ";" sheep-plasticity ";" wolf-plasticity ";"cost-plasticity-sheep ";" cost-plasticity-wolf ";" sheep-gain-from-food ";" wolf-gain-from-food ";"
             sheep-reproduce ";" wolf-reproduce ";" grass-regrowth-time ";" model-version ";" replicate-number ";" richness ";" shannon ";" Evenness ";"
             abundance-relative-patchesgreen ";" abundance-relative-patchesviolet ";" abundance-relative-patchesgray ";" abundance-relative-patchessky ";"
             abundance-relative-sheepone ";" abundance-relative-sheepthree ";" abundance-relative-sheepfour ";"
-            abundance-relative-wolvesone ";" abundance-relative-wolvestwo ";" abundance-relative-wolvesfour)
+            abundance-relative-wolvesone ";" abundance-relative-wolvestwo ";" abundance-relative-wolvesfour ";"
+            abundance-total-patchesgreen ";" abundance-total-patchesviolet ";" abundance-total-patchesgray ";" abundance-total-patchessky ";" abundance-total-sheepone ";"
+            abundance-total-sheepthree  ";"  abundance-total-sheepfour ";"  abundance-total-wolvesone ";" abundance-total-wolvestwo ";" abundance-total-wolvesfour ";" abundance-total)
   file-close
 end
 @#$#@#$#@
