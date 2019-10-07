@@ -1,5 +1,0 @@
-"sheep_plasticity";"wolf_plasticity";"cost_plasticity_sheep";"cost_plasticity_wolf";"sheep_gain_from_food";"wolf_gain_from_food";"sheep_reproduce";"wolf_reproduce";"grass_regrowth_time";"mean_Richness";"sd_Richness"
-5;6;0,8;0,9;30;40;25;5;5;9,94;0,238683256575943
-5;6;0,8;0,9;30;40;25;10;5;9,99;0,1
-5;6;0,8;0,9;30;50;25;5;5;10;0
-5;6;0,8;0,9;30;50;25;10;5;10;0
