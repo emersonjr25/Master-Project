@@ -7,56 +7,156 @@
 #install.packages("dplyr")
 library(stats)
 library(ggplot2)
-library(xlsx)
-library(FactoMineR)
-library(factoextra)
+#library(xlsx)
+#library(FactoMineR)
+#library(factoextra)
 library(dplyr)
 library(lmtest)
 library(car)
-
+library(here)
 #Loading data
-setwd("C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Resultado_dados/")
-getwd()
-dados <- read.csv("C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Resultado_dados/Resultados 24 combinacoes completo/test 2.csv", header = TRUE, sep = ";", quote = "\"", dec = ",")
+#setwd("C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Resultado_dados/")
+#getwd()
+dados <- read.csv(here("Resultado_dados/Dados brutos/dados_brutos_total.csv"), header = TRUE, sep = ";", quote = "\"", dec = ",")
 #View(dados)
-dados <- na.omit(dados)
+#dados <- na.omit(dados)
 
 
-#PCA Analysis - option 1
-pcaresults <- prcomp (dados[,26:35], scale = TRUE)
-pcaresults
-screeplot(pcaresults)
-plot(pcaresults)
-summary(pcaresults)
-#biplot(pcaresults)
+# #PCA Analysis - option 1
+# pcaresults <- prcomp (dados[,26:35], scale = TRUE)
+# pcaresults
+# screeplot(pcaresults)
+# plot(pcaresults)
+# summary(pcaresults)
+# #biplot(pcaresults)
+# 
+# #PCA Analysis - option 2
+# pcaresults2 <- na.omit(dados)
+# pcaresultsomit2 <- pcaresults2[, 26:35]
+# #View(pcaresultsomit2)
+# pcaresultsomit2 <- scale(pcaresultsomit2)
+# #View(pcaresultsomit2)
+# finalresultspca2 <- PCA(pcaresultsomit2, graph = F)
+# eig.val <- get_eigenvalue(finalresultspca2)
+# eig.val
+# fviz_eig(finalresultspca2)
+# var <- get_pca_var(finalresultspca2)
+# ind <- get_pca_ind(finalresultspca2)
+# fviz_pca_var(finalresultspca2, col.var = "blue")
+# grupo <- as.factor(pcaresults2[, 1])
+# fviz_pca_biplot(finalresultspca2, habillage = grupo, geom = "point", title = "Gr?fico PCA")
 
-#PCA Analysis - option 2
-pcaresults2 <- na.omit(dados)
-pcaresultsomit2 <- pcaresults2[, 26:35]
-#View(pcaresultsomit2)
-pcaresultsomit2 <- scale(pcaresultsomit2)
-#View(pcaresultsomit2)
-finalresultspca2 <- PCA(pcaresultsomit2, graph = F)
-eig.val <- get_eigenvalue(finalresultspca2)
-eig.val
-fviz_eig(finalresultspca2)
-var <- get_pca_var(finalresultspca2)
-ind <- get_pca_ind(finalresultspca2)
-fviz_pca_var(finalresultspca2, col.var = "blue")
-grupo <- as.factor(pcaresults2[, 1])
-fviz_pca_biplot(finalresultspca2, habillage = grupo, geom = "point", title = "Gráfico PCA")
-
-#plot - Pré e pós perturbação de cada uma das 24 combinação de parametros nas variaveis Shannon e equabilidade
-plot(dados$Shannon, dados$Evenness, col = dados$ticks)
+#plot - Pr? e p?s perturba??o de cada uma das 24 combina??o de parametros nas variaveis Shannon e equabilidade
+# plot(dados$Shannon, dados$Evenness, col = dados$ticks)
 
 #Normality
 #shapiro.test(dados$perturbation)
 
 #Homogeinity
-leveneTest(dados$Shannon ~ dados$plasticity)
+# leveneTest(dados$Shannon ~ dados$plasticity)
 
 #MANOVA
-ANOVA1 <- manova(cbind(dados$Shannon, dados$Evenness) ~ dados$plasticity * dados$cost * dados$perturbation, data = dados)
-summary(ANOVA1)
-plot(cbind(dados$Shannon, dados$Evenness) ~ dados$plasticity * dados$cost * dados$perturbation)
+# ANOVA1 <- manova(cbind(dados$Shannon, dados$Evenness) ~ dados$plasticity * dados$cost * dados$perturbation, data = dados)
+# summary(ANOVA1)
+# plot(cbind(dados$Shannon, dados$Evenness) ~ dados$plasticity * dados$cost * dados$perturbation)
 
+str(dados)
+dados$fractality = NA
+dados$perturbation = NA
+levels(dados$model.version)
+
+dados$fractality[dados$model.version == "HighPerturbationHighfractality"] = "high"
+dados$perturbation[dados$model.version == "HighPerturbationHighfractality"] = "high"
+
+
+dados$fractality[dados$model.version == "HighPerturbationLowfractality"] = "low"
+dados$perturbation[dados$model.version == "HighPerturbationLowfractality"] = "high"
+
+dados$fractality[dados$model.version == "LowPerturbationHighfractality"] = "high"
+dados$perturbation[dados$model.version == "LowPerturbationHighfractality"] = "low"
+
+dados$fractality[dados$model.version == "LowPerturbationLowfractality"] = "low"
+dados$perturbation[dados$model.version == "LowPerturbationLowfractality"] = "low"
+
+dados$cost_plasticity[dados$cost_plasticity_sheep == 0.2] ="low"
+dados$cost_plasticity[dados$cost_plasticity_sheep == 0.8] ="high"
+
+dados$level_plasticity[dados$sheep_plasticity == 2] ="low"
+dados$level_plasticity[dados$sheep_plasticity == 5] ="medium"
+dados$level_plasticity[dados$sheep_plasticity == 8] ="high"
+  
+colnames(dados)
+shannon.dists = data.frame("sheep_plasticity"= rep(NA, length(dados$ticks)),
+                           "wolf_plasticity"= rep(NA, length(dados$ticks)),
+                           "cost_plasticity_sheep"= rep(NA, length(dados$ticks)), 
+                           "cost_plasticity_wolf"= rep(NA, length(dados$ticks)), 
+                           "sheep_gain_from_food"= rep(NA, length(dados$ticks)), 
+                           "wolf_gain_from_food"=rep(NA, length(dados$ticks)), 
+                           "sheep_reproduce" = rep(NA, length(dados$ticks)),  
+                           "wolf_reproduce" = rep(NA, length(dados$ticks)), 
+                           "grass_regrowth_time"= rep(NA, length(dados$ticks)), 
+                           "model.version" = rep(NA, length(dados$ticks)), 
+                           "replicate.number" = rep(NA, length(dados$ticks)), 
+                           "fractality" = rep(NA, length(dados$ticks)), 
+                           "perturbation"= rep(NA, length(dados$ticks)),
+                           "cost_plasticity"= rep(NA, length(dados$ticks)),
+                           "level_plasticity"= rep(NA, length(dados$ticks)))
+i=1
+for( i in 1:length(dados$ticks)){
+ if(i %% 2!=0){ 
+ shannon.dists$Shannon.dists[i]        = abs(dados$Shannon[i] - dados$Shannon[i + 1])
+ shannon.dists$sheep_plasticity[i]     = dados$sheep_plasticity[i]
+ shannon.dists$wolf_plasticity[i]      = dados$wolf_plasticity[i]
+ shannon.dists$cost_plasticity_sheep[i]= dados$cost_plasticity_sheep[i]
+ shannon.dists$cost_plasticity_wolf[i] = dados$cost_plasticity_wolf[i]
+ shannon.dists$sheep_gain_from_food[i] = dados$sheep_gain_from_food[i]
+ shannon.dists$wolf_gain_from_food[i]  = dados$wolf_gain_from_food[i]
+ shannon.dists$sheep_reproduce[i]      = dados$sheep_reproduce[i]
+ shannon.dists$wolf_reproduce[i]       = dados$wolf_reproduce[i]
+ shannon.dists$grass_regrowth_time[i]  = dados$grass_regrowth_time[i]
+ shannon.dists$model.version[i]        = dados$model.version[i]
+ shannon.dists$replicate.number[i]     = dados$replicate.number[i]
+ shannon.dists$fractality[i]           = dados$fractality[i]
+ shannon.dists$perturbation[i]         = dados$perturbation[i]
+ shannon.dists$cost_plasticity[i]      = dados$cost_plasticity[i]     
+ shannon.dists$level_plasticity[i]     = dados$level_plasticity[i]     
+ }
+ 
+}
+shannon.dists = na.omit(shannon.dists)
+
+shannon.dists$sheep_plasticity      = as.factor(shannon.dists$sheep_plasticity      )
+shannon.dists$wolf_plasticity       = as.factor(shannon.dists$wolf_plasticity       )
+shannon.dists$cost_plasticity_sheep = as.factor(shannon.dists$cost_plasticity_sheep )
+shannon.dists$cost_plasticity_wolf  = as.factor(shannon.dists$cost_plasticity_wolf  )
+shannon.dists$sheep_gain_from_food  = as.factor(shannon.dists$sheep_gain_from_food  )
+shannon.dists$wolf_gain_from_food   = as.factor(shannon.dists$wolf_gain_from_food   )
+shannon.dists$sheep_reproduce       = as.factor(shannon.dists$sheep_reproduce       )
+shannon.dists$wolf_reproduce        = as.factor(shannon.dists$wolf_reproduce        )
+shannon.dists$grass_regrowth_time   = as.factor(shannon.dists$grass_regrowth_time   )
+shannon.dists$model.version         = as.factor(shannon.dists$model.version         )
+shannon.dists$replicate.number      = as.factor(shannon.dists$replicate.number      )
+shannon.dists$fractality            = as.factor(shannon.dists$fractality            )
+shannon.dists$perturbation          = as.factor(shannon.dists$perturbation          )
+shannon.dists$cost_plasticity       = as.factor(shannon.dists$cost_plasticity       )
+shannon.dists$level_plasticity      = as.factor(shannon.dists$level_plasticity      )
+
+shannon.dists=droplevels(shannon.dists)
+str(shannon.dists)
+levels(shannon.dists$level_plasticity)
+model = aov(shannon.dists$Shannon.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity +shannon.dists$fractality + shannon.dists$perturbation )
+summary(model)
+model2 = lm(shannon.dists$Shannon.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity +shannon.dists$fractality + shannon.dists$perturbation )
+
+summary(model2)
+
+ggplot(aes(y=shannon.dists$Shannon.dists), x=shannon.dists$cost_plasticity )+
+  geom_point(shannon.dists$cost_plasticity)
+
+
+ggplot(data = shannon.dists, aes(x= level_plasticity , y=Shannon.dists)) +
+  #ggtitle("Tempo de Atividade")+
+geom_boxplot(aes(color = cost_plasticity, fill= perturbation),  alpha= 0.3, height = .5, width=0.2) +
+  #geom_point(aes(color = cost_plasticity, shape = perturbation))+
+  scale_color_viridis_d()+
+  facet_grid( ~fractality, scales="free_y", space="free")
