@@ -17,7 +17,9 @@ library(here)
 #Loading data
 #setwd("C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Resultado_dados/")
 #getwd()
-dados <- read.csv(here("Resultado_dados/Dados brutos/dados_brutos_total.csv"), header = TRUE, sep = ";", quote = "\"", dec = ",")
+#dados <- read.csv(here("Resultado_dados/Dados brutos/dados_brutos_total.csv"), header = TRUE, sep = ";", quote = "\"", dec = ",")
+dados <- read.csv("C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Resultado_dados/Dados brutos/dados_brutos_total.csv", header = TRUE, sep = ";", quote = "\"", dec = ",")
+#dados <- read.csv("C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Resultado_dados/Resultados tudo junto e 24 combinacoes/24HighPlasticityHighCostHighPerturbationHighfractality.csv", header = TRUE, sep = ";", quote = "\"", dec = ",")
 #View(dados)
 #dados <- na.omit(dados)
 
@@ -47,7 +49,9 @@ dados <- read.csv(here("Resultado_dados/Dados brutos/dados_brutos_total.csv"), h
 # fviz_pca_biplot(finalresultspca2, habillage = grupo, geom = "point", title = "Gr?fico PCA")
 
 #plot - Pr? e p?s perturba??o de cada uma das 24 combina??o de parametros nas variaveis Shannon e equabilidade
-# plot(dados$Shannon, dados$Evenness, col = dados$ticks)
+#plot(dados$Shannon[2:1001], dados$Shannon[1002:2001], col = dados$ticks)
+#plot(dados$Shannon[2:1001], dados$Shannon[1002:2001], col = dados$ticks)
+#plot(dados$replicate.number, dados$Shannon, col = dados$ticks)
 
 #Normality
 #shapiro.test(dados$perturbation)
@@ -58,7 +62,8 @@ dados <- read.csv(here("Resultado_dados/Dados brutos/dados_brutos_total.csv"), h
 #MANOVA
 # ANOVA1 <- manova(cbind(dados$Shannon, dados$Evenness) ~ dados$plasticity * dados$cost * dados$perturbation, data = dados)
 # summary(ANOVA1)
-# plot(cbind(dados$Shannon, dados$Evenness) ~ dados$plasticity * dados$cost * dados$perturbation)
+#plot(cbind(dados$Shannon, dados$Evenness) ~ dados$plasticity * dados$cost * dados$perturbation)
+
 
 str(dados)
 dados$fractality = NA
@@ -150,13 +155,14 @@ model2 = lm(shannon.dists$Shannon.dists ~ shannon.dists$level_plasticity + shann
 
 summary(model2)
 
-ggplot(aes(y=shannon.dists$Shannon.dists), x=shannon.dists$cost_plasticity )+
-  geom_point(shannon.dists$cost_plasticity)
+#ggplot(data = shannon.dists, aes(y=shannon.dists$Shannon.dists), x=shannon.dists$cost_plasticity )+
+  #geom_point(shannon.dists$cost_plasticity)
 
 
 ggplot(data = shannon.dists, aes(x= level_plasticity , y=Shannon.dists)) +
   #ggtitle("Tempo de Atividade")+
-geom_boxplot(aes(color = cost_plasticity, fill= perturbation),  alpha= 0.3, height = .5, width=0.2) +
+geom_boxplot(aes(color = cost_plasticity, fill= perturbation),  alpha= 0.3, height = 0.5, width=0.2) +
   #geom_point(aes(color = cost_plasticity, shape = perturbation))+
   scale_color_viridis_d()+
   facet_grid( ~fractality, scales="free_y", space="free")
+
