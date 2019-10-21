@@ -5,6 +5,7 @@
 #install.packages("FactorMineR")
 #install.packages
 #install.packages("dplyr")
+#install.packages("vegan")
 library(stats)
 library(ggplot2)
 #library(xlsx)
@@ -14,11 +15,14 @@ library(dplyr)
 library(lmtest)
 library(car)
 library(here)
+library(vegan)
+
 #Loading data
 #setwd("C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Resultado_dados/")
 #getwd()
 #dados <- read.csv(here("Resultado_dados/Dados brutos/dados_brutos_total.csv"), header = TRUE, sep = ";", quote = "\"", dec = ",")
 dados <- read.csv("C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Resultado_dados/Dados brutos/dados_brutos_total.csv", header = TRUE, sep = ";", quote = "\"", dec = ",")
+#dados <- read.csv(here("Resultado_dados/Dados brutos/dados_brutos_total.csv"), header = TRUE, sep = ";", quote = "\"", dec = ",")
 #dados <- read.csv("C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Resultado_dados/Resultados tudo junto e 24 combinacoes/24HighPlasticityHighCostHighPerturbationHighfractality.csv", header = TRUE, sep = ";", quote = "\"", dec = ",")
 #View(dados)
 #dados <- na.omit(dados)
@@ -65,6 +69,8 @@ dados <- read.csv("C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/Mestrad
 #plot(cbind(dados$Shannon, dados$Evenness) ~ dados$plasticity * dados$cost * dados$perturbation)
 
 
+
+#Transformacao geral de fatores numericos em categoricos / organizando
 str(dados)
 dados$fractality = NA
 dados$perturbation = NA
@@ -72,7 +78,6 @@ levels(dados$model.version)
 
 dados$fractality[dados$model.version == "HighPerturbationHighfractality"] = "high"
 dados$perturbation[dados$model.version == "HighPerturbationHighfractality"] = "high"
-
 
 dados$fractality[dados$model.version == "HighPerturbationLowfractality"] = "low"
 dados$perturbation[dados$model.version == "HighPerturbationLowfractality"] = "high"
@@ -89,7 +94,32 @@ dados$cost_plasticity[dados$cost_plasticity_sheep == 0.8] ="high"
 dados$level_plasticity[dados$sheep_plasticity == 2] ="low"
 dados$level_plasticity[dados$sheep_plasticity == 5] ="medium"
 dados$level_plasticity[dados$sheep_plasticity == 8] ="high"
-  
+
+
+
+#calculate shannon trophical level and specialization
+dados$shannonprey = diversity(dados[30:32], index = "shannon")
+dados$shannonpredator = diversity(dados[33:35], index = "shannon")
+
+specialist <- data.frame("specialistone" = c(dados[30]),
+                         "specialisttwo" = c(dados[33]) )
+dados$shannonspecialist =  diversity(specialist, index = "shannon") #sheepone and wolvesone
+
+
+shannonspecialistandgeneralist <- data.frame("spegenone" = c(dados[31]),
+                                             "spegentwo" = c(dados[34]) )
+dados$shannonspecialistandgeneralist = diversity(shannonspecialistandgeneralist, index = "shannon") #sheepthree and wolvestwo
+
+
+shannongeneralist <- data.frame("generalistone" = c(dados[32]),
+                                "generalisttwo" = c(dados[35]) )
+dados$shannongeneralist = diversity(shannongeneralist, index = "shannon")  #sheepfour and wolvesfour
+
+
+#rep?
+
+#Dataframe geral - tabela com variaveis preditoras para os 3 objetivos
+
 colnames(dados)
 shannon.dists = data.frame("sheep_plasticity"= rep(NA, length(dados$ticks)),
                            "wolf_plasticity"= rep(NA, length(dados$ticks)),
@@ -106,10 +136,20 @@ shannon.dists = data.frame("sheep_plasticity"= rep(NA, length(dados$ticks)),
                            "perturbation"= rep(NA, length(dados$ticks)),
                            "cost_plasticity"= rep(NA, length(dados$ticks)),
                            "level_plasticity"= rep(NA, length(dados$ticks)))
+
+#plasticity effect resilience (general shannon dist)
+
 i=1
 for( i in 1:length(dados$ticks)){
  if(i %% 2!=0){ 
  shannon.dists$Shannon.dists[i]        = abs(dados$Shannon[i] - dados$Shannon[i + 1])
+ shannon.dists$eveness.dists[i]        = abs(dados$Evenness[i] - dados$Evenness [ i + 1])
+ shannon.dists$richness.dists[i]       = abs(dados$Richness[i] - dados$Richness [ i + 1])
+ shannon.dists$shannonprey.dists[i]    = abs(dados$shannonprey[i] - dados$shannonprey[i + 1])
+ shannon.dists$shannonpredator.dists[i] = abs(dados$shannonpredator[i] - dados$shannonpredator[i + 1])
+ shannon.dists$shannonspecialist.dists[i] = abs(dados$shannonspecialist[i] - dados$shannonspecialist[i + 1])
+ shannon.dists$shannonspecialistandgeneralist.dists[i] = abs(dados$shannonspecialistandgeneralist[i] - dados$shannonspecialistandgeneralist[i + 1])
+ shannon.dists$shannongeneralist[i] = abs(dados$shannongeneralist[i] - dados$shannongeneralist[i + 1])
  shannon.dists$sheep_plasticity[i]     = dados$sheep_plasticity[i]
  shannon.dists$wolf_plasticity[i]      = dados$wolf_plasticity[i]
  shannon.dists$cost_plasticity_sheep[i]= dados$cost_plasticity_sheep[i]
@@ -126,7 +166,6 @@ for( i in 1:length(dados$ticks)){
  shannon.dists$cost_plasticity[i]      = dados$cost_plasticity[i]     
  shannon.dists$level_plasticity[i]     = dados$level_plasticity[i]     
  }
- 
 }
 shannon.dists = na.omit(shannon.dists)
 
@@ -146,23 +185,25 @@ shannon.dists$perturbation          = as.factor(shannon.dists$perturbation      
 shannon.dists$cost_plasticity       = as.factor(shannon.dists$cost_plasticity       )
 shannon.dists$level_plasticity      = as.factor(shannon.dists$level_plasticity      )
 
-shannon.dists=droplevels(shannon.dists)
+shannon.dists=droplevels(shannon.dists) #?
 str(shannon.dists)
+#View(shannon.dists)
+
+
+#ANOVA test
 levels(shannon.dists$level_plasticity)
 model = aov(shannon.dists$Shannon.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity +shannon.dists$fractality + shannon.dists$perturbation )
 summary(model)
 model2 = lm(shannon.dists$Shannon.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity +shannon.dists$fractality + shannon.dists$perturbation )
-
 summary(model2)
 
-#ggplot(data = shannon.dists, aes(y=shannon.dists$Shannon.dists), x=shannon.dists$cost_plasticity )+
-  #geom_point(shannon.dists$cost_plasticity)
 
+#ggplot
 
-ggplot(data = shannon.dists, aes(x= level_plasticity , y=Shannon.dists)) +
-  #ggtitle("Tempo de Atividade")+
-geom_boxplot(aes(color = cost_plasticity, fill= perturbation),  alpha= 0.3, height = 0.5, width=0.2) +
-  #geom_point(aes(color = cost_plasticity, shape = perturbation))+
+ggplot(data = shannon.dists, aes(x= level_plasticity , y= Shannon.dists)) +
+  #ggtitle("graphic one")+
+ geom_boxplot(aes(color = cost_plasticity, fill= perturbation),  alpha= 0.3, height = 0.5, width=0.2) +
   scale_color_viridis_d()+
   facet_grid( ~fractality, scales="free_y", space="free")
+
 
