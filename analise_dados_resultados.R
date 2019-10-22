@@ -3,9 +3,10 @@
 #install.packages("ggplot2")
 #install.packages("xlsx")
 #install.packages("FactorMineR")
-#install.packages
+#install.packages("agricolae")
 #install.packages("dplyr")
 #install.packages("vegan")
+#install.packages("agricolae")
 library(stats)
 library(ggplot2)
 #library(xlsx)
@@ -16,12 +17,13 @@ library(lmtest)
 library(car)
 library(here)
 library(vegan)
+library(agricolae)
 
 #Loading data
 #setwd("C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Resultado_dados/")
 #getwd()
 #dados <- read.csv(here("Resultado_dados/Dados brutos/dados_brutos_total.csv"), header = TRUE, sep = ";", quote = "\"", dec = ",")
-dados <- read.csv("C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Resultado_dados/Dados brutos/dados_brutos_total.csv", header = TRUE, sep = ";", quote = "\"", dec = ",")
+dados <- read.csv("C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Resultado_dados/Dados brutos/dados_brutos_total_ordenado.csv", header = TRUE, sep = ";", quote = "\"", dec = ",")
 #dados <- read.csv(here("Resultado_dados/Dados brutos/dados_brutos_total.csv"), header = TRUE, sep = ";", quote = "\"", dec = ",")
 #dados <- read.csv("C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/MestradoEmerson-master/MestradoEmerson/Resultado_dados/Resultados tudo junto e 24 combinacoes/24HighPlasticityHighCostHighPerturbationHighfractality.csv", header = TRUE, sep = ";", quote = "\"", dec = ",")
 #View(dados)
@@ -56,12 +58,6 @@ dados <- read.csv("C:/Users/emers/Dropbox/Codigos/MestradoEmerson-master/Mestrad
 #plot(dados$Shannon[2:1001], dados$Shannon[1002:2001], col = dados$ticks)
 #plot(dados$Shannon[2:1001], dados$Shannon[1002:2001], col = dados$ticks)
 #plot(dados$replicate.number, dados$Shannon, col = dados$ticks)
-
-#Normality
-#shapiro.test(dados$perturbation)
-
-#Homogeinity
-# leveneTest(dados$Shannon ~ dados$plasticity)
 
 #MANOVA
 # ANOVA1 <- manova(cbind(dados$Shannon, dados$Evenness) ~ dados$plasticity * dados$cost * dados$perturbation, data = dados)
@@ -116,7 +112,6 @@ shannongeneralist <- data.frame("generalistone" = c(dados[32]),
 dados$shannongeneralist = diversity(shannongeneralist, index = "shannon")  #sheepfour and wolvesfour
 
 
-#rep?
 
 #Dataframe geral - tabela com variaveis preditoras para os 3 objetivos
 
@@ -185,9 +180,10 @@ shannon.dists$perturbation          = as.factor(shannon.dists$perturbation      
 shannon.dists$cost_plasticity       = as.factor(shannon.dists$cost_plasticity       )
 shannon.dists$level_plasticity      = as.factor(shannon.dists$level_plasticity      )
 
-shannon.dists=droplevels(shannon.dists) #?
+shannon.dists=droplevels(shannon.dists)
 str(shannon.dists)
 #View(shannon.dists)
+
 
 
 #ANOVA test
@@ -196,7 +192,10 @@ model = aov(shannon.dists$Shannon.dists ~ shannon.dists$level_plasticity + shann
 summary(model)
 model2 = lm(shannon.dists$Shannon.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity +shannon.dists$fractality + shannon.dists$perturbation )
 summary(model2)
-
+dist.shannoneveness <- cbind(shannon.dists$Shannon.dists, shannon.dists$eveness.dists)
+model3 = manova(dist.shannoneveness ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity +shannon.dists$fractality + shannon.dists$perturbation )
+summary(model3)
+#plot(dist.shannoneveness ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity + shannon.dists$fractality + shannon.dists$perturbation)
 
 #ggplot
 
@@ -206,4 +205,11 @@ ggplot(data = shannon.dists, aes(x= level_plasticity , y= Shannon.dists)) +
   scale_color_viridis_d()+
   facet_grid( ~fractality, scales="free_y", space="free")
 
+#tukey
+tukey <- HSD.test(model, c("shannon.dists$level_plasticity", "shannon.dists$cost_plasticity", "shannon.dists$fractality", "shannon.dists$perturbation"))
 
+#Normality
+#shapiro.test(shannon.dists$level_plasticity)
+
+#Homogeinity
+leveneTest(shannon.dists$Shannon.dists, shannon.dists$level_plasticity)
