@@ -22,11 +22,6 @@ write.csv2(species,"dados_brutos.csv", row.names = F)
  summary(species)
 species %>% 
    group_by (
-            ticks,
-            sheep_plasticity,
-            wolf_plasticity,
-            cost_plasticity_sheep,
-            cost_plasticity_wolf,
             sheep_gain_from_food,
             wolf_gain_from_food,
             sheep_reproduce,
