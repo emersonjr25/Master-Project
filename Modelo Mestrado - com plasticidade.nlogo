@@ -339,6 +339,9 @@ to-report plastic-jump
     [set ps random-normal wolf-plasticity 0.2
   ]
   ifelse(ps <= 0)[report 0.1][report ps]
+ ; Ifelse any? Patches in-radius Salto with [impact = 0]
+;[move-to one-of patches Patches in radius Salto with [impact = 0]]
+;[move-to one-of patches Patches in-radius Salto]
 end
 
 to-report salto
