@@ -43,7 +43,7 @@ dados$perturbation[dados$model.version == "LowPerturbationHighfractality"] = "lo
 dados$fractality[dados$model.version == "LowPerturbationLowfractality"] = "low"
 dados$perturbation[dados$model.version == "LowPerturbationLowfractality"] = "low"
 
-dados$cost_plasticity[dados$cost_plasticity_sheep == 0] = "no"
+dados$cost_plasticity[dados$cost_plasticity_sheep == 0] = "NA"
 dados$cost_plasticity[dados$cost_plasticity_sheep == 0.2] ="low"
 dados$cost_plasticity[dados$cost_plasticity_sheep == 0.8] ="high"
 
@@ -147,7 +147,7 @@ str(shannon.dists)
 
 #rearrange factor levels
 shannon.dists$level_plasticity <- factor(shannon.dists$level_plasticity, levels = c("no", "low", "medium", "high"))
-shannon.dists$cost_plasticity <- factor(shannon.dists$cost_plasticity, levels = c("no", "low", "high"))
+shannon.dists$cost_plasticity <- factor(shannon.dists$cost_plasticity, levels = c("low", "high"))
 shannon.dists$perturbation <- factor(shannon.dists$perturbation, levels = c("low", "high"))
 shannon.dists$fractality <- factor(shannon.dists$fractality, levels = c("low", "high"))
 
@@ -269,8 +269,22 @@ tukeydifferent6 <- HSD.test(modelgeneralist1, c("shannon.dists$level_plasticity"
 
 
 #Normality
+
 #shapiro.test(shannon.dists$level_plasticity)
 
-#Homogeinity
-leveneTest(shannon.dists$Shannon.dists, shannon.dists$level_plasticity)
+#Subsampling and Homogeinity
 
+mysample <- shannon.dists[sample(1:nrow(shannon.dists),2400,
+                          replace=FALSE),]
+leveneTest(mysample$Shannon.dists, mysample$level_plasticity)
+bartlett.test(mysample$Shannon.dists, mysample$level_plasticity)
+
+#Interaction Fractality and perturbation
+ggplot(data = shannon.dists, aes(x= fractality , y= Shannon.dists)) +
+  ggtitle("Interaction Fractality and perturbation") +
+  geom_boxplot(aes(fill = perturbation), alpha= 0.3, height = 0.5, width=0.2) +
+  scale_fill_manual(values=c("10", "20")) + scale_color_manual(values=c("1", "2", "3")) +
+  #facet_grid( ~fractality, scales="free_y", space="free") + 
+  theme_bw() + theme(plot.title = element_text(size = 12, face = 2, hjust = 0.5)) #+
+# stat_compare_means()
+#annotate("text", x = 2.2, y = 1.20, label = "P value: <2e-16 (all factors), R:0.80", color = "blue", size = 3) #+ rremove("grid") 
