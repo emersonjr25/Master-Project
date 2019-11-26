@@ -18,7 +18,7 @@ library(vegan)
 library(agricolae)
 
 #Loading data
-dados <- read.csv(here("Resultado_dados/Dados brutos/dados_brutos_total_com_e_sem_plasticidade.csv"), header = TRUE, sep = ";", quote = "\"", dec = ",")
+dados <- read.csv(here("Resultado_dados/Dados Brutos/dados_brutos_shannon_dist.csv"), header = TRUE, sep = ";", quote = "\"", dec = ",")
 
 #plot - Pre e pos perturbacao de cada uma das 24 combinacao de parametros nas variaveis Shannon e equabilidade
 #plot(dados$Shannon[2:1001], dados$Shannon[1002:2001], col = dados$ticks)
@@ -198,9 +198,9 @@ plot(shannon.dists$shannongeneralist ~ shannon.dists$level_plasticity + shannon.
 
 ggplot(data = shannon.dists, aes(x= level_plasticity , y= Shannon.dists)) +
   ggtitle("Plasticity effects on resilience") +
-  geom_boxplot(aes(color = cost_plasticity, fill= perturbation), alpha= 0.3, height = 0.5, width=0.2) +
+  geom_boxplot(aes(fill= perturbation), alpha= 0.3, height = 0.5, width=0.2) +
   scale_fill_manual(values=c("10", "20")) + scale_color_manual(values=c("1", "2", "3")) +
-  facet_grid( ~fractality, scales="free_y", space="free") + 
+  #facet_grid( ~fractality, scales="free_y", space="free") + 
   theme_bw() + theme(plot.title = element_text(size = 12, face = 2, hjust = 0.5)) #+
   # stat_compare_means()
   #annotate("text", x = 2.2, y = 1.20, label = "P value: <2e-16 (all factors), R:0.80", color = "blue", size = 3) #+ rremove("grid") 

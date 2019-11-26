@@ -22,6 +22,10 @@ write.csv2(species,"dados_brutos.csv", row.names = F)
  summary(species)
 species %>% 
    group_by (
+            sheep_plasticity, #apenas na versão com plasticidade
+            wolf_plasticity, #apenas na versão com plasticidade
+            cost_plasticity_sheep, #apenas na versão com plasticidade
+            cost_plasticity_wolf, #apenas na versão com plasticidade
             sheep_gain_from_food,
             wolf_gain_from_food,
             sheep_reproduce,
