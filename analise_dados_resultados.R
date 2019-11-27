@@ -19,11 +19,11 @@ library(agricolae)
 
 #Loading data
 dados <- read.csv(here("Resultado_dados/Dados Brutos/dados_brutos_shannon_dist.csv"), header = TRUE, sep = ";", quote = "\"", dec = ",")
+#dadoscombinacoes <- read.csv(here("Resultado_dados/Dados Brutos/Dados brutos para 24 combinacoes/27NoPlasticityNoCostHighPerturbationLowfractality.csv"), header = TRUE, sep = ";", quote = "\"", dec = ",")
 
 #plot - Pre e pos perturbacao de cada uma das 24 combinacao de parametros nas variaveis Shannon e equabilidade
-#plot(dados$Shannon[2:1001], dados$Shannon[1002:2001], col = dados$ticks)
-#plot(dados$Shannon[2:1001], dados$Shannon[1002:2001], col = dados$ticks)
-#plot(dados$replicate.number, dados$Shannon, col = dados$ticks)
+#plot(dadoscombinacoes$Shannon[2:1001], dadoscombinacoes$Shannon[1002:2001], main = "Shannon pre and post", xlab = "Shannon pre-disturbance", ylab = "Shannon post-disturbance", xlim = c(0.90, 2.25),ylim = c(0.90, 2.25), col = dadoscombinacoes$ticks)
+#plot(dadoscombinacoes$replicate.number, dadoscombinacoes$Shannon, main = "Shannon pre and post", sub = "Red = pre-disturbance, Black = post-disturbance", xlab = "Replicate Number", ylab = "Shannon Value", ylim = c(0.90, 2.25), col = dadoscombinacoes$ticks)
 
 #Transformacao geral de fatores numericos em categoricos / organizando
 str(dados)
@@ -150,123 +150,90 @@ shannon.dists$level_plasticity <- factor(shannon.dists$level_plasticity, levels 
 shannon.dists$cost_plasticity <- factor(shannon.dists$cost_plasticity, levels = c("low", "high"))
 shannon.dists$perturbation <- factor(shannon.dists$perturbation, levels = c("low", "high"))
 shannon.dists$fractality <- factor(shannon.dists$fractality, levels = c("low", "high"))
+shannon.dists$Shannon.dists = shannon.dists$Shannon.dists * -1
 
 #ANOVA general
-
 modelgeneral1 = aov(shannon.dists$Shannon.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity +shannon.dists$fractality + shannon.dists$perturbation )
 summary(modelgeneral1)
 modelgeneral2 = lm(shannon.dists$Shannon.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity +shannon.dists$fractality + shannon.dists$perturbation )
 summary(modelgeneral2)
-plot(shannon.dists$Shannon.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity + shannon.dists$fractality + shannon.dists$perturbation)
+kruskal.test(shannon.dists$Shannon.dists ~ shannon.dists$level_plasticity)
+#plot(shannon.dists$Shannon.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity + shannon.dists$fractality + shannon.dists$perturbation, ylab = "Resilience", ylim = c(-1.3, 0))
+plot(shannon.dists$Shannon.dists ~ shannon.dists$level_plasticity, main = "Effect of plasticity on resilience", xlab = "Plasticity", ylab = "Resilience", ylim = c(-1.3, 0), cex.main = 1.5, cex.lab = 1.4)
+plot(shannon.dists$Shannon.dists ~ shannon.dists$cost_plasticity, main = "Effect of cost on resilience", xlab = "Cost Plasticity", ylab = "Resilience", ylim = c(-1.3, 0), cex.main = 1.5, cex.lab = 1.4)
+plot(shannon.dists$Shannon.dists ~ shannon.dists$fractality, main = "Effect of Fractality on resilience", xlab = "Fractality", ylab = "Resilience", ylim = c(-1.3, 0), cex.main = 1.5, cex.lab = 1.4)
+plot(shannon.dists$Shannon.dists ~ shannon.dists$perturbation, main = "Effect of Disturbance on resilience", xlab = "Disturbance", ylab = "Resilience", ylim = c(-1.3, 0), cex.main = 1.5, cex.lab = 1.4)
 
-#ANOVA prey and predator
-
-modelprey1 = aov(shannon.dists$shannonprey.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity +shannon.dists$fractality + shannon.dists$perturbation )
-summary(modelprey1)
-modelprey2 = lm(shannon.dists$shannonprey.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity +shannon.dists$fractality + shannon.dists$perturbation )
-summary(modelprey2)
-plot(shannon.dists$shannonprey.dists  ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity + shannon.dists$fractality + shannon.dists$perturbation)
-
-modelpredator1 = aov(shannon.dists$shannonpredator.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity +shannon.dists$fractality + shannon.dists$perturbation )
-summary(modelpredator1)
-modelpredator2 = lm(shannon.dists$shannonpredator.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity +shannon.dists$fractality + shannon.dists$perturbation )
-summary(modelpredator2)
-plot(shannon.dists$shannonpredator.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity + shannon.dists$fractality + shannon.dists$perturbation)
-
-#ANOVA specialist, specialistgeneralist, generalist
-
-modelspecialist1 = aov(shannon.dists$shannonspecialist.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity +shannon.dists$fractality + shannon.dists$perturbation )
-summary(modelspecialist1)
-modelspecialist2 = lm(shannon.dists$shannonspecialist.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity +shannon.dists$fractality + shannon.dists$perturbation )
-summary(modelspecialist2)
-plot(shannon.dists$shannonspecialist.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity + shannon.dists$fractality + shannon.dists$perturbation)
-
-modelspecialistandgeneralist1 = aov(shannon.dists$shannonspecialistandgeneralist.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity +shannon.dists$fractality + shannon.dists$perturbation )
-summary(modelspecialistandgeneralist1)
-modelspecialistandgeneralist2 = lm(shannon.dists$shannonspecialistandgeneralist.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity +shannon.dists$fractality + shannon.dists$perturbation )
-summary(modelspecialistandgeneralist2)
-plot(shannon.dists$shannonspecialistandgeneralist.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity + shannon.dists$fractality + shannon.dists$perturbation)
-
-modelgeneralist1 = aov(shannon.dists$shannongeneralist ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity +shannon.dists$fractality + shannon.dists$perturbation )
-summary(modelgeneralist1)
-modelgeneralist2 = lm(shannon.dists$shannongeneralist ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity +shannon.dists$fractality + shannon.dists$perturbation )
-summary(modelgeneralist2)
-plot(shannon.dists$shannongeneralist ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity + shannon.dists$fractality + shannon.dists$perturbation)
-
-
-#ggplot general
-
-ggplot(data = shannon.dists, aes(x= level_plasticity , y= Shannon.dists)) +
-  ggtitle("Plasticity effects on resilience") +
-  geom_boxplot(aes(fill= perturbation), alpha= 0.3, height = 0.5, width=0.2) +
+ANOVAGENERAL <- ggplot(data = shannon.dists, aes(x= level_plasticity, y= Shannon.dists)) +
+  ggtitle("Effect of plasticity on resilience") +
+  geom_boxplot (aes(fill = perturbation), alpha= 0.3) +
   scale_fill_manual(values=c("10", "20")) + scale_color_manual(values=c("1", "2", "3")) +
   #facet_grid( ~fractality, scales="free_y", space="free") + 
-  theme_bw() + theme(plot.title = element_text(size = 12, face = 2, hjust = 0.5)) #+
+  theme_bw() + theme(plot.title = element_text(size = 12, face = 2, hjust = 0.5), axis.title.x = element_text(size = 14), axis.title.y = element_text(size = 14)) #+
   # stat_compare_means()
   #annotate("text", x = 2.2, y = 1.20, label = "P value: <2e-16 (all factors), R:0.80", color = "blue", size = 3) #+ rremove("grid") 
-  
+ANOVAGENERAL + scale_x_discrete(name = "Plasticity") + scale_y_continuous(name = "Resilience", limits = c(-1.20, 0)) 
 
-#ggplot prey and predator
+#ANOVA prey and predator
+shannondistpreyandpredator   <- data.frame(shannon_dist = c(shannon.dists$shannonprey.dists, shannon.dists$shannonpredator.dists), 
+                                           typeanimal = c(1:56000))
+shannondistpreyandpredator$typeanimal[1:28000] = c("prey")
+shannondistpreyandpredator$typeanimal[28001:56000] = c("predator")
 
-ggplot(data = shannon.dists, aes(x= level_plasticity , y= shannonprey.dists)) +
-  ggtitle("Plasticity effects on resilience prey") +
-  geom_boxplot(aes(color = cost_plasticity, fill= perturbation), alpha= 0.3, height = 0.5, width=0.2) +
+shannondistpreyandpredator$shannon_dist = shannondistpreyandpredator$shannon_dist * -1
+shannondistpreyandpredator$typeanimal <- factor(shannondistpreyandpredator$typeanimal, levels = c("prey", "predator"))
+
+modelpreyandpredator = t.test(shannondistpreyandpredator$shannon_dist ~ shannondistpreyandpredator$typeanimal)
+summary(modelpreyandpredator)
+plot(shannondistpreyandpredator$shannon_dist ~ shannondistpreyandpredator$typeanimal)
+
+
+ANOVAPREYANDPREDATOR <- ggplot(data = shannondistpreyandpredator, aes(x= typeanimal, y= shannon_dist)) +
+  ggtitle("Resilience in prey and predator") +
+  geom_boxplot ( alpha= 0.3) +
   scale_fill_manual(values=c("10", "20")) + scale_color_manual(values=c("1", "2", "3")) +
-  facet_grid( ~fractality, scales="free_y", space="free") + 
-  theme_bw() + theme(plot.title = element_text(size = 12, face = 2, hjust = 0.5)) #+
-  #stat_compare_means()
+  #facet_grid( ~fractality, scales="free_y", space="free") + 
+  theme_bw() + theme(plot.title = element_text(size = 12, face = 2, hjust = 0.5), axis.title.x = element_text(size = 14), axis.title.y = element_text(size = 14)) #+
+# stat_compare_means()
+#annotate("text", x = 2.2, y = 1.20, label = "P value: <2e-16 (all factors), R:0.80", color = "blue", size = 3) #+ rremove("grid") 
+ANOVAPREYANDPREDATOR + scale_x_discrete(name = "Trophic Level") + scale_y_continuous(name = "Resilience", limits = c(-1.20, 0))
 
-ggplot(data = shannon.dists, aes(x= level_plasticity , y= shannonpredator.dists)) +
-  ggtitle("Plasticity effects on resilience predator") +
-  geom_boxplot(aes(color = cost_plasticity, fill= perturbation), alpha= 0.3, height = 0.5, width=0.2) +
+
+#ANOVA specialist, specialistgeneralist, generalist
+shannondistspecialization   <- data.frame(shannon_dist = c(shannon.dists$shannonspecialist.dists, shannon.dists$shannonspecialistandgeneralist.dists, shannon.dists$shannongeneralist), 
+                                           specialization = c(1:84000))
+shannondistspecialization$specialization[1:28000] = c("Specialist")
+shannondistspecialization$specialization[28001:56000] = c("SpecieIntermediary")
+shannondistspecialization$specialization[56001:84000] = c("Generalist")
+
+shannondistspecialization$shannon_dist = shannondistspecialization$shannon_dist * -1
+shannondistspecialization$specialization <- factor(shannondistspecialization$specialization, levels = c("Specialist", "SpecieIntermediary", "Generalist" ))
+
+modelspecialization = aov(shannondistspecialization$shannon_dist ~ shannondistspecialization$specialization)
+summary(modelspecialization)
+plot(shannondistspecialization$shannon_dist ~ shannondistspecialization$specialization)
+
+
+ANOVASPECIALIZATION <- ggplot(data = shannondistspecialization, aes(x= specialization, y= shannon_dist)) +
+  ggtitle("Resilience in food specialization") +
+  geom_boxplot ( alpha= 0.3) +
   scale_fill_manual(values=c("10", "20")) + scale_color_manual(values=c("1", "2", "3")) +
-  facet_grid( ~fractality, scales="free_y", space="free") + 
-  theme_bw() + theme(plot.title = element_text(size = 12, face = 2, hjust = 0.5))# +
-  #stat_compare_means()
+  #facet_grid( ~fractality, scales="free_y", space="free") + 
+  theme_bw() + theme(plot.title = element_text(size = 12, face = 2, hjust = 0.5), axis.title.x = element_text(size = 14), axis.title.y = element_text(size = 14)) #+
+# stat_compare_means()
+#annotate("text", x = 2.2, y = 1.20, label = "P value: <2e-16 (all factors), R:0.80", color = "blue", size = 3) #+ rremove("grid") 
+ANOVASPECIALIZATION + scale_x_discrete(name = "Specialization") + scale_y_continuous(name = "Resilience", limits = c(-1.20, 0))
 
-
-#ggplot specialist, specialistgeneralist, generalist
-
-ggplot(data = shannon.dists, aes(x= level_plasticity , y= shannonspecialist.dists)) +
-  ggtitle("Plasticity effects on resilience specialist") +
-  geom_boxplot(aes(color = cost_plasticity, fill= perturbation), alpha= 0.3, height = 0.5, width=0.2) +
-  scale_fill_manual(values=c("10", "20")) + scale_color_manual(values=c("1", "2", "3")) +
-  facet_grid( ~fractality, scales="free_y", space="free") + 
-  theme_bw() + theme(plot.title = element_text(size = 12, face = 2, hjust = 0.5))# +
-  #stat_compare_means()
-
-ggplot(data = shannon.dists, aes(x= level_plasticity , y= shannonspecialistandgeneralist.dists)) +
-  ggtitle("Plasticity effects on resilience specialist and generalist") +
-  geom_boxplot(aes(color = cost_plasticity, fill= perturbation), alpha= 0.3, height = 0.5, width=0.2) +
-  scale_fill_manual(values=c("10", "20")) + scale_color_manual(values=c("1", "2", "3")) +
-  facet_grid( ~fractality, scales="free_y", space="free") + 
-  theme_bw() + theme(plot.title = element_text(size = 12, face = 2, hjust = 0.5)) #+
- # stat_compare_means()
-
-ggplot(data = shannon.dists, aes(x= level_plasticity , y= shannongeneralist)) +
-  ggtitle("Plasticity effects on resilience generalist") +
-  geom_boxplot(aes(color = cost_plasticity, fill= perturbation), alpha= 0.3, height = 0.5, width=0.2) +
-  scale_fill_manual(values=c("10", "20")) + scale_color_manual(values=c("1", "2", "3")) +
-  facet_grid( ~fractality, scales="free_y", space="free") + 
-  theme_bw() + theme(plot.title = element_text(size = 12, face = 2, hjust = 0.5))# +
- # stat_compare_means()
 
 #tukey
 
 tukey1 <- TukeyHSD(modelgeneral1, c("shannon.dists$level_plasticity", "shannon.dists$cost_plasticity", "shannon.dists$fractality", "shannon.dists$perturbation"))
-tukey2 <- TukeyHSD(modelprey1, c("shannon.dists$level_plasticity", "shannon.dists$cost_plasticity", "shannon.dists$fractality", "shannon.dists$perturbation"))
-tukey3 <- TukeyHSD(modelpredator1, c("shannon.dists$level_plasticity", "shannon.dists$cost_plasticity", "shannon.dists$fractality", "shannon.dists$perturbation"))
-tukey4 <- TukeyHSD(modelspecialist1, c("shannon.dists$level_plasticity", "shannon.dists$cost_plasticity", "shannon.dists$fractality", "shannon.dists$perturbation"))
-tukey5 <- TukeyHSD(modelspecialistandgeneralist1, c("shannon.dists$level_plasticity", "shannon.dists$cost_plasticity", "shannon.dists$fractality", "shannon.dists$perturbation"))
-tukey6 <- TukeyHSD(modelgeneralist1, c("shannon.dists$level_plasticity", "shannon.dists$cost_plasticity", "shannon.dists$fractality", "shannon.dists$perturbation"))
+tukey2 <- TukeyHSD(modelspecialization, c("shannondistspecialization$specialization"))
 
 tukeydifferent1 <- HSD.test(modelgeneral1, c("shannon.dists$level_plasticity", "shannon.dists$cost_plasticity", "shannon.dists$fractality", "shannon.dists$perturbation"))
-tukeydifferent2 <- HSD.test(modelprey1, c("shannon.dists$level_plasticity", "shannon.dists$cost_plasticity", "shannon.dists$fractality", "shannon.dists$perturbation"))
-tukeydifferent3 <- HSD.test(modelpredator1, c("shannon.dists$level_plasticity", "shannon.dists$cost_plasticity", "shannon.dists$fractality", "shannon.dists$perturbation"))
-tukeydifferent4 <- HSD.test(modelspecialist1, c("shannon.dists$level_plasticity", "shannon.dists$cost_plasticity", "shannon.dists$fractality", "shannon.dists$perturbation"))
-tukeydifferent5 <- HSD.test(modelspecialistandgeneralist1, c("shannon.dists$level_plasticity", "shannon.dists$cost_plasticity", "shannon.dists$fractality", "shannon.dists$perturbation"))
-tukeydifferent6 <- HSD.test(modelgeneralist1, c("shannon.dists$level_plasticity", "shannon.dists$cost_plasticity", "shannon.dists$fractality", "shannon.dists$perturbation"))
 
+modelgeneral8 <- aov(shannon.dists$Shannon.dists ~ shannon.dists$level_plasticity + shannon.dists$perturbation)
+tukeydifferent8 <- HSD.test(modelgeneral8, c("shannon.dists$level_plasticity","shannon.dists$perturbation"))
 
 #Normality
 
@@ -288,3 +255,48 @@ ggplot(data = shannon.dists, aes(x= fractality , y= Shannon.dists)) +
   theme_bw() + theme(plot.title = element_text(size = 12, face = 2, hjust = 0.5)) #+
 # stat_compare_means()
 #annotate("text", x = 2.2, y = 1.20, label = "P value: <2e-16 (all factors), R:0.80", color = "blue", size = 3) #+ rremove("grid") 
+
+#Other graphics
+modelprey1 = aov(shannon.dists$shannonprey.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity +shannon.dists$fractality + shannon.dists$perturbation )
+summary(modelprey1)
+modelprey2 = lm(shannon.dists$shannonprey.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity +shannon.dists$fractality + shannon.dists$perturbation )
+summary(modelprey2)
+shannon.dists$shannonprey.dists = shannon.dists$shannonprey.dists * -1
+plot(shannon.dists$shannonprey.dists  ~ shannon.dists$level_plasticity,  main = "Effect of plasticity on resilience prey", xlab = "Plasticity", ylab = "Resilience prey", ylim = c(-1.3, 0), cex.main = 1.5, cex.lab = 1.4)
+plot(shannon.dists$shannonprey.dists  ~ shannon.dists$perturbation, main = "Effect of disturbance on resilience prey", xlab = "Disturbance", ylab = "Resilience prey", ylim = c(-1.3, 0), cex.main = 1.5, cex.lab = 1.4)
+
+modelpredator1 = aov(shannon.dists$shannonpredator.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity +shannon.dists$fractality + shannon.dists$perturbation )
+summary(modelpredator1)
+modelpredator2 = lm(shannon.dists$shannonpredator.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity +shannon.dists$fractality + shannon.dists$perturbation )
+summary(modelpredator2)
+shannon.dists$shannonpredator.dists = shannon.dists$shannonpredator.dists * -1
+plot(shannon.dists$shannonpredator.dists  ~ shannon.dists$level_plasticity,  main = "Effect of plasticity on resilience predator", xlab = "Plasticity", ylab = "Resilience predator", ylim = c(-1.3, 0), cex.main = 1.5, cex.lab = 1.4)
+plot(shannon.dists$shannonpredator.dists  ~ shannon.dists$perturbation, main = "Effect of disturbance on resilience predator", xlab = "Disturbance", ylab = "Resilience predator", ylim = c(-1.3, 0), cex.main = 1.5, cex.lab = 1.4)
+
+#ANOVA specialist, specialistgeneralist, generalist
+
+modelspecialist1 = aov(shannon.dists$shannonspecialist.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity +shannon.dists$fractality + shannon.dists$perturbation )
+summary(modelspecialist1)
+modelspecialist2 = lm(shannon.dists$shannonspecialist.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity +shannon.dists$fractality + shannon.dists$perturbation )
+summary(modelspecialist2)
+shannon.dists$shannonspecialist.dists = shannon.dists$shannonspecialist.dists * -1
+plot(shannon.dists$shannonspecialist.dists  ~ shannon.dists$level_plasticity,  main = "Effect of plasticity on resilience specialist", xlab = "Plasticity", ylab = "Resilience specialist", ylim = c(-1.3, 0), cex.main = 1.5, cex.lab = 1.4)
+plot(shannon.dists$shannonspecialist.dists  ~ shannon.dists$perturbation, main = "Effect of disturbance on resilience specialist", xlab = "Disturbance", ylab = "Resilience specialist", ylim = c(-1.3, 0), cex.main = 1.5, cex.lab = 1.4)
+
+modelgeneralist1 = aov(shannon.dists$shannongeneralist ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity +shannon.dists$fractality + shannon.dists$perturbation )
+summary(modelgeneralist1)
+modelgeneralist2 = lm(shannon.dists$shannongeneralist ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity +shannon.dists$fractality + shannon.dists$perturbation )
+summary(modelgeneralist2)
+shannon.dists$shannongeneralist = shannon.dists$shannongeneralist * - 1
+plot(shannon.dists$shannongeneralist  ~ shannon.dists$level_plasticity,  main = "Effect of plasticity on resilience generalist", xlab = "Plasticity", ylab = "Resilience generalist", ylim = c(-1.3, 0), cex.main = 1.5, cex.lab = 1.4)
+plot(shannon.dists$shannongeneralist  ~ shannon.dists$perturbation, main = "Effect of disturbance on resilience generalist", xlab = "Disturbance", ylab = "Resilience generalist", ylim = c(-1.3, 0), cex.main = 1.5, cex.lab = 1.4)
+
+ANOVASSS <- ggplot(data = shannon.dists, aes(x= level_plasticity, y= shannongeneralist  )) +
+  ggtitle("Resilience in food specialization") +
+  geom_boxplot (aes(fill=perturbation), alpha= 0.3) +
+  scale_fill_manual(values=c("10", "20")) + scale_color_manual(values=c("1", "2", "3")) +
+  #facet_grid( ~fractality, scales="free_y", space="free") + 
+  theme_bw() + theme(plot.title = element_text(size = 12, face = 2, hjust = 0.5), axis.title.x = element_text(size = 14), axis.title.y = element_text(size = 14)) #+
+# stat_compare_means()
+#annotate("text", x = 2.2, y = 1.20, label = "P value: <2e-16 (all factors), R:0.80", color = "blue", size = 3) #+ rremove("grid") 
+ANOVASSS + scale_x_discrete(name = "Plasticity") + scale_y_continuous(name = "Resilience generalist", limits = c(-1.20, 0))
