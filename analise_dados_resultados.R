@@ -164,9 +164,11 @@ plot(shannon.dists$Shannon.dists ~ shannon.dists$cost_plasticity, main = "Effect
 plot(shannon.dists$Shannon.dists ~ shannon.dists$fractality, main = "Effect of Fractality on resilience", xlab = "Fractality", ylab = "Resilience", ylim = c(-1.3, 0), cex.main = 1.5, cex.lab = 1.4)
 plot(shannon.dists$Shannon.dists ~ shannon.dists$perturbation, main = "Effect of Disturbance on resilience", xlab = "Disturbance", ylab = "Resilience", ylim = c(-1.3, 0), cex.main = 1.5, cex.lab = 1.4)
 
+disturbance <- shannon.dists$perturbation
+
 ANOVAGENERAL <- ggplot(data = shannon.dists, aes(x= level_plasticity, y= Shannon.dists)) +
   ggtitle("Effect of plasticity on resilience") +
-  geom_boxplot (aes(fill = perturbation), alpha= 0.3) +
+  geom_boxplot (aes(fill = disturbance), alpha= 0.3) +
   scale_fill_manual(values=c("10", "20")) + scale_color_manual(values=c("1", "2", "3")) +
   #facet_grid( ~fractality, scales="free_y", space="free") + 
   theme_bw() + theme(plot.title = element_text(size = 12, face = 2, hjust = 0.5), axis.title.x = element_text(size = 14), axis.title.y = element_text(size = 14)) #+
@@ -293,7 +295,7 @@ plot(shannon.dists$shannongeneralist  ~ shannon.dists$perturbation, main = "Effe
 
 ANOVASSS <- ggplot(data = shannon.dists, aes(x= level_plasticity, y= shannongeneralist  )) +
   ggtitle("Resilience in food specialization") +
-  geom_boxplot (aes(fill=perturbation), alpha= 0.3) +
+  geom_boxplot (aes(fill=disturbance), alpha= 0.3) +
   scale_fill_manual(values=c("10", "20")) + scale_color_manual(values=c("1", "2", "3")) +
   #facet_grid( ~fractality, scales="free_y", space="free") + 
   theme_bw() + theme(plot.title = element_text(size = 12, face = 2, hjust = 0.5), axis.title.x = element_text(size = 14), axis.title.y = element_text(size = 14)) #+
