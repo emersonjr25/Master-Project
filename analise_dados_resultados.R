@@ -51,10 +51,10 @@ dados$cost_plasticity[dados$cost_plasticity_sheep == 0] = "NA"
 dados$cost_plasticity[dados$cost_plasticity_sheep == 0.2] ="low"
 dados$cost_plasticity[dados$cost_plasticity_sheep == 0.8] ="high"
 
-dados$level_plasticity[dados$sheep_plasticity == 0] ="no"
-dados$level_plasticity[dados$sheep_plasticity == 2] ="low"
-dados$level_plasticity[dados$sheep_plasticity == 5] ="medium"
-dados$level_plasticity[dados$sheep_plasticity == 8] ="high"
+dados$level_plasticity[dados$sheep_plasticity == 0] ="No"
+dados$level_plasticity[dados$sheep_plasticity == 2] ="Low"
+dados$level_plasticity[dados$sheep_plasticity == 5] ="Medium"
+dados$level_plasticity[dados$sheep_plasticity == 8] ="High"
 
 
 
@@ -150,7 +150,7 @@ str(shannon.dists)
 #View(shannon.dists)
 
 #rearrange factor levels
-shannon.dists$level_plasticity <- factor(shannon.dists$level_plasticity, levels = c("no", "low", "medium", "high"))
+shannon.dists$level_plasticity <- factor(shannon.dists$level_plasticity, levels = c("No", "Low", "Medium", "High"))
 shannon.dists$cost_plasticity <- factor(shannon.dists$cost_plasticity, levels = c("low", "high"))
 shannon.dists$perturbation <- factor(shannon.dists$perturbation, levels = c("low", "high"))
 shannon.dists$fractality <- factor(shannon.dists$fractality, levels = c("low", "high"))
@@ -378,7 +378,7 @@ KernelAnalysis + scale_x_continuous(name = "Resilience") + scale_y_continuous(na
 ANOVAPLASTICITY <- ggplot(data = shannon.dists, aes(x= level_plasticity, y= Shannon.dists)) +
   geom_violin (width = 0.9) +
   ggtitle("Effect of plasticity on resilience") +
-  geom_boxplot (width = 0.1, color = "grey",  alpha = 0.2, aes(fill = disturbance)) +
+  geom_boxplot (width = 0.1, color = "grey",  alpha = 0.2) +
   scale_fill_viridis(discrete = TRUE) +
   #facet_grid( ~fractality, scales="free_y", space="free") + 
   theme_bw() + theme(plot.title = element_text(size = 12, face = 2, hjust = 0.5), axis.title.x = element_text(size = 14), axis.title.y = element_text(size = 14)) #+
@@ -386,11 +386,12 @@ ANOVAPLASTICITY <- ggplot(data = shannon.dists, aes(x= level_plasticity, y= Shan
 #annotate("text", x = 2.2, y = 1.20, label = "P value: <2e-16 (all factors), R:0.80", color = "blue", size = 3) #+ rremove("grid") 
 ANOVAPLASTICITY + scale_x_discrete(name = "Plasticity") + scale_y_continuous(name = "Resilience", limits = c(-1.20, 0)) 
 
+shannon.dists <- na.omit(shannon.dists)
 #ANOVA Plasticity dispersion - low, medium and high
 ANOVAPLASTICITY <- ggplot(data = shannon.dists, aes(x= level_plasticity, y= Shannon.dists)) +
   geom_violin (width = 0.9) +
   ggtitle("Effect of plasticity on resilience") +
-  geom_boxplot (width = 0.1, color = "grey",  alpha = 0.2, aes(fill = disturbance)) +
+  geom_boxplot (width = 0.1, color = "grey",  alpha = 0.2) +
   scale_fill_viridis(discrete = TRUE) +
   #facet_grid( ~fractality, scales="free_y", space="free") + 
   theme_bw() + theme(plot.title = element_text(size = 12, face = 2, hjust = 0.5), axis.title.x = element_text(size = 14), axis.title.y = element_text(size = 14)) #+
@@ -398,3 +399,75 @@ ANOVAPLASTICITY <- ggplot(data = shannon.dists, aes(x= level_plasticity, y= Shan
 #annotate("text", x = 2.2, y = 1.20, label = "P value: <2e-16 (all factors), R:0.80", color = "blue", size = 3) #+ rremove("grid") 
 ANOVAPLASTICITY + scale_x_discrete(name = "Plasticity in dispersion") + scale_y_continuous(name = "Resilience", limits = c(-1.20, 0)) 
 
+#ANOVA Fractality
+ANOVAPLASTICITY <- ggplot(data = shannon.dists, aes(x= fractality, y= Shannon.dists)) +
+  geom_violin (width = 0.9) +
+  ggtitle("Effect of fractality on resilience") +
+  geom_boxplot (width = 0.1, color = "grey",  alpha = 0.2) +
+  scale_fill_viridis(discrete = TRUE) +
+  #facet_grid( ~fractality, scales="free_y", space="free") + 
+  theme_bw() + theme(plot.title = element_text(size = 12, face = 2, hjust = 0.5), axis.title.x = element_text(size = 14), axis.title.y = element_text(size = 14)) #+
+# stat_compare_means()
+#annotate("text", x = 2.2, y = 1.20, label = "P value: <2e-16 (all factors), R:0.80", color = "blue", size = 3) #+ rremove("grid") 
+ANOVAPLASTICITY + scale_x_discrete(name = "Fractality") + scale_y_continuous(name = "Resilience", limits = c(-1.20, 0)) 
+
+#ANOVA Disturbance
+ANOVAPLASTICITY <- ggplot(data = shannon.dists, aes(x= disturbance, y= Shannon.dists)) +
+  geom_violin (width = 0.9) +
+  ggtitle("Effect of disturbance on resilience") +
+  geom_boxplot (width = 0.1, color = "grey",  alpha = 0.2) +
+  scale_fill_viridis(discrete = TRUE) +
+  #facet_grid( ~fractality, scales="free_y", space="free") + 
+  theme_bw() + theme(plot.title = element_text(size = 12, face = 2, hjust = 0.5), axis.title.x = element_text(size = 14), axis.title.y = element_text(size = 14)) #+
+# stat_compare_means()
+#annotate("text", x = 2.2, y = 1.20, label = "P value: <2e-16 (all factors), R:0.80", color = "blue", size = 3) #+ rremove("grid") 
+ANOVAPLASTICITY + scale_x_discrete(name = "Disturbance") + scale_y_continuous(name = "Resilience", limits = c(-1.20, 0)) 
+
+#shannon.dists <- na.omit(shannon.dists)
+#ANOVA Cost
+ANOVAPLASTICITY <- ggplot(data = shannon.dists, aes(x= cost_plasticity, y= Shannon.dists)) +
+  geom_violin (width = 0.9) +
+  ggtitle("Effect of cost on resilience") +
+  geom_boxplot (width = 0.1, color = "grey",  alpha = 0.2) +
+  scale_fill_viridis(discrete = TRUE) +
+  #facet_grid( ~fractality, scales="free_y", space="free") + 
+  theme_bw() + theme(plot.title = element_text(size = 12, face = 2, hjust = 0.5), axis.title.x = element_text(size = 14), axis.title.y = element_text(size = 14)) #+
+# stat_compare_means()
+#annotate("text", x = 2.2, y = 1.20, label = "P value: <2e-16 (all factors), R:0.80", color = "blue", size = 3) #+ rremove("grid") 
+ANOVAPLASTICITY + scale_x_discrete(name = "Cost of plasticity") + scale_y_continuous(name = "Resilience", limits = c(-1.20, 0)) 
+
+#ANOVA Trophical level
+ANOVAPLASTICITY <- ggplot(data = shannondistpreyandpredator, aes(x= typeanimal, y= shannon_dist)) +
+  geom_violin (width = 0.9) +
+  ggtitle("Effect of Trophical Level on resilience") +
+  geom_boxplot (width = 0.1, color = "grey",  alpha = 0.2) +
+  scale_fill_viridis(discrete = TRUE) +
+  #facet_grid( ~fractality, scales="free_y", space="free") + 
+  theme_bw() + theme(plot.title = element_text(size = 12, face = 2, hjust = 0.5), axis.title.x = element_text(size = 14), axis.title.y = element_text(size = 14)) #+
+# stat_compare_means()
+#annotate("text", x = 2.2, y = 1.20, label = "P value: <2e-16 (all factors), R:0.80", color = "blue", size = 3) #+ rremove("grid") 
+ANOVAPLASTICITY + scale_x_discrete(name = "Trophical level") + scale_y_continuous(name = "Resilience", limits = c(-1.20, 0))
+
+#ANOVA Specialization
+ANOVAPLASTICITY <- ggplot(data = shannondistspecialization, aes(x= specialization, y= shannon_dist)) +
+  geom_violin (width = 0.9) +
+  ggtitle("Effect of Specialization on resilience") +
+  geom_boxplot (width = 0.1, color = "grey",  alpha = 0.2) +
+  scale_fill_viridis(discrete = TRUE) +
+  #facet_grid( ~fractality, scales="free_y", space="free") + 
+  theme_bw() + theme(plot.title = element_text(size = 12, face = 2, hjust = 0.5), axis.title.x = element_text(size = 14), axis.title.y = element_text(size = 14)) #+
+# stat_compare_means()
+#annotate("text", x = 2.2, y = 1.20, label = "P value: <2e-16 (all factors), R:0.80", color = "blue", size = 3) #+ rremove("grid") 
+ANOVAPLASTICITY + scale_x_discrete(name = "Specialization") + scale_y_continuous(name = "Resilience", limits = c(-1.20, 0)) 
+
+#ANOVA Disturbance
+ANOVAPLASTICITY <- ggplot(data = shannon.dists, aes(x= fractality, y= Shannon.dists)) +
+  geom_violin (width = 0.9) +
+  ggtitle("Effect of Fractality and Disturbance on resilience") +
+  geom_boxplot (width = 0.1, color = "grey",  alpha = 0.2, aes(fill = disturbance)) +
+  scale_fill_viridis(discrete = TRUE) +
+  #facet_grid( ~fractality, scales="free_y", space="free") + 
+  theme_bw() + theme(plot.title = element_text(size = 12, face = 2, hjust = 0.5), axis.title.x = element_text(size = 14), axis.title.y = element_text(size = 14)) #+
+# stat_compare_means()
+#annotate("text", x = 2.2, y = 1.20, label = "P value: <2e-16 (all factors), R:0.80", color = "blue", size = 3) #+ rremove("grid") 
+ANOVAPLASTICITY + scale_x_discrete(name = "Fractality") + scale_y_continuous(name = "Resilience", limits = c(-1.20, 0)) 
