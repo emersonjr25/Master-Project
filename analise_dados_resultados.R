@@ -8,6 +8,8 @@
 #install.packages("agricolae")
 #install.packages("ggpubr")
 #install.packages("hexbin")
+#install.packages("hrbrthemes")
+#install.packages("viridis")
 library(ggpubr)
 library(stats)
 library(ggplot2)
@@ -18,10 +20,14 @@ library(here)
 library(vegan)
 library(agricolae)
 library(hexbin)
+library(hrbrthemes)
+library(viridis)
 
 #Loading data
 dados <- read.csv(here("Resultado_dados/Dados Brutos/dados_brutos_shannon_dist.csv"), header = TRUE, sep = ";", quote = "\"", dec = ",")
-#dadoscombinacoes <- read.csv(here("Resultado_dados/Dados Brutos/Dados brutos para 24 combinacoes/28NoPlasticityNoCostHigherturbationHighfractality.csv"), header = TRUE, sep = ";", quote = "\"", dec = ",")
+#dados <- read.csv(here("Resultado_dados/Dados Brutos/dados_brutos_grande_mundo_shannon_dist.csv"), header = TRUE, sep = ";", quote = "\"", dec = ",")
+#dados <- read.csv(here("Resultado_dados/Dados Brutos/dados_brutos_pequeno_mundo_shannon_dist.csv"), header = TRUE, sep = ";", quote = "\"", dec = ",")
+#dadoscombinacoes <- read.csv(here("Resultado_dados/Dados Brutos/Dados brutos para 24 combinacoes/2LowPlasticityLowCostLowPerturbationHighfractality.csv"), header = TRUE, sep = ";", quote = "\"", dec = ",")
 
 #Transformacao geral de fatores numericos em categoricos / organizando
 str(dados)
@@ -191,11 +197,11 @@ ANOVAGENERAL + scale_x_discrete(name = "Plasticity") + scale_y_continuous(name =
 #ANOVA prey and predator
 shannondistpreyandpredator   <- data.frame(shannon_dist = c(shannon.dists$shannonprey.dists, shannon.dists$shannonpredator.dists), 
                                            typeanimal = c(1:56000))
-shannondistpreyandpredator$typeanimal[1:28000] = c("prey")
-shannondistpreyandpredator$typeanimal[28001:56000] = c("predator")
+shannondistpreyandpredator$typeanimal[1:28000] = c("herbivore")
+shannondistpreyandpredator$typeanimal[28001:56000] = c("carnivore")
 
 shannondistpreyandpredator$shannon_dist = shannondistpreyandpredator$shannon_dist * -1
-shannondistpreyandpredator$typeanimal <- factor(shannondistpreyandpredator$typeanimal, levels = c("prey", "predator"))
+shannondistpreyandpredator$typeanimal <- factor(shannondistpreyandpredator$typeanimal, levels = c("herbivore", "carnivore"))
 
 modelpreyandpredator <- wilcox.test(shannondistpreyandpredator$shannon_dist ~ shannondistpreyandpredator$typeanimal)
 summary(modelpreyandpredator)
@@ -203,7 +209,7 @@ plot(shannondistpreyandpredator$shannon_dist ~ shannondistpreyandpredator$typean
 
 
 ANOVAPREYANDPREDATOR <- ggplot(data = shannondistpreyandpredator, aes(x= typeanimal, y= shannon_dist)) +
-  ggtitle("Resilience in prey and predator") +
+  ggtitle("Resilience in herbivore and carnivore") +
   geom_boxplot ( alpha= 0.3) +
   scale_fill_manual(values=c("10", "20")) + scale_color_manual(values=c("1", "2", "3")) +
   #facet_grid( ~fractality, scales="free_y", space="free") + 
@@ -261,7 +267,7 @@ leveneTest(mysample$Shannon.dists, mysample$level_plasticity)
 bartlett.test(mysample$Shannon.dists, mysample$level_plasticity)
 
 #Interaction Fractality and perturbation
-ggplot(data = shannon.dists, aes(x= fractality , y= Shannon.dists)) +
+fractalityanddisturbance <- ggplot(data = shannon.dists, aes(x= fractality , y= Shannon.dists)) +
   ggtitle("Interaction Fractality and perturbation") +
   geom_boxplot(aes(fill = perturbation), alpha= 0.3, height = 0.5, width=0.2) +
   scale_fill_manual(values=c("10", "20")) + scale_color_manual(values=c("1", "2", "3")) +
@@ -269,6 +275,7 @@ ggplot(data = shannon.dists, aes(x= fractality , y= Shannon.dists)) +
   theme_bw() + theme(plot.title = element_text(size = 12, face = 2, hjust = 0.5)) #+
 # stat_compare_means()
 #annotate("text", x = 2.2, y = 1.20, label = "P value: <2e-16 (all factors), R:0.80", color = "blue", size = 3) #+ rremove("grid") 
+fractalityanddisturbance  + scale_x_discrete(name = "Fractality") + scale_y_continuous(name = "Resilience", limits = c(-1.20, 0))
 
 #Other graphics
 modelprey1 = aov(shannon.dists$shannonprey.dists ~ shannon.dists$level_plasticity )
@@ -276,16 +283,16 @@ summary(modelprey1)
 modelprey2 = lm(shannon.dists$shannonprey.dists ~ shannon.dists$level_plasticity )
 summary(modelprey2)
 shannon.dists$shannonprey.dists = shannon.dists$shannonprey.dists * -1
-plot(shannon.dists$shannonprey.dists  ~ shannon.dists$level_plasticity,  main = "Effect of plasticity on resilience prey", xlab = "Plasticity", ylab = "Resilience prey", ylim = c(-1.3, 0), cex.main = 1.5, cex.lab = 1.4)
-plot(shannon.dists$shannonprey.dists  ~ shannon.dists$perturbation, main = "Effect of disturbance on resilience prey", xlab = "Disturbance", ylab = "Resilience prey", ylim = c(-1.3, 0), cex.main = 1.5, cex.lab = 1.4)
+plot(shannon.dists$shannonprey.dists  ~ shannon.dists$level_plasticity,  main = "Effect of plasticity on resilience herbivore", xlab = "Plasticity", ylab = "Resilience herbivore", ylim = c(-1.3, 0), cex.main = 1.5, cex.lab = 1.4)
+plot(shannon.dists$shannonprey.dists  ~ shannon.dists$perturbation, main = "Effect of disturbance on resilience herbivore", xlab = "Disturbance", ylab = "Resilience herbivore", ylim = c(-1.3, 0), cex.main = 1.5, cex.lab = 1.4)
 
 modelpredator1 = aov(shannon.dists$shannonpredator.dists ~ shannon.dists$level_plasticity )
 summary(modelpredator1)
 modelpredator2 = lm(shannon.dists$shannonpredator.dists ~ shannon.dists$level_plasticity  )
 summary(modelpredator2)
 shannon.dists$shannonpredator.dists = shannon.dists$shannonpredator.dists * -1
-plot(shannon.dists$shannonpredator.dists  ~ shannon.dists$level_plasticity,  main = "Effect of plasticity on resilience predator", xlab = "Plasticity", ylab = "Resilience predator", ylim = c(-1.3, 0), cex.main = 1.5, cex.lab = 1.4)
-plot(shannon.dists$shannonpredator.dists  ~ shannon.dists$perturbation, main = "Effect of disturbance on resilience predator", xlab = "Disturbance", ylab = "Resilience predator", ylim = c(-1.3, 0), cex.main = 1.5, cex.lab = 1.4)
+plot(shannon.dists$shannonpredator.dists  ~ shannon.dists$level_plasticity,  main = "Effect of plasticity on resilience carnivore", xlab = "Plasticity", ylab = "Resilience carnivore", ylim = c(-1.3, 0), cex.main = 1.5, cex.lab = 1.4)
+plot(shannon.dists$shannonpredator.dists  ~ shannon.dists$perturbation, main = "Effect of disturbance on resilience carnivore", xlab = "Disturbance", ylab = "Resilience carnivore", ylim = c(-1.3, 0), cex.main = 1.5, cex.lab = 1.4)
 
 #ANOVA specialist, specialistgeneralist, generalist
 
@@ -341,7 +348,7 @@ densityplot + scale_x_continuous(name = "ShannonPre", limits = c(1.0, 2.30)) + s
 #Kernel Analysis specific - Alternative States
 KernelAnalysis <-  ggplot(dadoscombinacoes, aes(dadoscombinacoes$Shannon, fill = ticks)) +
   geom_density(alpha = 0.3) + 
-  ggtitle("Kernel analysis general") + 
+  #ggtitle("Kernel analysis general") + 
   theme_bw() + theme(plot.title = element_text(size = 12, face = 2, hjust = 0.5), axis.title.x = element_text(size = 12), axis.title.y = element_text(size = 12)) #+
 KernelAnalysis + scale_x_continuous(name = "Shannon", limits = c(1.0, 2.30)) + scale_y_continuous(name = "Density")
 
@@ -365,3 +372,29 @@ KernelAnalysis <-  ggplot(shannon.dists, aes(Shannon.dists, fill = fractality)) 
   ggtitle("Kernel analysis") + 
   theme_bw() + theme(plot.title = element_text(size = 12, face = 2, hjust = 0.5), axis.title.x = element_text(size = 12), axis.title.y = element_text(size = 12)) #+
 KernelAnalysis + scale_x_continuous(name = "Resilience") + scale_y_continuous(name = "Density")
+
+# NEW ANALYSIS
+#ANOVA Plasticity - no and yes
+ANOVAPLASTICITY <- ggplot(data = shannon.dists, aes(x= level_plasticity, y= Shannon.dists)) +
+  geom_violin (width = 0.9) +
+  ggtitle("Effect of plasticity on resilience") +
+  geom_boxplot (width = 0.1, color = "grey",  alpha = 0.2, aes(fill = disturbance)) +
+  scale_fill_viridis(discrete = TRUE) +
+  #facet_grid( ~fractality, scales="free_y", space="free") + 
+  theme_bw() + theme(plot.title = element_text(size = 12, face = 2, hjust = 0.5), axis.title.x = element_text(size = 14), axis.title.y = element_text(size = 14)) #+
+# stat_compare_means()
+#annotate("text", x = 2.2, y = 1.20, label = "P value: <2e-16 (all factors), R:0.80", color = "blue", size = 3) #+ rremove("grid") 
+ANOVAPLASTICITY + scale_x_discrete(name = "Plasticity") + scale_y_continuous(name = "Resilience", limits = c(-1.20, 0)) 
+
+#ANOVA Plasticity dispersion - low, medium and high
+ANOVAPLASTICITY <- ggplot(data = shannon.dists, aes(x= level_plasticity, y= Shannon.dists)) +
+  geom_violin (width = 0.9) +
+  ggtitle("Effect of plasticity on resilience") +
+  geom_boxplot (width = 0.1, color = "grey",  alpha = 0.2, aes(fill = disturbance)) +
+  scale_fill_viridis(discrete = TRUE) +
+  #facet_grid( ~fractality, scales="free_y", space="free") + 
+  theme_bw() + theme(plot.title = element_text(size = 12, face = 2, hjust = 0.5), axis.title.x = element_text(size = 14), axis.title.y = element_text(size = 14)) #+
+# stat_compare_means()
+#annotate("text", x = 2.2, y = 1.20, label = "P value: <2e-16 (all factors), R:0.80", color = "blue", size = 3) #+ rremove("grid") 
+ANOVAPLASTICITY + scale_x_discrete(name = "Plasticity in dispersion") + scale_y_continuous(name = "Resilience", limits = c(-1.20, 0)) 
+
