@@ -1,0 +1,12 @@
+#step
+selectionmodel <- step(modelgeneral2, direction = "forward")
+summary(selectionmodel)
+
+###olsrr
+ols_step_forward_aic(modelgeneral2)
+k <- ols_step_best_subset(modelgeneral2)
+plot(k)
+
+###MASS
+stepAIC(modelgeneral2, scope=list(upper= ~shannon.dists$level_plasticity * shannon.dists$cost_plasticity * shannon.dists$fractality * shannon.dists$perturbation, lower= ~1), direction = "forward")
+stepAIC(modelgeneral2, direction = "forward", trace = FALSE)

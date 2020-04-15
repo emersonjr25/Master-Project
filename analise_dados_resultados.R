@@ -10,6 +10,10 @@
 #install.packages("hexbin")
 #install.packages("hrbrthemes")
 #install.packages("viridis")
+#install.packages("olsrr")
+#install.packages("MASS")
+library(olsrr)
+library(MASS)
 library(ggpubr)
 library(stats)
 library(ggplot2)
@@ -24,10 +28,11 @@ library(hrbrthemes)
 library(viridis)
 
 #Loading data
-dados <- read.csv(here("Resultado_dados/Dados Brutos/dados_brutos_shannon_dist.csv"), header = TRUE, sep = ";", quote = "\"", dec = ",")
-#dados <- read.csv(here("Resultado_dados/Dados Brutos/dados_brutos_grande_mundo_shannon_dist.csv"), header = TRUE, sep = ";", quote = "\"", dec = ",")
+#dados <- read.csv(here("Resultado_dados/Dados Brutos/dados_brutos_shannon_dist.csv"), header = TRUE, sep = ";", quote = "\"", dec = ",")
+dados <- read.csv(here("Resultado_dados/Dados Brutos/dados_brutos_grande_mundo_shannon_dist.csv"), header = TRUE, sep = ";", quote = "\"", dec = ",")
 #dados <- read.csv(here("Resultado_dados/Dados Brutos/dados_brutos_pequeno_mundo_shannon_dist.csv"), header = TRUE, sep = ";", quote = "\"", dec = ",")
 #dadoscombinacoes <- read.csv(here("Resultado_dados/Dados Brutos/Dados brutos para 24 combinacoes/2LowPlasticityLowCostLowPerturbationHighfractality.csv"), header = TRUE, sep = ";", quote = "\"", dec = ",")
+#dados <- read.csv(here("Resultado_dados/Dados Brutos/dados_brutos_população.csv"), header = TRUE, sep = ";", quote = "\"", dec = ",")
 
 #Transformacao geral de fatores numericos em categoricos / organizando
 str(dados)
@@ -51,10 +56,10 @@ dados$cost_plasticity[dados$cost_plasticity_sheep == 0] = "NA"
 dados$cost_plasticity[dados$cost_plasticity_sheep == 0.2] ="low"
 dados$cost_plasticity[dados$cost_plasticity_sheep == 0.8] ="high"
 
-dados$level_plasticity[dados$sheep_plasticity == 0] ="No"
-dados$level_plasticity[dados$sheep_plasticity == 2] ="Low"
-dados$level_plasticity[dados$sheep_plasticity == 5] ="Medium"
-dados$level_plasticity[dados$sheep_plasticity == 8] ="High"
+dados$level_plasticity[dados$sheep_plasticity == 0] ="Without"
+dados$level_plasticity[dados$sheep_plasticity == 2] ="With"
+dados$level_plasticity[dados$sheep_plasticity == 5] ="With"
+dados$level_plasticity[dados$sheep_plasticity == 8] ="With"
 
 
 
@@ -150,16 +155,16 @@ str(shannon.dists)
 #View(shannon.dists)
 
 #rearrange factor levels
-shannon.dists$level_plasticity <- factor(shannon.dists$level_plasticity, levels = c("No", "Low", "Medium", "High"))
-shannon.dists$cost_plasticity <- factor(shannon.dists$cost_plasticity, levels = c("low", "high"))
+shannon.dists$level_plasticity <- factor(shannon.dists$level_plasticity, levels = c("Without", "With")) #Without and With # Low Medium High
+#shannon.dists$cost_plasticity <- factor(shannon.dists$cost_plasticity, levels = c("low", "high"))
 shannon.dists$perturbation <- factor(shannon.dists$perturbation, levels = c("low", "high"))
 shannon.dists$fractality <- factor(shannon.dists$fractality, levels = c("low", "high"))
 shannon.dists$Shannon.dists = shannon.dists$Shannon.dists * -1
 
 #ANOVA general
-modelgeneral1 = aov(shannon.dists$Shannon.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity +shannon.dists$fractality + shannon.dists$perturbation )
+modelgeneral1 = aov(shannon.dists$Shannon.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity + shannon.dists$fractality + shannon.dists$perturbation )
 summary(modelgeneral1)
-modelgeneral2 = lm(shannon.dists$Shannon.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity +shannon.dists$fractality + shannon.dists$perturbation )
+modelgeneral2 = lm(shannon.dists$Shannon.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity + shannon.dists$fractality + shannon.dists$perturbation)
 summary(modelgeneral2)
 kruskal.test(shannon.dists$Shannon.dists ~ shannon.dists$level_plasticity)
 #plot(shannon.dists$Shannon.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity + shannon.dists$fractality + shannon.dists$perturbation, ylab = "Resilience", ylim = c(-1.3, 0))
@@ -167,6 +172,82 @@ plot(shannon.dists$Shannon.dists ~ shannon.dists$level_plasticity, main = "Effec
 plot(shannon.dists$Shannon.dists ~ shannon.dists$cost_plasticity, main = "Effect of cost on resilience", xlab = "Cost Plasticity", ylab = "Resilience", ylim = c(-1.3, 0), cex.main = 1.5, cex.lab = 1.4)
 plot(shannon.dists$Shannon.dists ~ shannon.dists$fractality, main = "Effect of Fractality on resilience", xlab = "Fractality", ylab = "Resilience", ylim = c(-1.3, 0), cex.main = 1.5, cex.lab = 1.4)
 plot(shannon.dists$Shannon.dists ~ shannon.dists$perturbation, main = "Effect of Disturbance on resilience", xlab = "Disturbance", ylab = "Resilience", ylim = c(-1.3, 0), cex.main = 1.5, cex.lab = 1.4)
+
+################################################
+#Model Selection
+modelgeneral2 <- lm(shannon.dists$Shannon.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity + shannon.dists$fractality + shannon.dists$perturbation, na.action = na.omit)
+#ols_step_all_possible(modelgeneral2)
+#plot (modelgeneral2)
+#res <- resid(modelgeneral2)
+#par(mfrow=c(2,2))
+
+###AIC - forward
+one <- lm(shannon.dists$Shannon.dists ~ shannon.dists$level_plasticity)
+#two <- lm(shannon.dists$Shannon.dists ~ shannon.dists$fractality)
+#three <- lm(shannon.dists$Shannon.dists ~ shannon.dists$perturbation)
+#four <- lm(shannon.dists$Shannon.dists ~ shannon.dists$cost_plasticity)
+five <- lm(shannon.dists$Shannon.dists ~ shannon.dists$level_plasticity + shannon.dists$perturbation)
+six <- lm(shannon.dists$Shannon.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity)
+seven <- lm(shannon.dists$Shannon.dists ~ shannon.dists$level_plasticity + shannon.dists$fractality)
+eight <- lm(shannon.dists$Shannon.dists ~ shannon.dists$level_plasticity + shannon.dists$perturbation + shannon.dists$cost_plasticity)
+nine <- lm(shannon.dists$Shannon.dists ~ shannon.dists$level_plasticity + shannon.dists$perturbation + shannon.dists$fractality)
+ten <- lm(shannon.dists$Shannon.dists ~ shannon.dists$level_plasticity + shannon.dists$cost_plasticity + shannon.dists$fractality)
+eleven <- lm(shannon.dists$Shannon.dists ~ shannon.dists$level_plasticity + shannon.dists$perturbation + shannon.dists$cost_plasticity + shannon.dists$fractality)
+#twelve <- lm(shannon.dists$Shannon.dists ~ shannon.dists$fractality + shannon.dists$perturbation)
+#thirteen <- lm(shannon.dists$Shannon.dists ~ shannon.dists$cost_plasticity + shannon.dists$fractality)
+#fourteen <- lm(shannon.dists$Shannon.dists ~ shannon.dists$cost_plasticity + shannon.dists$fractality + shannon.dists$perturbation)
+#fifteen <- lm(shannon.dists$Shannon.dists ~ shannon.dists$cost_plasticity + shannon.dists$perturbation)
+
+AIC(one)
+#AIC(two)
+#AIC(three)
+#AIC(four)
+AIC(five)
+AIC(six)
+AIC(seven)
+AIC(eight)
+AIC(nine)
+AIC(ten)
+AIC(eleven)
+#AIC(twelve)
+#AIC(thirteen)
+#AIC(fourteen)
+#AIC(fifteen)
+
+resone <- resid(one)
+#restwo <- resid(two)
+#resthree <- resid(three)
+#resfour <- resid(four)
+resfive <- resid(five)
+ressix <- resid(six)
+resseven <- resid(seven)
+reseight <- resid(eight)
+resnine <- resid(nine)
+resten <- resid(ten)
+reseleven <- resid(eleven)
+#restwelve <- resid(twelve)
+#resthirteen <- resid(thirteen)
+#resfourteen <- resid(fourteen)
+#resfifteen <- resid(fifteen)
+
+plot(resone)
+#plot(restwo)
+#plot(resthree)
+#plot(resfour)
+plot(resfive)
+plot(ressix)
+plot(resseven)
+plot(reseight)
+plot(resnine)
+plot(resten)
+plot(reseleven)
+#plot(restwelve)
+#plot(resthirteen)
+#plot(resfourteen)
+#plot(fifteen)
+
+
+###################################################
 
 disturbance <- shannon.dists$perturbation
 
@@ -378,7 +459,7 @@ KernelAnalysis + scale_x_continuous(name = "Resilience") + scale_y_continuous(na
 ANOVAPLASTICITY <- ggplot(data = shannon.dists, aes(x= level_plasticity, y= Shannon.dists)) +
   geom_violin (width = 0.9) +
   ggtitle("Effect of plasticity on resilience") +
-  geom_boxplot (width = 0.1, color = "grey",  alpha = 0.2) +
+  geom_boxplot (width = 0.1, color = "grey",  alpha = 0.2, aes(fill = disturbance)) +
   scale_fill_viridis(discrete = TRUE) +
   #facet_grid( ~fractality, scales="free_y", space="free") + 
   theme_bw() + theme(plot.title = element_text(size = 12, face = 2, hjust = 0.5), axis.title.x = element_text(size = 14), axis.title.y = element_text(size = 14)) #+
@@ -471,3 +552,21 @@ ANOVAPLASTICITY <- ggplot(data = shannon.dists, aes(x= fractality, y= Shannon.di
 # stat_compare_means()
 #annotate("text", x = 2.2, y = 1.20, label = "P value: <2e-16 (all factors), R:0.80", color = "blue", size = 3) #+ rremove("grid") 
 ANOVAPLASTICITY + scale_x_discrete(name = "Fractality") + scale_y_continuous(name = "Resilience", limits = c(-1.20, 0)) 
+
+
+#AOV population
+worldpopulation <- lm(dados$abundance.total ~ dados$World.Size)
+summary(worldpopulation)
+dados$World.Size <- factor(dados$World.Size, levels = c("Little", "Medium", "Big"))
+plot(dados$abundance.total ~ dados$World.Size)
+
+ANOVAPOPULATION <- ggplot(data = dados, aes(x= World.Size, y= abundance.total)) +
+  geom_violin (width = 0.9) +
+  ggtitle("Effect World Size in Population Size") +
+  geom_boxplot (width = 0.1, color = "grey",  alpha = 0.2) +
+  scale_fill_viridis(discrete = TRUE) +
+  #facet_grid( ~fractality, scales="free_y", space="free") + 
+  theme_bw() + theme(plot.title = element_text(size = 12, face = 2, hjust = 0.5), axis.title.x = element_text(size = 14), axis.title.y = element_text(size = 14)) #+
+# stat_compare_means()
+#annotate("text", x = 2.2, y = 1.20, label = "P value: <2e-16 (all factors), R:0.80", color = "blue", size = 3) #+ rremove("grid") 
+ANOVAPOPULATION + scale_x_discrete(name = "World Size") + scale_y_continuous(name = "Population Size") 
