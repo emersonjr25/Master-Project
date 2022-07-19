@@ -1,0 +1,183 @@
+# install packages
+
+# install.packages("stats")
+# install.packages("olsrr"")
+# install.packages("ggplot2")
+# install.packages("agricolae")
+# install.packages("FactorMineR")
+# install.packages("dplyr")
+# install.packages("vegan")
+# install.packages("agricolae")
+# install.packages("ggpubr")
+# install.packages("hexbin")
+# install.packages("hrbrthemes")
+# install.packages("viridis")
+# install.packages("olsrr")
+# install.packages("here")
+# install.packages("MASS")
+# install.packages("lmtest")
+
+# carrying packages
+library(olsrr)
+library(MASS)
+library(ggpubr)
+library(stats)
+library(ggplot2)
+library(dplyr)
+library(lmtest)
+library(car)
+library(here)
+library(vegan)
+library(agricolae)
+library(hexbin)
+library(hrbrthemes)
+library(viridis)
+
+#Loading data
+
+### ALL WORLD ###
+dados_all <- read.csv(("to_analysis.csv"), header = TRUE, sep = ";", dec = ",")
+
+dados_specialization <- read.csv(("shannondistspecialization_all.csv"), header = TRUE, sep = ";", dec = ",")
+
+dados_trophic <- read.csv2(("shannondistpreyandpredator_all.csv"), header = TRUE, sep = ";", dec = ",")
+
+# organize
+
+### ALL WORLD ####
+dados_all$level_plasticity <- factor(dados_all$level_plasticity, levels = c("Low", "Medium", "High")) 
+dados_all$cost_plasticity <- factor(dados_all$cost_plasticity, levels = c("Low", "High"))
+dados_all$perturbation <- factor(dados_all$perturbation, levels = c("low extent", "high extent"))
+dados_all$fractality <- factor(dados_all$fractality, levels = c("scattered", "clustered"))
+dados_all$Shannon.dists <- as.numeric(gsub(",", ".", gsub("\\.", "", dados_all$Shannon.dists)))
+dados_all$Shannon.dists = dados_all$Shannon.dists * -1
+dados_all$WorldSize = factor(dados_all$WorldSize, levels = c("Smaller World", "Regular World", "Larger World"))
+
+dados_specialization$dados_little = dados_specialization$dados_little * -1
+dados_specialization$specialization <- factor(dados_specialization$specialization, levels = c("Generalist", "Intermediary", "Specialist"))
+dados_specialization$World.Size = factor(dados_specialization$World.Size, levels = c("Smaller World", "Regular World", "Larger World"))
+
+dados_trophic$dados_little <- as.numeric(gsub(",", ".", gsub("\\.", "", dados_trophic$dados_little)))
+dados_trophic$dados_little  = dados_trophic$dados_little* -1
+dados_trophic$typeanimal <- factor(dados_trophic$typeanimal, levels = c("Herbivore", "Carnivore"))
+dados_trophic$WorldSize = factor(dados_trophic$WorldSize, levels = c("Smaller World", "Regular World", "Larger World"))
+
+# graphs
+
+disturbance <- dados_all$perturbation
+
+### DISTURBANCE EXTENSION ####
+
+ANOVADISTURBANCEALL <- ggplot(data = dados_all, aes(x= disturbance, y= Shannon.dists)) +
+  geom_violin (width = 0.9) +
+  #ggtitle("Effect of disturbance extent on resilience") +
+  geom_boxplot (width = 0.3, color = "grey",  alpha = 0.2, fill = "red") +
+  scale_fill_viridis(discrete = TRUE) +
+  #facet_grid( ~fractality, scales="free_y", space="free") + 
+  theme_bw() + theme(plot.title = element_text(size = 20, face = 2, hjust = 0.5), axis.title.x = element_text(size = 15), axis.title.y = element_text(size = 15), axis.text = element_text(size = 13), panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) 
+
+ANOVADISTURBANCEALL <- ANOVADISTURBANCEALL + scale_x_discrete(name = "Disturbance Extent") + scale_y_continuous(name = "Resilience", limits = c(-1.20, 0))
+
+ANOVADISTURBANCEALL <- ANOVADISTURBANCEALL + facet_wrap( ~ dados_all$WorldSize)
+
+ANOVADISTURBANCEALL
+
+# tiff("ANOVADISTURBANCEALL.tiff",
+#     width = 25,
+#      height = 15,
+#      units = "cm",
+#      res = 300)
+# ANOVADISTURBANCEALL
+# dev.off()
+
+### PLASTICITY, COST, AND DISTURBANCE CLUSTERING ####
+
+ANOVAPLASTICITYALL <- ggplot(data = dados_all, aes(x= level_plasticity, y= Shannon.dists, fill = disturbance)) +
+  geom_violin (width = 0.9, fill = "white") +
+  geom_boxplot (width = 0.4, color = "grey",  alpha = 0.2) +
+  scale_fill_viridis(discrete = TRUE) +
+  #facet_grid( ~fractality, scales="free_y", space="free") + 
+  theme_bw() + theme(plot.title = element_text(size = 18, face = 2, hjust = 0.5), axis.title.x = element_text(size = 15), axis.title.y = element_text(size = 15), axis.text = element_text(size = 13), panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"), legend.position = "top") + ggtitle("Effect of plasticity, disturbance extent, plasticity cost, and disturbance clustering on resilience")
+
+ANOVAPLASTICITYALL <- ANOVAPLASTICITYALL + scale_x_discrete(name = "Plasticity") + scale_y_continuous(name = "Resilience", limits = c(-1.20, 0)) 
+
+ANOVAPLASTICITYALL <- ANOVAPLASTICITYALL + facet_wrap(~ WorldSize)
+
+ANOVAPLASTICITYALL 
+
+ANOVACOSTALL <- ggplot(data = dados_all, aes(x= cost_plasticity, y= Shannon.dists)) +
+  geom_violin (width = 0.9, fill = "white") +
+  #ggtitle("Effect of plasticity cost on resilience") +
+  geom_boxplot (width = 0.3, color = "grey",  alpha = 0.2, fill = "red") +
+  scale_fill_viridis(discrete = TRUE) +
+  #facet_grid( ~fractality, scales="free_y", space="free") + 
+  theme_bw() + theme(plot.title = element_text(size = 20, face = 2, hjust = 0.5), axis.title.x = element_text(size = 15), axis.title.y = element_text(size = 15), axis.text = element_text(size = 13), panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) #+
+
+ANOVACOSTALL <- ANOVACOSTALL + scale_x_discrete(name = "Plasticity Cost") + scale_y_continuous(name = "Resilience", limits = c(-1.20, 0)) 
+ANOVACOSTALL <- ANOVACOSTALL + facet_wrap(~ WorldSize)
+
+ANOVACOSTALL
+
+ANOVAFORMALL <- ggplot(data = dados_all, aes(x= fractality, y= Shannon.dists)) +
+  geom_violin (width = 0.9, fill = "white") +
+  # ggtitle("Effect of disturbance clustering on resilience") +
+  geom_boxplot (width = 0.3, color = "grey",  alpha = 0.2, fill = "red") +
+  scale_fill_viridis(discrete = TRUE) +
+  #facet_grid( ~fractality, scales="free_y", space="free") + 
+  theme_bw() + theme(plot.title = element_text(size = 16, face = 2, hjust = 0.5), axis.title.x = element_text(size = 15), axis.title.y = element_text(size = 15), axis.text = element_text(size = 13), panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) #+
+
+ANOVAFORMALL <- ANOVAFORMALL+ scale_x_discrete(name = "Disturbance Clustering") + scale_y_continuous(name = "Resilience", limits = c(-1.20, 0)) 
+ANOVAFORMALL <- ANOVAFORMALL + facet_wrap(~ WorldSize)
+
+ANOVAFORMALL 
+
+Figure_2 <- ggarrange(ANOVAPLASTICITYALL, ANOVADISTURBANCEALL, ANOVACOSTALL, ANOVAFORMALL, nrow = 4, common.legend = TRUE, labels = "AUTO")
+
+tiff("Figure_2.tiff",
+     width = 32,
+     height = 35,
+     units = "cm",
+     res = 300)
+Figure_2
+dev.off()
+
+##### TROPHICAL LEVEL AND SPECIALIZATION #####
+
+ANOVASPECIALIZATIONALL <- ggplot(data = dados_specialization, aes(x= specialization, y= dados_little)) +
+  geom_violin (width = 0.9, fill = "white") +
+  ggtitle("Effect of specialization and trophic level on resilience") +
+  geom_boxplot (width = 0.3, color = "grey",  alpha = 0.2, fill = "red") +
+  scale_fill_viridis(discrete = TRUE) +
+  #facet_grid( ~fractality, scales="free_y", space="free") + 
+  theme_bw() + theme(plot.title = element_text(size = 20, face = 2, hjust = 0.5), axis.title.x = element_text(size = 15), axis.title.y = element_text(size = 15), panel.border = element_blank(), panel.grid.major = element_blank(), axis.text = element_text(size = 13), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) #+
+
+ANOVASPECIALIZATIONALL <- ANOVASPECIALIZATIONALL + scale_x_discrete(name = "Specialization Levels") + scale_y_continuous(name = "Resilience", limits = c(-1.20, 0)) 
+
+ANOVASPECIALIZATIONALL <- ANOVASPECIALIZATIONALL + facet_wrap(~ dados_specialization$World.Size)
+
+ANOVASPECIALIZATIONALL
+
+ANOVATROPHICALL <- ggplot(data = dados_trophic, aes(x= dados_trophic$typeanimal, y= dados_little)) +
+  geom_violin (width = 0.9, fill = "white") +
+  #ggtitle("Effect of trophic level on resilience") +
+  geom_boxplot (width = 0.3, color = "grey",  alpha = 0.2, fill = "red") +
+  scale_fill_viridis(discrete = TRUE) +
+  #facet_grid( ~fractality, scales="free_y", space="free") + 
+  theme_bw() + theme(plot.title = element_text(size = 12, face = 2, hjust = 0.5), axis.title.x = element_text(size = 15), axis.title.y = element_text(size = 15), axis.text = element_text(size = 13), panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) #+
+
+ANOVATROPHICALL <- ANOVATROPHICALL + scale_x_discrete(name = "Trophic Level") + scale_y_continuous(name = "Resilience", limits = c(-1.20, 0)) 
+
+ANOVATROPHICALL <- ANOVATROPHICALL + facet_wrap(~ WorldSize)
+
+ANOVATROPHICALL
+
+Figure_3 <- ggarrange(ANOVASPECIALIZATIONALL, ANOVATROPHICALL, nrow = 2, labels = "AUTO", common.legend = TRUE)
+
+# tiff("Figure_3.tiff",
+# width = 28,
+# height = 20,
+# units = "cm",
+# res = 300)
+# Figure_3
+# dev.off()
+
